@@ -1,2 +1,0 @@
-# KidVenture
-CS Capstone project
