@@ -1,0 +1,243 @@
+body {
+    margin: 0px;
+    padding: 0px;
+    background-color: #b0c9c4; 
+    overflow: hidden;
+    font-family: system-ui;
+}
+
+.clearfix {
+    clear: both;
+}
+
+.logo {
+    margin: 0px;
+    margin-left: 28px;
+    font-weight: bold;
+    color: #cadec8; /* Soft Mint */
+    margin-bottom: 30px;
+    font-size: 36px;
+}
+
+.logo span {
+    color: #84aca3; /* Light Teal */
+}
+
+.sidenav {
+    height: 100%;
+    width: 300px;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    background-color: #4c6f66; /* Dark Teal */
+    overflow: hidden;
+    transition: .5s;
+    padding-top: 30px;
+}
+
+.sidenav a {
+    padding: 15px 8px 15px 32px;
+    text-decoration: none;
+    font-size: 20px;
+    color: #cadec8; /* Soft Mint */
+    display: block;
+    transition: 0.3s;
+}
+
+.sidenav a:hover {
+    color: #25433d; /* Deep Green */
+    background-color: #84aca3; /* Light Teal Accent */
+}
+
+#main {
+    transition: margin-left .5s;
+    padding: 16px;
+    margin-left: 300px;
+    /* background-color: #b0c9c4; Cool Gray */
+}
+
+.head {
+    padding: 20px;
+    /* background-color: #4c6f66; Dark Teal */
+    color: #cadec8; /* Soft Mint */
+    font-size: 24px;
+    font-weight: bold;
+    /* border-bottom: 2px solid #718f89; Gray-Green Border */
+}
+
+.col-div-6 {
+    width: 50%;
+    float: left;
+}
+
+.profile {
+    display: inline-block;
+    float: right;
+    width: 160px;
+}
+
+.pro-img {
+    float: left;
+    width: 40px;
+    margin-top: 5px;
+}
+
+.profile p {
+    color: #cadec8; /* Soft Mint */
+    font-weight: 500;
+    margin-left: 55px;
+    margin-top: 10px;
+    font-size: 13.5px;
+}
+
+.profile p span {
+    font-weight: 400;
+    font-size: 12px;
+    display: block;
+    color: #718f89; /* Gray-Green */
+}
+
+.nav2 {
+    display: none;
+}
+
+.col-div-3 {
+    width: 25%;
+    float: left;
+}
+
+.box {
+    width: 85%;
+    height: 100px;
+    background-color: #4c6f66; /* Dark Teal */
+    margin-left: 10px;
+    padding: 10px;
+}
+
+.box p {
+    font-size: 35px;
+    color: #cadec8; /* Soft Mint */
+    font-weight: bold;
+    line-height: 30px;
+    padding-left: 10px;
+    margin-top: 20px;
+    display: inline-block;
+}
+
+.box p span {
+    font-size: 20px;
+    font-weight: 400;
+    color: #718f89; /* Gray-Green */
+}
+
+.box-icon {
+    font-size: 40px !important;
+    float: right;
+    margin-top: 35px !important;
+    color: #718f89; /* Gray-Green */
+    padding-right: 10px;
+}
+
+.col-div-8 {
+    width: 70%;
+    float: left;
+}
+
+.col-div-4 {
+    width: 30%;
+    float: left;
+}
+
+.content-box {
+    padding: 20px;
+    /* margin-top: 100px; */
+}
+
+.content-box p {
+    margin: 0px;
+    font-size: 20px;
+    color: #84aca3; /* Light Teal */
+}
+
+.content-box p span {
+    float: right;
+    background-color: #84aca3; /* Light Teal */
+    padding: 3px 10px;
+    font-size: 15px;
+    color: #25433d; /* Deep Green */
+}
+
+.box-8, .box-4 {
+    width: 96.5%;
+    background-color: #4c6f66; /* Dark Teal */
+    height: 330px;
+}
+
+.box-8 {
+    margin-left: 10px;
+    width: 95%;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+td, th {
+    text-align: left;
+    padding: 15px;
+    color: #25433d; /* Deep Green */
+    border-bottom: 1px solid #718f8949; /* Gray-Green Transparent */
+}
+
+table tr:nth-child(even) {
+    background-color: #cadec8; /* Soft Mint Alternating Rows */
+}
+
+table tr:nth-child(odd) {
+    background-color: #b0c9c4; /* Cool Gray Alternating Rows */
+}
+
+.circle-wrap {
+    margin: 50px auto;
+    width: 150px;
+    height: 150px;
+    background: #84aca3; /* Light Teal */
+    border-radius: 50%;
+}
+
+.circle-wrap .circle .mask,
+.circle-wrap .circle .fill {
+    width: 150px;
+    height: 150px;
+    position: absolute;
+    border-radius: 50%;
+}
+
+.circle-wrap .circle .mask {
+    clip: rect(0px, 150px, 150px, 75px);
+}
+
+.circle-wrap .circle .mask .fill {
+    clip: rect(0px, 75px, 150px, 0px);
+    background-color: #84aca3; /* Light Teal */
+}
+
+
+
+.circle-wrap .inside-circle {
+    width: 130px;
+    height: 130px;
+    border-radius: 50%;
+    background: #cadec8; /* Soft Mint */
+    line-height: 130px;
+    text-align: center;
+    margin-top: 10px;
+    margin-left: 10px;
+    position: absolute;
+    z-index: 100;
+    font-weight: 700;
+    font-size: 2em;
+    color: #25433d; /* Deep Green */
+}
