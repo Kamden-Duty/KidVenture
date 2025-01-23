@@ -8,7 +8,8 @@ urlpatterns = [
     path('home', views.home, name='home'),
     path('logout/', views.logout_view, name='logout_view'),
     path('create_class/', views.create_class, name='create_class'),
-    # path('student_page/', views.home, name='student'),
-    # path('teacher_page/', views.home, name='teacher'),
+    path('student_page/', views.home, name='student'),
+    path('teacher_page/', views.home, name='teacher'),
+    path('matching_game/', views.matching_game, name='matching_game'),
     
 ]

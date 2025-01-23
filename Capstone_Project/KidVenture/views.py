@@ -132,3 +132,5 @@ def create_class(request):
         form = CreateClassForm()
     return render(request, 'KidVenture/create_class.html', {'form': form})
     
+def matching_game(request):
+    return render(request, "KidVenture/matching_game.html")
