@@ -5,17 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Matching Game</title>
     {% load static %}
-    <link rel="stylesheet" href="{% static 'KidVenture/css/alphabet_matching.css' %}">
-
+    <link
+      rel="stylesheet"
+      href="{% static 'KidVenture/css/alphabet_matching.css' %}"
+    />
   </head>
   <body>
     <h1>Matching Game</h1>
     <div id="timer">Time: 0 seconds</div>
     <div class="score-container">
-        <div id="score">Score: 0 / 10</div>
-        <div id="mismatched">Mismatched: 0</div>
+      <div id="score">Score: 0 / 10</div>
+      <div id="mismatched">Mismatched: 0</div>
     </div>
-    <div>hello world</div>
     <div id="game-board"></div>
 
     <!-- Audio elements for sound effects -->
@@ -159,33 +160,33 @@
           secondCard = clickedCard;
 
           if (
-              firstCard.dataset.card.toLowerCase() ===
-              secondCard.dataset.card.toLowerCase()
-            ) {
-              firstCard.classList.add("matched");
-              secondCard.classList.add("matched");
+            firstCard.dataset.card.toLowerCase() ===
+            secondCard.dataset.card.toLowerCase()
+          ) {
+            firstCard.classList.add("matched");
+            secondCard.classList.add("matched");
+            firstCard = null;
+            secondCard = null;
+            matches++;
+            updateScore();
+
+            if (matches === totalMatches) {
+              stopTimer();
+              setTimeout(advanceToNextLevel, 2000);
+            }
+          } else {
+            mismatchCount++; // Increment mismatch count
+            firstCard.classList.add("mismatched");
+            secondCard.classList.add("mismatched");
+            updateScore();
+
+            setTimeout(() => {
+              firstCard.classList.remove("selected", "mismatched");
+              secondCard.classList.remove("selected", "mismatched");
               firstCard = null;
               secondCard = null;
-              matches++;
-              updateScore();
-
-              if (matches === totalMatches) {
-                stopTimer();
-                setTimeout(advanceToNextLevel, 2000);
-              }
-            } else {
-              mismatchCount++; // Increment mismatch count
-              firstCard.classList.add("mismatched");
-              secondCard.classList.add("mismatched");
-              updateScore();
-
-              setTimeout(() => {
-                firstCard.classList.remove("selected", "mismatched");
-                secondCard.classList.remove("selected", "mismatched");
-                firstCard = null;
-                secondCard = null;
-              }, 1000);
-            }
+            }, 1000);
+          }
         }
       }
 
