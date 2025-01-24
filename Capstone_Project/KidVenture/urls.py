@@ -10,6 +10,6 @@ urlpatterns = [
     path('create_class/', views.create_class, name='create_class'),
     path('student_page/', views.home, name='student'),
     path('teacher_page/', views.home, name='teacher'),
-    path('matching_game/', views.matching_game, name='matching_game'),
+    path('alphabet_matching/', views.alphabet_matching, name='alphabet_matching'),
     
 ]
