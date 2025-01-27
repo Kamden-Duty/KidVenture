@@ -134,3 +134,9 @@ def create_class(request):
     
 def alphabet_matching(request):
     return render(request, "KidVenture/alphabet_matching.html")
+
+def alphabet_memory(request):
+    return render(request, "KidVenture/alphabet_memory.html")
+
+def game_selection(request):
+    return render(request, "KidVenture/game_selection.html")

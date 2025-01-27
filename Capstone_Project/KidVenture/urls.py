@@ -11,5 +11,7 @@ urlpatterns = [
     path('student_page/', views.home, name='student'),
     path('teacher_page/', views.home, name='teacher'),
     path('alphabet_matching/', views.alphabet_matching, name='alphabet_matching'),
+    path('alphabet_memory/', views.alphabet_memory, name='alphabet_memory'),
+    path('game_selection/', views.game_selection, name='game_selection'),
     
 ]

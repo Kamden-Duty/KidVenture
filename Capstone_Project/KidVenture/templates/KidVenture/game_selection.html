@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Game Selection</title>
+    {% load static %}
+    <link
+      rel="stylesheet"
+      href="{% static 'KidVenture/css/game_selection.css' %}"
+    />
+  </head>
+  <body>
+    <h1>Select a Game</h1>
+    <button onclick="window.location.href='{% url 'alphabet_matching' %}'">
+      Play Alphabet Game
+    </button>
+    <button onclick="window.location.href='{% url 'alphabet_memory' %}'">
+      Play Alphabet Memory Game
+    </button>
+  </body>
+</html>

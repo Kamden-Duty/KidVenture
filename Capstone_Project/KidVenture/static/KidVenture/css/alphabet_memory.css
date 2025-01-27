@@ -1,0 +1,87 @@
+body {
+    font-family: "Comic Sans MS", "Comic Sans", cursive;
+    text-align: center;
+    background-color: #fce4ec;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100vh;
+  }
+
+  h1 {
+    font-size: 36px;
+    color: #d81b60;
+    margin-bottom: 20px;
+  }
+
+  #timer,
+  #score,
+  #mismatched {
+    font-size: 24px;
+    margin: 10px 0;
+    color: #6a1b9a;
+  }
+
+  .score-container {
+    display: flex;
+    gap: 20px; 
+    justify-content: center;
+    margin-top: 10px;
+  }
+
+  #game-board {
+    display: flex;
+    flex-wrap: wrap; 
+    gap: 15px;
+    justify-content: center;
+    max-width: 80%;
+    margin: 30px auto;
+  }
+
+  .card {
+    width: 100px;
+    height: 100px;
+    perspective: 1000px;
+    cursor: pointer;
+    position: relative;
+  }
+
+  .card-inner {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+    transform: rotateY(180deg); /* Start with back side visible */
+    transition: transform 0.6s ease-in-out;
+  }
+
+  .card.flip .card-inner {
+    transform: rotateY(0deg); /* Flip to reveal front side */
+  }
+
+  .card-front,
+  .card-back {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    backface-visibility: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 15px;
+    box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2);
+    background-color: #ffecb3;
+    border: 2px solid #3e2723;
+    color: #5c6bc0;
+  }
+
+  .card-front {
+    font-size: 36px;
+    font-weight: bold;
+  }
+
+  .card-back {
+    transform: rotateY(180deg); 
+  }
