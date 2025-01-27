@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Memory Game</title>
+    {% load static %}
+    <link
+      rel="stylesheet"
+      href="{% static 'KidVenture/css/alphabet_memory.css' %}"
+    />
+  </head>
+  <body>
+    <div>
+      <a href="{% url 'game_selection' %}">Back to Game Selection</a>
+    </div>
+    <h1>Memory Game</h1>
+    <p>Match the uppercase and lowercase letters</p>
+    <div id="timer">Time: 0 seconds</div>
+    <div class="score-container">
+      <div id="score">Score: 0 / 10</div>
+      <div id="mismatched">Mismatched: 0</div>
+    </div>
+    <div id="game-board"></div>
+
+    <!-- Audio elements for sound effects -->
+    <audio
+      id="card-click-sound"
+      src="{% static 'KidVenture/sound_effects/card_click_sound.mp3' %}"
+      preload="auto"
+    ></audio>
+    <audio
+      id="match-sound"
+      src="{% static 'KidVenture/sound_effects/correct.mp3' %}"
+      preload="auto"
+    ></audio>
+    <audio
+      id="mismatch-sound"
+      src="{% static 'KidVenture/sound_effects/mismatch-sound.mp3' %}"
+      preload="auto"
+    ></audio>
+    <audio
+      id="level-up-sound"
+      src="{% static 'KidVenture/sound_effects/LevelUp.mp3' %}"
+      preload="auto"
+    ></audio>
+
+    <script src="{% static 'KidVenture/scripts/alphabet_memory.js' %}"></script>
+  </body>
+</html>

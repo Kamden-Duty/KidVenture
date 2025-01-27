@@ -132,3 +132,11 @@ def create_class(request):
         form = CreateClassForm()
     return render(request, 'KidVenture/create_class.html', {'form': form})
     
+def alphabet_matching(request):
+    return render(request, "KidVenture/alphabet_matching.html")
+
+def alphabet_memory(request):
+    return render(request, "KidVenture/alphabet_memory.html")
+
+def game_selection(request):
+    return render(request, "KidVenture/game_selection.html")
