@@ -140,6 +140,7 @@ def create_class(request):
         form = CreateClassForm()
     return render(request, 'KidVenture/create_class.html', {'form': form})
     
+
 def classes(request):
     if not request.user.is_teacher:
             return redirect('home')
@@ -275,3 +276,13 @@ def delete_student(request, student_id, class_id):
     if request.method == "POST":
         student.delete()
         return redirect("teacher_students")
+
+def alphabet_matching(request):
+    return render(request, "KidVenture/alphabet_matching.html")
+
+def alphabet_memory(request):
+    return render(request, "KidVenture/alphabet_memory.html")
+
+def game_selection(request):
+    return render(request, "KidVenture/game_selection.html")
+

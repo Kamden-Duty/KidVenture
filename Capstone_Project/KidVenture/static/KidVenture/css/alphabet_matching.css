@@ -1,0 +1,96 @@
+body {
+    font-family: "Comic Sans MS", "Comic Sans", cursive;
+    text-align: center;
+    background-color: #fce4ec;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100vh;
+  }
+
+  h1 {
+    font-size: 36px;
+    color: #d81b60;
+    margin-bottom: 20px;
+  }
+
+  #timer,
+  #score,
+  #mismatched {
+    font-size: 24px;
+    margin: 10px 0;
+    color: #6a1b9a;
+  }
+
+  .score-container {
+    display: flex;
+    gap: 20px; /* Adjust the gap between the score and mismatched count as needed */
+    justify-content: center; /* Center the content horizontally */
+    margin-top: 10px; /* Add some margin at the top */
+}
+
+  #game-board {
+        display: flex;
+        flex-wrap: wrap; /* Allows wrapping to the next line if needed */
+        gap: 15px;
+        justify-content: center;
+        max-width: 80%;
+        margin: 30px auto;
+    }
+
+  .card {
+    width: 100px;
+    height: 100px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #ffecb3;
+    color: #5c6bc0;
+    font-size: 36px;
+    font-weight: bold;
+    border-radius: 15px;
+    border: 2px solid #3e2723;
+    box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    transition: transform 0.3s, background-color 0.3s;
+  }
+
+  .card:hover {
+    transform: scale(1.1);
+  }
+
+  .selected {
+    background-color: #ffffff;
+  }
+
+  .mismatched {
+    background-color: #ff8a80;
+  }
+
+  .matched {
+    background-color: #a5d6a7;
+    pointer-events: none;
+  }
+
+  button {
+    font-size: 18px;
+    padding: 10px 20px;
+    background-color: #8e24aa;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+  }
+
+  button:hover {
+    background-color: #ab47bc;
+    transform: scale(1.05);
+  }
+
+  button:active {
+    background-color: #6a1b9a;
+    transform: scale(0.95);
+  }
