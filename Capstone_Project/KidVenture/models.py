@@ -33,3 +33,39 @@ class Student(models.Model):
 
     def __str__(self):
          return self.user.username if self.user else "Unassigned Student"
+
+class Activity(models.Model):
+    name = models.CharField(max_length=255)  # Name of the activity
+    description = models.TextField(blank=True, null=True)  # Optional description
+    progress = models.IntegerField(default=0)  # Progress percentage (0-100)
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='activities')  # Link to a student
+    url_name = models.CharField(max_length=50, blank=True, null=True)  # URL name for activity navigation
+    completed = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.name} - {self.student.user.username if self.student and self.student.user else 'Unassigned'}"
+    
+class LeaderboardEntry(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='leaderboard_entry')
+    points = models.IntegerField(default=0)
+    
+    def __str__(self):
+        return f"{self.user.username} - {self.points} points"
+    
+class Badge(models.Model):
+    name = models.CharField(max_length=100)
+    image = models.ImageField(upload_to='badges/')
+    student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='badges')
+    
+    def __str__(self):
+        return self.name 
+    
+class Notification(models.Model):
+    title = models.CharField(max_length=255)  # The title of the notification
+    message = models.TextField()  # The main content of the notification
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="notifications")  # Link to the recipient
+    date = models.DateTimeField(auto_now_add=True)  # Automatically set when the notification is created
+    read = models.BooleanField(default=False)  # Whether the notification has been read
+
+    def __str__(self):
+        return f"Notification for {self.user.username}: {self.title}"
