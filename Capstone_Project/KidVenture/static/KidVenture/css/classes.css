@@ -1,0 +1,163 @@
+Main Container Styling
+.classes-container {
+    display: flex;
+    flex-wrap: wrap; /* Allows flexibility for smaller screens */
+    justify-content: space-between; /* Evenly spaces the boxes */
+    gap: 20px; /* Spacing between the boxes */
+    padding: 20px; /* Padding around the container */
+    box-sizing: border-box;
+    margin-top: -60px; /* Pull the container upward */
+}
+
+/* Box-8 Styling (Manage Classes) */
+.box-8 {
+    width: 80%; /* Width of the box */
+    padding: 20px;
+    margin: 20px auto; /* Center the box horizontally */
+    box-sizing: border-box; /* Includes padding in the width/height */
+    background-color: #4c6f66;
+    border: 1px solid #ddd;
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    min-height: 450px; /* Ensure enough height for the table and label */
+    max-height: 500px; /* Adjust for visual constraints, if needed */
+    display: flex;
+    flex-direction: column; /* Ensures content stacks vertically */
+    justify-content: flex-start; /* Align content at the top */
+    overflow: hidden; /* Prevent content overflow */
+}
+
+/* Box-4 Styling (Create Class) */
+.box-4 {
+    width: 80%; /* Adjust to match other sections */
+    padding: 15px; /* Reduced padding for less height */
+    margin: 20px auto; /* Center the box horizontally */
+    box-sizing: border-box;
+    background-color: #f7f7f7;
+    border: 1px solid #ddd;
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    min-height: 200px; /* Decreased minimum height */
+    max-height: 250px; /* Optional: Cap the height if necessary */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start; /* Align content to the top */
+}
+
+/* Content Box Styling */
+.content-box {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 15px;
+    border-radius: 6px;
+}
+
+/* Label Styling */
+.p-lable {
+    font-size: 18px;
+    font-weight: bold;
+    color: #ffffff; /* Matches header text */
+    margin-bottom: 10px;
+    padding-left: 15px; /* Aligns with table padding */
+}
+
+/* Table Styling */
+.content-table {
+    border-collapse: collapse;
+    margin: 25px 0;
+    font-size: 0.9em;
+    min-width: 400px; /* Ensures the table has a minimum width */
+    border-radius: 5px 5px 0 0; /* Rounded corners on the top */
+    overflow: hidden; /* Ensures content doesn't overflow the corners */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Adds a subtle shadow */
+}
+
+.content-table thead tr {
+    /* background-color: red !important; Header background color */
+    color: #ffffff; /* White text for the header */
+    text-align: left;
+    font-weight: bold;
+}
+
+th {
+    background-color: #cadec8;
+}
+
+.content-table th, .content-table td {
+    padding: 12px 15px; /* Consistent padding for cells */
+}
+
+.content-table tbody tr {
+    border-bottom: 1px solid #dddddd; /* Light border between rows */
+}
+
+.content-table tbody tr:nth-of-type(even) {
+    background-color: #f3f3f3; /* Alternate row background */
+}
+
+.content-table tbody tr:last-of-type {
+    border-bottom: 2px solid red; /* Matches the header color */
+}
+
+.content-table tbody tr.active-row {
+    font-weight: bold; /* Highlights an active row */
+    color: red; /* Matches the header color */
+}
+
+.content-table tr:nth-child(even) {
+    background-color: #f9f9f9; /* Alternating row colors */
+}
+
+.content-table tr:nth-child(odd) {
+    background-color: #ffffff;
+}
+
+.content-table tr:hover {
+    background-color: #e8f0fe; /* Slight hover effect */
+}
+
+/* Delete Button Styling */
+.delete-btn {
+    padding: 8px 12px; /* Padding for button size */
+    color: white;
+    background-color: #ff4d4d;
+    border: none;
+    border-radius: 4px; /* Rounded corners */
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.delete-btn:hover {
+    background-color: #ff1a1a; /* Darker red on hover */
+}
+
+/* Submit Button Styling */
+.submit-btn {
+    padding: 10px; /* Padding for button size */
+    color: white;
+    background-color: #4CAF50;
+    border: none;
+    border-radius: 4px; /* Rounded corners */
+    font-size: 14px;
+    cursor: pointer;
+    width: 100%; /* Button spans full width */
+    transition: background-color 0.3s ease;
+}
+
+.submit-btn:hover {
+    background-color: #45a049; /* Slightly darker green on hover */
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .box-8, .box-4 {
+        width: 100%; /* Boxes take full width on smaller screens */
+    }
+
+    .content-table {
+        display: block;
+        overflow-x: auto; /* Allow horizontal scrolling if needed */
+        white-space: nowrap; /* Prevent text wrapping */
+    }
+}

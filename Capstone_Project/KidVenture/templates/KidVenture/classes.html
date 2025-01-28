@@ -1,0 +1,67 @@
+{% extends 'KidVenture/teacher_base.html' %}
+
+{% block title %}Classes{% endblock%}
+
+{% block pageName %}
+    <span style="font-size: 30px; cursor: pointer; color: white;" class="nav">&#9776; Classes</span>
+    <span style="font-size: 30px; cursor: pointer; color: white;" class="nav2">&#9776; Classes</span>
+    <!-- {% load static %}
+    <link rel="stylesheet" href="{% static 'KidVenture/css/classes.css' %}"> -->
+{% endblock %}
+
+{% block content %}
+<div class="classes-container">
+    <!-- Classes Section -->
+    <div class="box-8">
+        <div class="content-box">
+            <p class="p-lable">Manage Your Classes</p>
+            <br />
+            <table class="content-table">
+                <thead>
+                    <tr>
+                        <th>Class Name</th>
+                        <th>Access Token</th>
+                        <th>Students</th>
+                        <th>Actions</th> <!-- New column for delete buttons -->
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for classroom in request.user.classes.all %}
+                    <tr>
+                        <td>{{ classroom.name }}</td>
+                        <td>{{ classroom.access_token }}</td>
+                        <td>{{ classroom.students.count }}</td>
+                        <td>
+                            <form action="{% url 'delete_class' classroom.id %}" method="POST" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="delete-btn" title="Delete Class">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4">You have no classes yet. Use the form on the right to create one.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            
+            
+        </div>
+    </div>
+
+    <!-- Create Class Form -->
+    <div class="box-4">
+        <div class="content-box">
+            <h2>Create a New Class</h2>
+            <form method="post" action="{% url 'create_class' %}">
+                {% csrf_token %}
+                <label for="name">Class Name:</label><br>
+                <input type="text" id="name" name="name" required style="width: 100%; margin-bottom: 10px;"><br>
+                <button type="submit" class="submit-btn" style="width: 100%;">Create Class</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

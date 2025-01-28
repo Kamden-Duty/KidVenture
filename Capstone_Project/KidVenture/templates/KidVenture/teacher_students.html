@@ -1,0 +1,53 @@
+{% extends 'KidVenture/teacher_base.html' %}
+
+{% block title %}Student Overview{% endblock%}
+
+{% block pageName %}
+    <span style="font-size: 30px; cursor: pointer; color: white;" class="nav">&#9776; Students</span>
+    <span style="font-size: 30px; cursor: pointer; color: white;" class="nav2">&#9776; Students</span>
+{% endblock %}
+
+{% block content %}
+<div class="content-box">
+    <h2>Student Overview</h2>
+
+    <!-- Search Bar -->
+    <input type="text" id="search-bar" placeholder="Search by student or class..." onkeyup="filterTable()" style="width: 100%; padding: 10px; margin-bottom: 20px;">
+
+    <!-- Export Button -->
+    <button onclick="exportTableToCSV()" style="margin-bottom: 20px; padding: 10px 20px; background-color: #84aca3; color: #4c6f66;; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">Export as CSV</button>
+
+    <!-- Table -->
+    <table class="student-overview-table" id="student-table" data-sort-asc="false">
+        <thead>
+            <tr>
+                <th onclick="sortTable(0)" style="cursor: pointer;">Student Name</th>
+                <th onclick="sortTable(1)" style="cursor: pointer;">Class</th>
+                <th onclick="sortTable(2)" style="cursor: pointer;">Token</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for classroom in classes %}
+                {% for student in classroom.students.all %}
+                <tr>
+                    <td>{{ student.user.username }}</td>
+                    <td>{{ classroom.name }}</td>
+                    <td>{{ classroom.access_token }}</td>
+                    <td>
+                        <form method="POST" action="{% url 'delete_student' student.id classroom.id %}" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="delete-btn">Remove</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            {% endfor %}
+        </tbody>
+    </table>
+    
+
+{% load static %}
+<script src="{% static 'KidVenture/js/student_overview.js' %}"></script>
+
+{% endblock %}

@@ -13,5 +13,11 @@ urlpatterns = [
     path('alphabet_matching/', views.alphabet_matching, name='alphabet_matching'),
     path('alphabet_memory/', views.alphabet_memory, name='alphabet_memory'),
     path('game_selection/', views.game_selection, name='game_selection'),
+     path('classes', views.classes, name='classes'),
+    path('delete-class/<int:class_id>/', views.delete_class, name='delete_class'),
+    path('join-class/', views.join_class, name='join_class'),
+    path('students/', views.teacher_students, name='teacher_students'),
+    path('delete-student/<int:student_id>/<int:class_id>/', views.delete_student, name='delete_student'),
+
     
 ]
