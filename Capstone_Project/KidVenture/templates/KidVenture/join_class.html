@@ -1,0 +1,20 @@
+{% extends 'KidVenture/student_base.html' %}
+
+{% block title %}Join a Class{% endblock%}
+
+{% block pageName %}
+    <span style="font-size: 30px; cursor: pointer; color: white;" class="nav">&#9776; Join Class</span>
+    <span style="font-size: 30px; cursor: pointer; color: white;" class="nav2">&#9776; Join Class</span>
+{% endblock %}
+
+{% block content %}
+<div class="content-box">
+    <h2>Join a Class</h2>
+    <form method="post" action="{% url 'join_class' %}">
+        {% csrf_token %}
+        <label for="access_token">Class Access Token:</label>
+        <input type="text" id="access_token" name="access_token" required style="width: 100%; margin-bottom: 10px;">
+        <button type="submit" class="submit-btn" style="width: 100%;">Join Class</button>
+    </form>
+</div>
+{% endblock %}

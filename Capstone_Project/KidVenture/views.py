@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 
 from django.http import HttpResponse, HttpResponseForbidden
 
@@ -14,6 +14,10 @@ from .models import Class, Student
 import random
 
 import string
+
+from django.db.models import Count, Prefetch
+
+from django.contrib import messages
 
 
 @login_required
@@ -91,7 +95,8 @@ def login_view(request):
 @login_required
 def home(request):
     if request.user.is_teacher:
-        return render(request, "KidVenture/teacher_page.html")
+        total_students = request.user.classes.aggregate(total=Count('students'))['total'] or 0
+        return render(request, "KidVenture/teacher_page.html", {'total_students': total_students })
     elif request.user.is_student:
         return render(request, "KidVenture/student_page.html")
 
@@ -118,7 +123,10 @@ def createToken():
 def create_class(request):
 
     if not request.user.is_teacher:
-        return httpResponseForbidden("You are not authorized to create a class")
+        return HttpResponseForbidden("You are not authorized to create a class")
+
+    if request.user.classes.count() >= 5:
+        return HttpResponseForbidden("You cannot create more than 5 classes")
 
     if request.method == 'POST':
         form = CreateClassForm(request.POST)
@@ -127,11 +135,148 @@ def create_class(request):
             my_class.teacher = request.user
             my_class.access_token = createToken()
             my_class.save()
-            return redirect('home')
+            return redirect('classes')
     else:
         form = CreateClassForm()
     return render(request, 'KidVenture/create_class.html', {'form': form})
     
+
+def classes(request):
+    if not request.user.is_teacher:
+            return redirect('home')
+    return render(request, 'KidVenture/classes.html')
+
+
+
+@login_required
+def delete_class(request, class_id):
+
+    my_class = get_object_or_404(Class, id=class_id)
+
+    if request.user != my_class.teacher:
+         return httpResponseForbidden("You are not authorized to delete a class")
+
+    my_class.delete()
+
+    return redirect('classes')
+
+
+"""
+# View to allow teacher to add students to their classes
+@login_required
+def add_student(request, class_id):
+
+    # If user is not a teacher don't allow them to add students
+    if not request.user.is_teacher:
+        return httpResponseForbidden("You are not authorized to add students")
+
+    # Get class 
+    my_class = get_object_or_404(Class, id=class_id)
+
+    # If user is not teachr of said class, dont allow them to add students to it
+    if request.user != my_class.teacher:
+        return httpResponseForbidden("You are not authorized to add students to this class")
+
+    
+    if request.method == 'POST':
+        # Get students name from from
+        student_username = request.POST.get('student_username')
+
+        # Try to get student
+        try:
+            student_user = User.objects.get(username=student_username, is_student=True)
+        except User.DoesNotExist:
+            messages.error(request, "Student not found or is not a student")
+            return redirect('classes')
+
+    # If student not in class already add them. else student is already in class
+    if not Student.objects.filter(user=student_user, classroom=my_class).exists():
+        Student.objects.create(user=student_user, classroom=my_class)
+        messages.success(request, f"Student {student_username} added to {my_class.name}")
+    else:
+        message.error(request, f"Student {student_username} is already in this class")
+
+    # Stay on classes page
+    return redirect('classes')
+"""
+
+# View for allowing student to join classes by entering their respective tokens
+@login_required
+def join_class(request):
+    # If user not student don't let them join a class
+    if not request.user.is_student:
+        return HttpResponseForbidden("Only students can join classes.")
+
+    if request.method == 'POST':
+
+        # Get toke from form
+        access_token = request.POST.get('access_token')
+
+        try:
+            # Find class that has the given token
+            classroom = Class.objects.get(access_token=access_token)
+        # If not class has a token, say invlaid token  
+        except Class.DoesNotExist:
+            messages.error(request, "Invalid access token. Please try again.")
+            return redirect('join_class')
+
+        try:
+            student = Student.objects.get(user=request.user)
+            if student.classroom == classroom:
+                messages.error(request, f"You are already enrolled in {classroom.name}.")
+            else:
+                messages.error(request, "You are already enrolled in another class. Leave your current class before joining a new one.")
+            return redirect('join_class')
+        except Student.DoesNotExist:
+            # Student is not enrolled in any class, so add them to this one
+            Student.objects.create(user=request.user, classroom=classroom)
+            messages.success(request, f"You have successfully joined {classroom.name}.")
+            return redirect('classes')
+
+    return render(request, 'KidVenture/join_class.html')   
+
+
+
+
+
+
+# A view for allowing teacher to view all of thier current students and what classes they are in.
+@login_required
+def teacher_students(request):
+
+    # Make sure the user is a teacher
+    if not request.user.is_teacher:
+        return HttpResponseForbidden("You are not authorized to view this page")
+
+    # Get all classes and students for teacher
+    classes = request.user.classes.prefetch_related(Prefetch('students', queryset=Student.objects.select_related('user')))
+
+    # Render page
+    return render(request, 'KidVenture/teacher_students.html', {'classes': classes})
+
+        
+
+# View for removing students from classes
+@login_required
+def delete_student(request, student_id, class_id):
+    
+    # If user not teacher, don't let them delete student
+    if not request.user.is_teacher:
+        return HttpResponseForbidden("You are not authorized to delete student")
+
+    # Make sure class belongs to current user
+    classroom = get_object_or_404(Class, id=class_id, teacher=request.user)
+
+
+    # Find and makre sure student are part of class
+    student = get_object_or_404(Student, id=student_id, classroom=classroom)
+
+
+    # If request post, delete student
+    if request.method == "POST":
+        student.delete()
+        return redirect("teacher_students")
+
 def alphabet_matching(request):
     return render(request, "KidVenture/alphabet_matching.html")
 
@@ -140,3 +285,4 @@ def alphabet_memory(request):
 
 def game_selection(request):
     return render(request, "KidVenture/game_selection.html")
+
