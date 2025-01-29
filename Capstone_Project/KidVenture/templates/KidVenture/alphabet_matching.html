@@ -23,6 +23,11 @@
     </div>
     <div id="game-board"></div>
 
+    <!-- Overlay for end level messages -->
+    <div id="end-level-overlay" class="overlay">
+      <div id="end-level-message" class="message"></div>
+    </div>
+
     <!-- #region Audio elements for sound effects -->
     <audio
       id="card-click-sound"
@@ -46,7 +51,11 @@
     ></audio>
     <!-- #endregion -->
 
-    <script src="{% static 'KidVenture/scripts/alphabet_matching.js' %}"></script>
+    <!-- Include the main script with type="module" -->
+    <script
+      type="module"
+      src="{% static 'KidVenture/js/alphabet_matching.js' %}"
+    ></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
   </body>
 </html>
