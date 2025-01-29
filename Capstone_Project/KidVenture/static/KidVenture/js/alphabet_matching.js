@@ -1,3 +1,5 @@
+import { messages, MessageCategories } from '/static/KidVenture/js/messages.js';
+
 const maxLevel = 25;
 const allLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 const cardClickSound = document.getElementById("card-click-sound");
@@ -199,65 +201,32 @@ function reshuffleCards() {
 }
 
 function displayEndLevelMessages(elapsedSeconds, mismatchCount) {
-    const generalPraise = [
-        `Fantastic work! You completed the level in just ${elapsedSeconds} seconds with only ${mismatchCount} mistakes. Keep it up!`,
-        `Great job! It took you ${elapsedSeconds} seconds to finish, and you’re improving every step of the way!`,
-        `Well done! With only ${mismatchCount} mistakes and a time of ${elapsedSeconds} seconds, you’re mastering these letters quickly!`,
-        `Awesome effort! Just ${elapsedSeconds} seconds to finish this level. Let’s aim for even fewer mistakes next time!`,
-        `You did it! ${elapsedSeconds} seconds and ${mismatchCount} mistakes—your hard work is paying off!`
-    ];
-
-    const lowMistakes = [
-        `Wow! Only ${mismatchCount} mistakes this level! Your focus is fantastic!`,
-        `Amazing! ${mismatchCount} mistakes in ${elapsedSeconds} seconds? That’s incredible progress!`,
-        `So close to perfection! ${elapsedSeconds} seconds and just ${mismatchCount} mistakes. You’re on fire!`
-    ];
-
-    const fastCompletion = [
-        `Speedy and sharp! You finished the level in just ${elapsedSeconds} seconds. Can you go even faster next time?`,
-        `Lightning quick! ${elapsedSeconds} seconds flat. Keep pushing, and you’ll be unstoppable!`
-    ];
-
-    const motivationForImprovement = [
-        `Good effort! You completed the level in ${elapsedSeconds} seconds. Let’s focus on cutting down those ${mismatchCount} mistakes!`,
-        `Well done! ${mismatchCount} mistakes this time. Try for even fewer in the next level!`,
-        `Every mistake is a learning opportunity! You finished in ${elapsedSeconds} seconds, and you’ll get even better.`,
-        `Keep going! ${elapsedSeconds} seconds and ${mismatchCount} mistakes mean you’re making solid progress.`
-    ];
-
-    const friendlyEncouragement = [
-        `Great job! Remember, practice makes perfect. On to the next level!`,
-        `Fantastic effort! No matter the time or mistakes, you’re doing great!`,
-        `Keep up the amazing work! Your brain is getting stronger every level!`,
-        `Another level mastered! You’re building skills step by step. Awesome!`
-    ];
-
-    const reallyWell = [
-        `Perfect score! No mistakes and ${elapsedSeconds} seconds—this level didn’t stand a chance against you!`,
-        `Wow, you’re a pro! You conquered this level with ${elapsedSeconds} seconds and no mistakes!`
-    ];
-
-    const creativeAndFun = [
-        `You’re climbing to the top like a spelling wizard! ${elapsedSeconds} seconds and ${mismatchCount} mistakes this time.`,
-        `That level didn’t know what hit it! ${elapsedSeconds} seconds and ${mismatchCount} mistakes—great stuff!`,
-        `Alphabet champ! You’re making those letters look easy in ${elapsedSeconds} seconds.`,
-        `You aced that level faster than a cheetah! ${elapsedSeconds} seconds and just ${mismatchCount} mistakes!`,
-        `Your brainpower is unstoppable! ${elapsedSeconds} seconds and only ${mismatchCount} mistakes. Let’s keep the momentum!`
-    ];
-
     let message = "";
 
     if (mismatchCount === 0) {
-        message = reallyWell[Math.floor(Math.random() * reallyWell.length)];
+        message = messages[MessageCategories.REALLY_WELL][Math.floor(Math.random() * messages[MessageCategories.REALLY_WELL].length)];
     } else if (mismatchCount < 3) {
-        message = lowMistakes[Math.floor(Math.random() * lowMistakes.length)];
+        message = messages[MessageCategories.LOW_MISTAKES][Math.floor(Math.random() * messages[MessageCategories.LOW_MISTAKES].length)];
     } else if (elapsedSeconds < 30) {
-        message = fastCompletion[Math.floor(Math.random() * fastCompletion.length)];
+        message = messages[MessageCategories.FAST_COMPLETION][Math.floor(Math.random() * messages[MessageCategories.FAST_COMPLETION].length)];
     } else if (elapsedSeconds < 60) {
-        message = generalPraise[Math.floor(Math.random() * generalPraise.length)];
+        const options = [
+            ...messages[MessageCategories.GENERAL_PRAISE],
+            ...messages[MessageCategories.FRIENDLY_ENCOURAGEMENT],
+            ...messages[MessageCategories.CREATIVE_AND_FUN]
+        ];
+        message = options[Math.floor(Math.random() * options.length)];
     } else {
-        message = motivationForImprovement[Math.floor(Math.random() * motivationForImprovement.length)];
+        const options = [
+            ...messages[MessageCategories.MOTIVATION_FOR_IMPROVEMENT],
+            ...messages[MessageCategories.FRIENDLY_ENCOURAGEMENT],
+            ...messages[MessageCategories.CREATIVE_AND_FUN]
+        ];
+        message = options[Math.floor(Math.random() * options.length)];
     }
+
+    // Replace placeholders with actual values
+    message = message.replace('{time}', elapsedSeconds).replace('{mistakes}', mismatchCount);
 
     // Display the message in the overlay
     const overlay = document.getElementById("end-level-overlay");
