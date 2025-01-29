@@ -9,7 +9,9 @@ from django.contrib.auth import authenticate, login, logout
 
 from django.contrib.auth.decorators import login_required
 
-from .models import Class, Student
+from django.contrib.auth.decorators import login_required, user_passes_test
+
+from .models import Class, Student, Activity, Notification
 
 import random
 
@@ -139,6 +141,40 @@ def create_class(request):
     else:
         form = CreateClassForm()
     return render(request, 'KidVenture/create_class.html', {'form': form})
+
+def is_student(user):
+    return user.user_type == 'student'
+    
+@login_required
+@user_passes_test(is_student)
+def student_homepage(request):
+    # Get the current user's student profile
+    try:
+        student = Student.objects.get(user=request.user)
+    except Student.DoesNotExist:
+        return HttpResponseForbidden("You are not authorized to access this page.")
+
+    # Fetch activities linked to the student
+    completed_activities = Activity.objects.filter(student=student, completed=True)
+    pending_activities = Activity.objects.filter(student=student, completed=False)
+    
+    progress = Progress.objects.filter(student=student)
+    achievements = Achievement.objects.filter(student=student)
+    # announcements = Announcement.objects.filter(classroom=student.classroom)
+    leaderboard = LeaderboardEntry.objects.order_by('-points')[:10]
+    notifications = Notification.objects.filter(user=request.user).order_by('-date')
+
+    return render(request, 'KidVenture/student_page.html', {
+        # 'activities': activities,
+        'completed_activities': completed_activities,
+        'pending_activities': pending_activities,
+        'progress': progress,
+        'achievements': achievements,
+        # 'announcements': announcements,
+        'leaderboard': leaderboard,
+        'notifications': notifications,
+    })
+
     
 
 def classes(request):

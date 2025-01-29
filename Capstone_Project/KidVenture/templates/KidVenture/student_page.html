@@ -2,22 +2,129 @@
 <html>
 
 <head>
-
-    <title>Login</title>
+    <title>Student Home Page</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Home Page</title>
     {% load static %}
     <link rel="stylesheet" href="{% static 'KidVenture/css/student.css' %}">
-
+    <script src="{% static 'KidVenture/js/student_tab.js' %}"></script>
 </head>
-</head>
-
 
 <body>
+    <header>
+        <h1>Welcome {{ request.user.username }}!</h1>
+    </header>
 
-    <h1>
-        Welcome {{ request.user.username}}
-    </h1>
-    
+    <main>
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab-link active" data-tab="progress-section">Your Progress</button>
+            <button class="tab-link" data-tab="activities-section">Available Activities</button>
+            <button class="tab-link" data-tab="leaderboard-section">Leaderboard</button>
+            <button class="tab-link" data-tab="badges-section">Achievements</button>
+        </div>
+        <!-- Progress Section -->
+        <section id="progress-section" class="tab-content">
+            <h2>Your Progress</h2>
+            <ul>
+                {% for activity in activities %}
+                <li>
+                    <strong>{{ activity.name }}:</strong>
+                    <div class="progress-bar-container" style="background-color: #ddd; border-radius: 10px;">
+                        <div class="progress-bar" data-progress="{{ activity.progress }}" style="width: {{ activity.progress }}%;"></div>
+                    </div>
+                        <!-- <small>{{ activity.progress }}%</small> -->
+                    <p class="milestone">
+                        {% if activity.progress > 80 %}
+                        Great job! Almost there!
+                        {% elif activity.progress > 50 %}
+                        Keep going, you're halfway through!
+                        {% else %}
+                        Just getting started – you can do it!
+                        {% endif %}
+                    </p>
+                </li>
+                {% endfor %}
+            </ul>
+        </section>
+
+        <!-- Activities Section -->
+        <section id="activities-section" class=""tab-content hidden>
+            <h2>Available Activities</h2>
+            <ul>
+                {% for activity in activities %}
+                <li>
+                    <a href="{% url activity.url_name %}">{{ activity.name }}</a>
+                    <span class="status {% if activity.completed %}completed{% else %}pending{% endif %}">
+                        {% if activity.completed %}Completed{% else %}Pending{% endif %}
+                    </span>
+                </li>
+                {% empty %}
+                <p>No activities available at the moment!</p>
+                {% endfor %}
+            </ul>
+        </section>
+
+        <!-- Leaderboard Section -->
+        <section id="leaderboard-section" class="tab-content hidden">
+            <h2>Leaderboard</h2>
+            <table class="leaderboard-table">
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Name</th>
+                        <th>Points</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in leaderboard %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ user.name }}</td>
+                        <td>{{ user.points }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3">No leaderboard data available yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+
+        <section id="badges-section" class="tab-content hidden">
+            <h2>Your Achievements</h2>
+            <div class="badge-container">
+                {% for badge in badges %}
+                <div class="badge">
+                    <img src="{% static badge.image %}" alt="{{ badge.name}}">
+                    <p>{{ badge.name }}</p>
+                </div>
+                {% empty %}
+                <p> No badges earned yet. Start completing activities to earn rewards!</p>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section id="notifications-section" class="tab-content hidden">
+            <h2>Notification</h2>
+            <ul>
+                {% for notification in notifications %}
+                <li>
+                    <strong>{{ notification.title }}</strong>
+                    <p>{{ notification.message }}</p>
+                    <small>Posted on {{ notification.date|date:"M d, Y" }}</small>
+                </li>
+                {% empty %}
+                <p>No new notifications!</p>
+                {% endfor %}
+            </ul>
+        </section>
+    </main>
+
+    <footer>
+        <p>KidVenture - Making Learning Fun!</p>
+    </footer>
 </body>
+
+</html>
