@@ -431,3 +431,97 @@ form label {
 
 
 
+
+
+/* Style for the textarea (description box) */
+textarea {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #718f89; /* Gray-Green */
+    border-radius: 5px;
+    background-color: #cadec8; /* Soft Mint */
+    color: #25433d; /* Deep Green */
+    font-size: 16px;
+    box-sizing: border-box;
+    resize: vertical; /* Allow vertical resizing */
+    min-height: 30px; /* Reduced height for a more compact look */
+    max-height: 50px; /* Prevents it from expanding too much */
+}
+
+textarea:focus {
+    border-color: #25433d; /* Dark Green */
+    background-color: #e0f2f1; /* Lightened background */
+    box-shadow: 0 0 5px rgba(37, 67, 61, 0.5); /* Subtle glow */
+    outline: none;
+}
+
+
+/* Style for the select (dropdown boxes) */
+select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #718f89; /* Gray-Green */
+    border-radius: 5px;
+    background-color: #cadec8; /* Soft Mint */
+    color: #25433d; /* Deep Green */
+    font-size: 16px;
+    box-sizing: border-box;
+    appearance: none; /* Removes default arrow for better styling */
+    cursor: pointer;
+}
+
+/* Add custom arrow for dropdown */
+select::after {
+    content: "▼"; /* Custom dropdown arrow */
+    font-size: 12px;
+    color: #25433d; /* Dark Green */
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+/* Dropdown Hover & Focus Effects */
+select:hover, select:focus {
+    background-color: #e0f2f1; /* Lightened background */
+    border-color: #25433d; /* Dark Green */
+    outline: none;
+}
+
+
+/* Ensure dropdowns are placed side by side */
+.form-row {
+    display: flex;
+    justify-content: space-between; /* Ensures they are spaced evenly */
+    gap: 15px; /* Adds spacing between the dropdowns */
+    margin-bottom: 15px; /* Spacing between this row and the next input */
+}
+
+.form-group {
+    width: 50%; /* Each dropdown takes half of the row */
+}
+
+/* Keep dropdown styling consistent */
+select {
+    width: 100%; /* Ensure full width within the group */
+    padding: 8px;
+    border: 1px solid #718f89; /* Gray-Green */
+    border-radius: 5px;
+    background-color: #cadec8; /* Soft Mint */
+    color: #25433d; /* Deep Green */
+    font-size: 16px;
+    box-sizing: border-box;
+    appearance: none; /* Removes default arrow */
+    cursor: pointer;
+}
+
+/* Dropdown Hover & Focus Effects */
+select:hover, select:focus {
+    background-color: #e0f2f1; /* Lightened background */
+    border-color: #25433d; /* Dark Green */
+    outline: none;
+}
+
+
+

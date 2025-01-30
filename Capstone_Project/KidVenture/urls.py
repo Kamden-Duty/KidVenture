@@ -18,6 +18,8 @@ urlpatterns = [
     path('join-class/', views.join_class, name='join_class'),
     path('students/', views.teacher_students, name='teacher_students'),
     path('delete-student/<int:student_id>/<int:class_id>/', views.delete_student, name='delete_student'),
+    path('assign_activity/', views.assign_activity, name='assign_activity'),
+  
 
     
 ]

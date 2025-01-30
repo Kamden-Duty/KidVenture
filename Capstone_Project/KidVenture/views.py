@@ -179,8 +179,13 @@ def student_homepage(request):
 
 def classes(request):
     if not request.user.is_teacher:
-            return redirect('home')
-    return render(request, 'KidVenture/classes.html')
+        return redirect('home')
+  
+    # Get unique activities per class (ignoring duplicates per student)
+    activities = Activity.objects.values("name", "student__classroom__name", "url_name").distinct().order_by("student__classroom__name")
+
+    return render(request, 'KidVenture/classes.html', {"activities": activities})
+
 
 
 
@@ -321,4 +326,32 @@ def alphabet_memory(request):
 
 def game_selection(request):
     return render(request, "KidVenture/game_selection.html")
+
+
+
+
+
+def assign_activity(request):
+    if request.method == "POST":
+        class_id = request.POST.get("classroom")
+        activity_name = request.POST.get("activity_name")
+        description = request.POST.get("description")
+        url_name = request.POST.get("url_name")
+
+        classroom = get_object_or_404(Class, id=class_id)
+
+        # Assign the activity to all students in the class
+        for student in classroom.students.all():
+            Activity.objects.create(
+                name=activity_name,
+                description=description,
+                progress=0,  # Start at 0%
+                student=student,
+                url_name=url_name
+            )
+
+        return redirect('classes')  # Redirect back to the page
+
+    return redirect('classes')
+
 

@@ -26,7 +26,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for classroom in request.user.classes.all %}
+                    {% for classroom in request.user.classes.all.distinct %}
                     <tr>
                         <td>{{ classroom.name }}</td>
                         <td>{{ classroom.access_token }}</td>
@@ -63,5 +63,83 @@
         </div>
     </div>
 </div>
+
+
+<!-- Activity Management Section -->
+<div class="classes-container">
+    <!-- Assign Activity to Class -->
+    <!-- Assign Activity to Class -->
+    <div class="box-8">
+        <div class="content-box">
+            <h2>Assign Activity to Class</h2>
+            <form method="post" action="{% url 'assign_activity' %}">
+                {% csrf_token %}
+                
+                <!-- Class & Game Selection in One Row -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="classroom">Select Class:</label>
+                        <select id="classroom" name="classroom" required>
+                            {% for classroom in request.user.classes.all %}
+                            <option value="{{ classroom.id }}">{{ classroom.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="url_name">Select Game:</label>
+                        <select id="url_name" name="url_name" required>
+                            <option value="alphabet_matching">Alphabet Matching</option>
+                            <option value="alphabet_memory">Alphabet Memory</option>
+                        </select>
+                    </div>
+                </div>
+
+                <label for="activity_name">Activity Name:</label>
+                <input type="text" id="activity_name" name="activity_name" required>
+
+                <label for="description">Description:</label>
+                <textarea id="description" name="description" rows="3"></textarea>
+
+                <button type="submit" class="submit-btn">Assign Activity</button>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- Ongoing Activities Section -->
+    <div class="box-4">
+        <div class="content-box">
+            <h2>Ongoing Activities</h2>
+            <table class="content-table">
+                <thead>
+                    <tr>
+                        <th>Activity</th>
+                        <th>Class</th>
+                        <th>Game</th>
+                        <th>Progress</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for activity in activities %}
+                    <tr>
+                        <td>{{ activity.name }}</td>
+                        <td>{{ activity.student__classroom__name }}</td> <!-- Fixes class name reference -->
+                        <td>{{ activity.url_name }}</td>
+                        <td>-</td> <!-- No student-specific progress -->
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4">No ongoing activities.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                
+                
+            </table>
+        </div>
+    </div>
+</div>
+
 
 {% endblock %}
