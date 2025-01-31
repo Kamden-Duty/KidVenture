@@ -11,7 +11,7 @@ from django.contrib.auth.decorators import login_required
 
 from django.contrib.auth.decorators import login_required, user_passes_test
 
-from .models import Class, Student, Activity, Notification
+from .models import *
 
 import random
 
@@ -354,4 +354,11 @@ def assign_activity(request):
 
     return redirect('classes')
 
+
+
+
+
+def leaderboard_view(request):
+    leaderboard = LeaderboardEntry.objects.order_by('-points')  
+    return render(request, 'KidVenture/leaderboard.html', {'leaderboard': leaderboard})
 
