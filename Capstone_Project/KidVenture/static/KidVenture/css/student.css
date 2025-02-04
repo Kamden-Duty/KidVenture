@@ -187,4 +187,47 @@ footer {
     }
 }
 
+button {
+    background-color: #ffcc00;
+    color: #333;
+    border: none;
+    padding: 10px 15px;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+button:hover {
+    background-color: #ff9900;
+}
+
+button i {
+    font-size: 20px;
+}
+
+.game-button {
+    margin-bottom: 1rem;
+}
+
+.game-container {
+    display: flex;
+    background: cornsilk;
+    gap: 3rem;
+}
+
+.game-header {
+    font-size: medium;
+    font-family: cursive;
+}
+
+.game-item {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+}
 
