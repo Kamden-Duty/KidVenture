@@ -8,6 +8,8 @@
     {% load static %}
     <link rel="stylesheet" href="{% static 'KidVenture/css/student.css' %}">
     <script src="{% static 'KidVenture/js/student_tab.js' %}"></script>
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
 </head>
 
 <body>
@@ -49,21 +51,51 @@
         </section>
 
         <!-- Activities Section -->
-        <section id="activities-section" class=""tab-content hidden>
-            <h2>Available Activities</h2>
-            <ul>
-                {% for activity in activities %}
-                <li>
-                    <a href="{% url activity.url_name %}">{{ activity.name }}</a>
-                    <span class="status {% if activity.completed %}completed{% else %}pending{% endif %}">
-                        {% if activity.completed %}Completed{% else %}Pending{% endif %}
-                    </span>
-                </li>
-                {% empty %}
-                <p>No activities available at the moment!</p>
-                {% endfor %}
-            </ul>
-        </section>
+        <section id="activities-section" class="tab-content hidden">
+            <h2>Games</h2>
+            <p>Select a game to play:</p>
+
+            <div class="game-container">
+
+            
+
+                <!-- Game Selection -->
+                <div class="game-item">
+                    <h2 class="game-header">Alphabet Matching Game</h2>
+                    <iframe src="../../static/KidVenture/images/alphabet-matching.jpg" width="250px" height="250px" style="border:none;"></iframe>
+                    <button class="game-button" onclick="window.location.href='{% url 'alphabet_matching' %}'">
+                        <i class="fas fa-play-circle"></i> Play
+                    </button>
+                </div>
+
+                <div class="game-item">
+                    <h2 class="game-header">Alphabet Memory Game</h2>
+                    <iframe src="../../static/KidVenture/images/memory_game.jpg" width="250px" height="250px" style="border:none;"></iframe>
+                    <button class="game-button" onclick="window.location.href='{% url 'alphabet_memory' %}'">
+                        <i class="fas fa-play-circle"></i> Play
+                    </button>
+                </div>
+            </div>
+            <!-- <button class="game-button" onclick="window.location.href='{% url 'alphabet_matching' %}'">
+                <i class="fas fa-play-circle"></i> Play Alphabet Matching Game
+            </button> -->
+
+            <!-- <button class="game-button" onclick="window.location.href='{% url 'alphabet_memory' %}'">
+                <i class="fas fa-play-circle"></i> Play Alphabet Memory Game
+            </button> -->
+
+            <!-- Alphabet Matching Game -->
+            <!-- <section id="alphabet-matching-section" class="tab-content">
+                <h2>Alphabet Matching Game</h2>
+                <iframe src="../../static/KidVenture/images/alphabet-matching-image.jpg" width="100%" height="600px" style="border:none;"></iframe>
+            </section> -->
+
+            <!-- Alphabet Memory Game -->
+            <!-- <section id="alphabet-memory-section" class="tab-content">
+                <h2>Alphabet Memory Game</h2>
+                <iframe src="{% url 'alphabet_memory' %}" width="100%" height="600px" style="border:none;"></iframe>
+            </section>
+        </section> -->
 
         <!-- Leaderboard Section -->
         <section id="leaderboard-section" class="tab-content hidden">
