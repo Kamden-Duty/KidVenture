@@ -25,7 +25,24 @@ header {
 
 header h1 {
     margin: 0;
-    font-size: 2rem;
+    /* font-size: 2rem; */
+    font-size: revert-layer;
+    font-family: initial
+}
+
+.header-left {
+    flex: 1; /* Allows it to take space */
+    text-align: left;
+    font-size: revert-layer;
+    font-family: fantasy;
+    margin-top: -35px;
+}
+
+.kidventure-logo {
+    font-size: 24px;
+    font-weight: bold;
+    margin: 0;
+    color: white;
 }
 
 main {
@@ -230,4 +247,28 @@ button i {
     align-items: center;
     gap: 1rem;
 }
+.logout-container {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    margin-top: 10px;
+}
 
+.logout-button {
+    font-size: 24px;
+    color: white;
+    text-decoration: none;
+    padding: 10px;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+/* .logout-button i { */
+    /* font-size: 24px; Adjust size if needed */
+    /* color: white; */
+/* } */
+
+.logout-button:hover {
+    color: #ff4d4d; /* Change color on hover */
+}
