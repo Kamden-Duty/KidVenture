@@ -1,0 +1,95 @@
+{% extends "KidVenture/teacher_base.html" %}
+{% load static %}
+{% block title %}Edit Avatar{% endblock %}
+{% block pageName %}
+<link rel="stylesheet" href="{% static 'KidVenture/css/avatar.css' %}">
+{%endblock%}
+{% block content %}
+<div class="edit-avatar-container">
+    <h2>Edit Your Avatar</h2>
+
+    <!-- Centered Avatar Preview -->
+    <div id="avatar-preview-container">
+        <div id="avatar-preview">
+            {{ user.avatar.render_svg|safe }}
+        </div>
+    </div>
+
+    <!-- Avatar Editing Controls -->
+    <form method="POST">
+        {% csrf_token %}
+
+        <div class="avatar-edit-section">
+            {% for feature, options in avatar_options.items %}
+                <div class="avatar-control">
+                    <label class="avatar-label">{{ feature|capfirst }}</label> <!-- Section Title -->
+                    <div class="selector-container">
+                        <button type="button" class="arrow-btn" onclick="changeAvatar('{{ feature }}', -1)">⬅</button>
+                        <span id="{{ feature }}-display" data-index="0">{{ options.0 }}</span> <!-- Shows selected option -->
+                        <button type="button" class="arrow-btn" onclick="changeAvatar('{{ feature }}', 1)">➡</button>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        
+
+        <input type="hidden" name="avatar_data" id="avatar-data">
+        <button type="submit" id="save-avatar">Save Avatar</button>
+    </form>
+
+    <a href="{% url 'home' %}" class="back-link">Back to Profile</a>
+
+    <script>
+        const avatarOptions = JSON.parse('{{ avatar_options_json|safe }}');  
+        let avatarData = {};  
+
+        document.addEventListener("DOMContentLoaded", function () {
+            Object.keys(avatarOptions).forEach(feature => {
+                let displayElement = document.getElementById(feature + "-display");
+                if (displayElement) {
+                    displayElement.innerText = avatarOptions[feature][0];  
+                    avatarData[feature] = avatarOptions[feature][0];  
+                }
+            });
+
+            document.getElementById("save-avatar").addEventListener("click", function() {
+                updateHiddenInput();
+            });
+
+            window.changeAvatar = function (feature, direction) {
+                let displayElement = document.getElementById(feature + "-display");
+                let options = avatarOptions[feature];
+
+                let currentIndex = options.indexOf(avatarData[feature]);
+                let newIndex = (currentIndex + direction + options.length) % options.length;
+
+                avatarData[feature] = options[newIndex];
+                displayElement.innerText = options[newIndex];
+
+                updateHiddenInput();
+                updateAvatarPreview();  
+            };
+
+            function updateHiddenInput() {
+                document.getElementById("avatar-data").value = JSON.stringify(avatarData);
+            }
+
+            function updateAvatarPreview() {
+                fetch("{% url 'update_avatar_preview' %}", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": "{{ csrf_token }}"
+                    },
+                    body: JSON.stringify(avatarData)
+                })
+                .then(response => response.text())  
+                .then(svg => {
+                    document.getElementById("avatar-preview").innerHTML = svg;  
+                })
+                .catch(error => console.error("Error updating avatar:", error));
+            }
+        });
+    </script>
+</div>
+{% endblock %}

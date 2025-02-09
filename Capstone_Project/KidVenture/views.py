@@ -22,6 +22,15 @@ from django.db.models import Count, Prefetch
 from django.contrib import messages
 
 
+
+# Avatar imports
+from py_avataaars import (
+    PyAvataaar, AvatarStyle, SkinColor, HairColor, FacialHairType,
+    TopType, MouthType, EyesType, EyebrowType, NoseType,
+    AccessoriesType, ClotheType, ClotheGraphicType, Color  
+)
+
+
 @login_required
 def home(request):
     return render(request, "KidVenture/home.html")
@@ -362,3 +371,134 @@ def leaderboard_view(request):
     leaderboard = LeaderboardEntry.objects.order_by('-points')  
     return render(request, 'KidVenture/leaderboard.html', {'leaderboard': leaderboard})
 
+
+
+
+
+
+
+
+
+
+
+import json
+import os
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from django.conf import settings
+from py_avataaars import PyAvataaar, AvatarStyle, SkinColor, HairColor, FacialHairType, \
+    TopType, Color, MouthType, EyesType, EyebrowType, NoseType, AccessoriesType, \
+    ClotheType, ClotheGraphicType
+
+@login_required
+def edit_avatar(request):
+    """Allow users to modify their avatar using arrows to cycle through options."""
+    user = request.user  # Get current user
+
+    # ✅ Define available avatar options
+    avatar_options = {
+        "style": [e.name for e in AvatarStyle],
+        "skin_color": [e.name for e in SkinColor],
+        "hair_color": [e.name for e in HairColor],
+        "facial_hair_type": [e.name for e in FacialHairType],
+        "top_type": [e.name for e in TopType],
+        "mouth_type": [e.name for e in MouthType],
+        "eye_type": [e.name for e in EyesType],
+        "eyebrow_type": [e.name for e in EyebrowType],
+        "nose_type": [e.name for e in NoseType],
+        "accessories_type": [e.name for e in AccessoriesType],
+        "clothe_type": [e.name for e in ClotheType],
+        "clothe_graphic_type": [e.name for e in ClotheGraphicType],
+        "clothe_color": [e.name for e in Color],
+    }
+
+    # ✅ Convert options to JSON for JavaScript
+    avatar_options_json = json.dumps(avatar_options)
+
+    if request.method == "POST":
+        new_avatar_data = request.POST.get("avatar_data")
+        print(f"🟢 Received avatar data: {new_avatar_data}")  # ✅ Debugging
+
+        if new_avatar_data:
+            try:
+                new_avatar_data = json.loads(new_avatar_data)
+                print(f"✅ Parsed JSON: {new_avatar_data}")  # ✅ Confirm parsing worked
+
+                # ✅ Generate new avatar
+                avatar = PyAvataaar(
+                    style=getattr(AvatarStyle, new_avatar_data["style"]),
+                    skin_color=getattr(SkinColor, new_avatar_data["skin_color"]),
+                    hair_color=getattr(HairColor, new_avatar_data["hair_color"]),
+                    facial_hair_type=getattr(FacialHairType, new_avatar_data["facial_hair_type"]),
+                    top_type=getattr(TopType, new_avatar_data["top_type"]),
+                    mouth_type=getattr(MouthType, new_avatar_data["mouth_type"]),
+                    eye_type=getattr(EyesType, new_avatar_data["eye_type"]),
+                    eyebrow_type=getattr(EyebrowType, new_avatar_data["eyebrow_type"]),
+                    nose_type=getattr(NoseType, new_avatar_data["nose_type"]),
+                    accessories_type=getattr(AccessoriesType, new_avatar_data["accessories_type"]),
+                    clothe_type=getattr(ClotheType, new_avatar_data["clothe_type"]),
+                    clothe_graphic_type=getattr(ClotheGraphicType, new_avatar_data["clothe_graphic_type"]),
+                    clothe_color=getattr(Color, new_avatar_data["clothe_color"]),
+                )
+
+                # ✅ Save new avatar
+                avatar_path = os.path.join(settings.MEDIA_ROOT, "avatars", f"avatar_{user.username}.png")
+                os.makedirs(os.path.dirname(avatar_path), exist_ok=True)
+                avatar.render_png_file(avatar_path)
+
+                # ✅ Update user avatar field
+                user.avatar.name = f"avatars/avatar_{user.username}.png"
+                user.save()
+                print("✅ Avatar updated successfully!")  # Debugging
+            except Exception as e:
+                print(f"❌ Error processing avatar: {e}")  # Debugging
+
+        return redirect("home")  # ✅ Redirect after saving
+
+    return render(request, "KidVenture/edit_avatar.html", {
+        "avatar_options": avatar_options,
+        "avatar_options_json": avatar_options_json,
+    })
+
+
+
+
+
+
+import json
+from django.http import HttpResponse
+from django.views.decorators.csrf import csrf_exempt
+from py_avataaars import PyAvataaar, AvatarStyle, SkinColor, HairColor, FacialHairType, \
+    TopType, Color, MouthType, EyesType, EyebrowType, NoseType, AccessoriesType, \
+    ClotheType, ClotheGraphicType
+
+@csrf_exempt  # Allows AJAX POST requests without CSRF token issues
+def update_avatar_preview(request):
+    """Generate and return a live SVG preview based on user selections."""
+    if request.method == "POST":
+        try:
+            avatar_data = json.loads(request.body)  # Parse JSON from request
+
+            # ✅ Generate new avatar SVG
+            avatar = PyAvataaar(
+                style=getattr(AvatarStyle, avatar_data["style"]),
+                skin_color=getattr(SkinColor, avatar_data["skin_color"]),
+                hair_color=getattr(HairColor, avatar_data["hair_color"]),
+                facial_hair_type=getattr(FacialHairType, avatar_data["facial_hair_type"]),
+                top_type=getattr(TopType, avatar_data["top_type"]),
+                mouth_type=getattr(MouthType, avatar_data["mouth_type"]),
+                eye_type=getattr(EyesType, avatar_data["eye_type"]),
+                eyebrow_type=getattr(EyebrowType, avatar_data["eyebrow_type"]),
+                nose_type=getattr(NoseType, avatar_data["nose_type"]),
+                accessories_type=getattr(AccessoriesType, avatar_data["accessories_type"]),
+                clothe_type=getattr(ClotheType, avatar_data["clothe_type"]),
+                clothe_graphic_type=getattr(ClotheGraphicType, avatar_data["clothe_graphic_type"]),
+                clothe_color=getattr(Color, avatar_data["clothe_color"]),
+            )
+
+            return HttpResponse(avatar.render_svg(), content_type="image/svg+xml")  # ✅ Fix here
+
+        except Exception as e:
+            return HttpResponse(f"Error: {e}", status=400)
+
+    return HttpResponse("Invalid request", status=400)

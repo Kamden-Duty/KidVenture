@@ -1,5 +1,7 @@
 from django.urls import path
 from . import views
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('', views.home, name = 'home'),
@@ -20,6 +22,12 @@ urlpatterns = [
     path('delete-student/<int:student_id>/<int:class_id>/', views.delete_student, name='delete_student'),
     path('assign_activity/', views.assign_activity, name='assign_activity'),
     path('leaderboard/', views.leaderboard_view, name='leaderboard'),
+    path("edit-avatar/", views.edit_avatar, name="edit_avatar"),
+     path("update-avatar-preview/", views.update_avatar_preview, name="update_avatar_preview"),
+
 
     
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
