@@ -35,7 +35,7 @@
                     <td>{{ classroom.name }}</td>
                     <td>{{ classroom.access_token }}</td>
                     <td>
-                        <form method="POST" action="{% url 'delete_student' student.id classroom.id %}" style="display:inline;">
+                        <form method="POST" action="{% url 'delete_student' student.id classroom.id %}" style="display:inline;" onsubmit="return confirmRemoveStudent()">
                             {% csrf_token %}
                             <button type="submit" class="delete-btn">Remove</button>
                         </form>
@@ -49,5 +49,12 @@
 
 {% load static %}
 <script src="{% static 'KidVenture/js/student_overview.js' %}"></script>
+
+<script>
+    function confirmRemoveStudent() {
+        return confirm("Are you sure you want to remove this student from the class?");
+    }
+</script>
+    
 
 {% endblock %}
