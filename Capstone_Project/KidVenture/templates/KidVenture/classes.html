@@ -32,11 +32,12 @@
                         <td>{{ classroom.access_token }}</td>
                         <td>{{ classroom.students.count }}</td>
                         <td>
-                            <form action="{% url 'delete_class' classroom.id %}" method="POST" style="display:inline;">
+                            <form action="{% url 'delete_class' classroom.id %}" method="POST" style="display:inline;" onsubmit="return confirmDelete()">
                                 {% csrf_token %}
                                 <button type="submit" class="delete-btn" title="Delete Class">Delete</button>
                             </form>
                         </td>
+                        
                     </tr>
                     {% empty %}
                     <tr>
@@ -140,6 +141,14 @@
         </div>
     </div>
 </div>
+
+
+<script>
+    function confirmDelete() {
+        return confirm("Are you sure you want to delete this class? This action cannot be undone.");
+    }
+</script>
+    
 
 
 {% endblock %}
