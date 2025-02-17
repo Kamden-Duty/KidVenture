@@ -243,3 +243,22 @@ table tr:nth-child(odd) {
 }
 
 
+
+
+/* -------------------------------------- */
+
+
+/* Scrollable Table Container */
+.table-container {
+    max-height: 400px; /* Set max height */
+    overflow-y: auto; /* Enable vertical scrolling */
+    border: 1px solid #ddd; /* Optional: Adds border */
+}
+
+/* Fix the header so it doesn't scroll */
+.table-container thead th {
+    position: sticky;
+    top: 0;
+    background: white; /* Keep header visible */
+    z-index: 2;
+}
