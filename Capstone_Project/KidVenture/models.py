@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-
+from django.conf import settings
 # Import for custom avatar creation
 from py_avataaars import PyAvataaar, AvatarStyle, SkinColor, HairColor, FacialHairType, TopType, Color, MouthType, EyesType, EyebrowType, NoseType, AccessoriesType, ClotheType, ClotheGraphicType
 
@@ -131,3 +131,14 @@ class Notification(models.Model):
 
     def __str__(self):
         return f"Notification for {self.user.username}: {self.title}"
+
+class GameProgress(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='game_progress')  # Link to the user
+    level = models.IntegerField(default=1) # The level of the game
+    time_taken = models.IntegerField(default=0)  # Time in seconds
+    mistakes = models.IntegerField(default=0) # Number of mistakes made
+    mismatched_letters = models.TextField()  # Store as a JSON string
+    timestamp = models.DateTimeField(auto_now_add=True)  # Automatically set when the progress is created
+
+    def __str__(self):
+        return f"{self.user.username} - Level {self.level}"

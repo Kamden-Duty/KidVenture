@@ -13,6 +13,7 @@ let timerInterval = null;
 let elapsedSeconds = 0;
 let matches = 0;
 let mismatchCount = 0;
+let mismatchedLetters = [];
 
 function shuffle(array) {
     for (let i = array.length - 1; i > 0; i--) {
@@ -72,8 +73,63 @@ function updateScore() {
     ).textContent = `Mismatched: ${mismatchCount}`;
 }
 
+function saveGameProgress(level, timeTaken, mistakes, mismatchedLetters) {
+    const data = {
+        level: level,
+        time_taken: timeTaken,
+        mistakes: mistakes,
+        mismatched_letters: mismatchedLetters
+    };
+    console.log('Sending data to server:', data);
+
+    fetch('/save_game_progress/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Server response:', data);
+        if (data.status === 'success') {
+            console.log('Game progress saved successfully.');
+        } else {
+            console.error('Error saving game progress.');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
 function advanceToNextLevel() {
+    console.log("Advancing to next level...");
+    console.log("Current Level:", currentLevel);
+    console.log("Elapsed Seconds:", elapsedSeconds);
+    console.log("Mismatch Count:", mismatchCount);
+    console.log("Mismatched Letters:", mismatchedLetters);
+
+    saveGameProgress(currentLevel, elapsedSeconds, mismatchCount, mismatchedLetters);
     currentLevel++;
+    console.log("New Level:", currentLevel);
+
     if (currentLevel > maxLevel) {
         alert(
             `Congratulations! You completed all levels in ${elapsedSeconds} seconds.`
@@ -87,6 +143,7 @@ function advanceToNextLevel() {
     timerStarted = false;
     firstCard = null;
     secondCard = null;
+    mismatchedLetters = []; // Reset mismatched letters for the new level
 
     document.getElementById("timer").textContent = "Time: 0 seconds";
     initializeGame();
@@ -143,11 +200,15 @@ function onCardClick(event) {
                 playSound("level-up-sound");
                 triggerConfetti(); 
                 displayEndLevelMessages(timerInterval, mismatchCount);
-                // The advanceToNextLevel function will be called once the level-up sound ends
+
+                // Add an event listener to call advanceToNextLevel once the level-up sound ends
+                const levelUpSound = document.getElementById("level-up-sound");
+                levelUpSound.addEventListener("ended", advanceToNextLevel);
             }
         } else {
             playSound("mismatch-sound");
             mismatchCount++; 
+            mismatchedLetters.push({ first: firstCard.dataset.card, second: secondCard.dataset.card });
             firstCard.classList.add("mismatched");
             secondCard.classList.add("mismatched");
             updateScore();
@@ -237,12 +298,57 @@ function displayEndLevelMessages(elapsedSeconds, mismatchCount) {
     // Hide the overlay after a few seconds
     setTimeout(() => {
         overlay.style.visibility = "hidden";
-        advanceToNextLevel();
     }, 3500);
 }
 
 // Add this event listener to call advanceToNextLevel once the sound has finished playing
 document.getElementById("level-up-sound").addEventListener("ended", advanceToNextLevel);
 
-initializeGame();
+document.addEventListener("DOMContentLoaded", () => {
+    fetch('/get_last_session/')
+        .then(response => response.text()) // Change to response.text() to log the raw response
+        .then(text => {
+            console.log('Raw response:', text); // Log the raw response
+            const data = JSON.parse(text); // Parse the response text as JSON
+            if (data.last_level && data.last_level > 1) {
+                console.log('Last level:', data.last_level);
+                showSessionModal(data.last_level);
+            } else {
+                console.log('No last session found.');
+                initializeGame();
+                showGameElements();
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching last session:', error);
+            initializeGame();
+            showGameElements();
+        });
+});
+
+function showSessionModal(lastLevel) {
+    const modal = document.getElementById("session-modal");
+    modal.style.display = "block";
+
+    document.getElementById("continue-btn").addEventListener("click", () => {
+        currentLevel = lastLevel;
+        totalMatches = currentLevel + 1;
+        modal.style.display = "none";
+        initializeGame();
+        showGameElements();
+    });
+
+    document.getElementById("start-over-btn").addEventListener("click", () => {
+        modal.style.display = "none";
+        initializeGame();
+        showGameElements();
+    });
+}
+
+function showGameElements() {
+    document.getElementById("timer").classList.remove("hidden");
+    document.querySelector(".score-container").classList.remove("hidden");
+    document.getElementById("game-board").classList.remove("hidden");
+}
+
 updateScore();

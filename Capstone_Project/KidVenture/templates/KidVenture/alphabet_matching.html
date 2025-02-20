@@ -14,14 +14,27 @@
     <div>
       <a href="{% url 'game_selection' %}">Back to Game Selection</a>
     </div>
+    <h1>Welcome {{ request.user.username }}!</h1>
     <h1>Matching Game</h1>
     <p>Match the uppercase and lowercase letters</p>
-    <div id="timer">Time: 0 seconds</div>
-    <div class="score-container">
+    <div id="timer" class="hidden">Time: 0 seconds</div>
+    <div class="score-container hidden">
       <div id="score">Score: 0 / 10</div>
       <div id="mismatched">Mismatched: 0</div>
     </div>
-    <div id="game-board"></div>
+    <div id="game-board" class="hidden"></div>
+
+    <!-- Modal for session prompt -->
+    <div id="session-modal" class="modal">
+      <div class="modal-content">
+        <p>
+          Do you want to continue from your last session or start from the first
+          level?
+        </p>
+        <button id="continue-btn">Continue</button>
+        <button id="start-over-btn">Start Over</button>
+      </div>
+    </div>
 
     <!-- Overlay for end level messages -->
     <div id="end-level-overlay" class="overlay">
@@ -57,5 +70,6 @@
       src="{% static 'KidVenture/js/alphabet_matching.js' %}"
     ></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
+    {% csrf_token %}
   </body>
 </html>

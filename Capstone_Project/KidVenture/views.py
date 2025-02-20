@@ -21,6 +21,10 @@ from django.db.models import Count, Prefetch
 
 from django.contrib import messages
 
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+import json
+
 
 
 # Avatar imports
@@ -336,7 +340,35 @@ def alphabet_memory(request):
 def game_selection(request):
     return render(request, "KidVenture/game_selection.html")
 
+@csrf_exempt
+@login_required
+def save_game_progress(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        level = data.get('level')
+        time_taken = data.get('time_taken')
+        mistakes = data.get('mistakes')
+        mismatched_letters = data.get('mismatched_letters')
 
+        GameProgress.objects.create(
+            user=request.user,
+            level=level,
+            time_taken=time_taken,
+            mistakes=mistakes,
+            mismatched_letters=json.dumps(mismatched_letters)
+        )
+
+        return JsonResponse({'status': 'success'})
+
+    return JsonResponse({'status': 'error'}, status=400)
+
+@login_required
+def get_last_session(request):
+    try:
+        last_progress = GameProgress.objects.filter(user=request.user).latest('timestamp')
+        return JsonResponse({'last_level': last_progress.level})
+    except GameProgress.DoesNotExist:
+        return JsonResponse({'last_level': None})
 
 
 
