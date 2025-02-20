@@ -1,6 +1,19 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.conf import settings
+# Import for custom avatar creation
+from py_avataaars import PyAvataaar, AvatarStyle, SkinColor, HairColor, FacialHairType, TopType, Color, MouthType, EyesType, EyebrowType, NoseType, AccessoriesType, ClotheType, ClotheGraphicType
+
+from PIL import Image
+import cairosvg
+from io import BytesIO
+from django.core.files.base import ContentFile
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
+import os
+from django.conf import settings
+
 
 
 # Create your models here.
@@ -12,9 +25,58 @@ class User(AbstractUser):
     # Creates a teacher field which is set to false by default
     is_teacher = models.BooleanField('teacher', default=False)
 
+    # Creates a image field for storing the users avatar --- Note this ImageField must take a jpg or png.
+    avatar = models.ImageField(upload_to="avatars/", blank=True, null=True)
+
+
+
+    def generate_default_avatar(self):
+        """Generate a default avatar and save it to the user's profile."""
+        avatar = PyAvataaar(
+            style=AvatarStyle.CIRCLE,
+            skin_color=SkinColor.LIGHT,
+            hair_color=HairColor.BROWN,
+            facial_hair_type=FacialHairType.DEFAULT,
+            facial_hair_color=HairColor.BLACK,
+            top_type=TopType.SHORT_HAIR_SHORT_FLAT,
+            hat_color=Color.BLACK,
+            mouth_type=MouthType.SMILE,
+            eye_type=EyesType.DEFAULT,
+            eyebrow_type=EyebrowType.DEFAULT,
+            nose_type=NoseType.DEFAULT,
+            accessories_type=AccessoriesType.DEFAULT,
+            clothe_type=ClotheType.GRAPHIC_SHIRT,
+            clothe_color=Color.HEATHER,
+            clothe_graphic_type=ClotheGraphicType.BAT,
+        )
+
+        # Define path to save PNG file
+        avatar_path = os.path.join(settings.MEDIA_ROOT, "avatars", f"avatar_{self.username}.png")
+
+        # Ensure the avatars directory exists
+        os.makedirs(os.path.dirname(avatar_path), exist_ok=True)
+
+        # Render the avatar as a PNG file
+        avatar.render_png_file(avatar_path)
+
+        # Save the file path to the ImageField
+        self.avatar.name = f"avatars/avatar_{self.username}.png"
+
+
+
     def __str__(self):
         role = "Student" if self.is_student else "Teacher" if self.is_teacher else "None"
         return f"{self.username} - {role}"
+
+
+
+# Generate avatar when user is created
+@receiver(post_save, sender=User)
+def create_user_avatar(sender, instance, created, **kwargs):
+    if created and not instance.avatar:  # Only generate if new user and no avatar set
+        instance.generate_default_avatar()
+        instance.save()
+
 
 
 class Class(models.Model):

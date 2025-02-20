@@ -1,0 +1,42 @@
+{% extends 'KidVenture/teacher_base.html' %}
+
+{% block title %}Leaderboard{% endblock%}
+
+{% block pageName %}
+    <span style="font-size: 30px; cursor: pointer; color: white;" class="nav">&#9776; Leaderboard</span>
+    <span style="font-size: 30px; cursor: pointer; color: white;" class="nav2">&#9776; Leaderboard</span>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'KidVenture/css/classes.css' %}">
+{% endblock %}
+
+
+{% block content %}
+
+
+<h2 style="text-align:center;">Leaderboard</h2>
+    <table>
+        <tr>
+            <th>Rank</th>
+            <th>Name</th>
+            <th>Points</th>
+        </tr>
+        {% for entry in leaderboard %}
+        <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ entry.user.username }}</td>
+            <td>{{ entry.points }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+
+
+
+{% endblock %}
+
+
+
+
+
+
+
