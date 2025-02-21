@@ -15,18 +15,24 @@
 <body>
     <header>
         <h1>Welcome {{ request.user.username }}!</h1>
-
+    
         <div class="header-left">
             <h1 class="kidventure-logo">KidVenture</h1>
         </div>
-
-        <!-- Logout Icon -->
-        <div class="logout-container">
+    
+        <div class="header-right">
+            <!-- Profile Image beside Logout Button -->
+            <a href="{% url 'edit_avatar' %}" class="profile-link">
+                <img src="{{ user.avatar.url }}" alt="Profile" class="profile-image">
+            </a>
+    
+            <!-- Logout Icon -->
             <a href="{% url 'logout_view' %}" class="logout-button" title="Logout">
                 <i class="fa fa-sign-out-alt"></i>
             </a>
         </div>
     </header>
+    
 
     <main>
         <!-- Tabs -->

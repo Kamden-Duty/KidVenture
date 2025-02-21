@@ -16,6 +16,7 @@
 </head>
 
 <body>
+    {% if request.user.is_teacher %}
     <!-- Navbar Section -->
     <div id="mySidenav" class="sidenav">
         <p class="logo"><span>K</span>idVenture</p>
@@ -26,6 +27,7 @@
         <a href="{% url 'leaderboard' %}"" class="icon-a"><i class="fa fa-trophy icons"></i>&nbsp;&nbsp;Leaderboard</a>
         <a href="{% url 'logout_view' %}" class="icon-a"><i class="fa fa-sign-out-alt icons"></i>&nbsp;&nbsp;Logout</a>
     </div>
+    {%endif%}
 
     <div id="main">
         <div class="head">
