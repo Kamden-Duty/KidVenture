@@ -9,34 +9,25 @@
     <link rel="stylesheet" href="{% static 'KidVenture/css/classes.css' %}">
 {% endblock %}
 
-
 {% block content %}
 
-
 <h2 style="text-align:center;">Leaderboard</h2>
-    <table>
-        <tr>
-            <th>Rank</th>
-            <th>Name</th>
-            <th>Points</th>
-        </tr>
-        {% for entry in leaderboard %}
-        <tr>
-            <td>{{ forloop.counter }}</td>
-            <td>{{ entry.user.username }}</td>
-            <td>{{ entry.points }}</td>
-        </tr>
-        {% endfor %}
-    </table>
-
-
-
+<table>
+    <tr>
+        <th>Rank</th>
+        <th>Name</th>
+        <th>Points</th>
+    </tr>
+    {% for entry in leaderboard %}
+    <tr>
+        <td>{{ forloop.counter }}</td>
+        <td class="leaderboard-user">
+            <img src="{{ entry.user.avatar.url }}" alt="{{ entry.user.username }}'s Avatar" class="leaderboard-avatar">
+            {{ entry.user.username }}
+        </td>
+        <td>{{ entry.points }}</td>
+    </tr>
+    {% endfor %}
+</table>
 
 {% endblock %}
-
-
-
-
-
-
-

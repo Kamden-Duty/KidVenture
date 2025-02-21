@@ -280,3 +280,15 @@ select:hover, select:focus {
 
 
 
+.leaderboard-user {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Adds spacing between avatar and username */
+}
+
+.leaderboard-avatar {
+    width: 40px; /* Adjust size */
+    height: 40px;
+    border-radius: 50%; /* Circular avatar */
+    object-fit: cover;
+}
