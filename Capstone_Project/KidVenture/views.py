@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 
 from django.http import HttpResponse, HttpResponseForbidden
 
-from .forms import SignUpForm, LoginForm, CreateClassForm
+from .forms import SignUpForm, LoginForm, CreateClassForm, JoinClassForm
 
 from django.contrib.auth import authenticate, login, logout
 
@@ -21,9 +21,16 @@ from django.db.models import Count, Prefetch
 
 from django.contrib import messages
 
+<<<<<<< Updated upstream
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 import json
+=======
+import logging
+
+logger = logging.getLogger(__name__)
+
+>>>>>>> Stashed changes
 
 
 
@@ -113,7 +120,47 @@ def home(request):
         total_students = request.user.classes.aggregate(total=Count('students'))['total'] or 0
         return render(request, "KidVenture/teacher_page.html", {'total_students': total_students })
     elif request.user.is_student:
-        return render(request, "KidVenture/student_page.html")
+        print("classroom")
+        if not request.user.is_student:
+            return HttpResponseForbidden("You are not authorized to access this page.")
+        
+        # Get the current users student profile
+        try:
+            student = Student.objects.get(user=request.user)
+            classroom = student.classroom
+            activites = Activity.objects.filter(student=student)
+        except Student.DoesNotExist:
+            classroom = None
+            activities = None
+            
+        # If the student hasn't joined a class, redirect them to the join class page
+        # if classroom is None:
+        #     return redirect('join_class')
+        # print(classroom)
+        # Fetch activities linked to the student
+        # completed_activities = Activity.objects.filter(student=student, completed=True)
+        # pending_activities = Activity.objects.filter(student=student, completed=False)
+        
+        # progress = Progress.objects.filter(student=student)
+        # achievements = Achievement.objects.filter(student=student)
+        # announcements = Announcement.objects.filter(classroom=student.classroom)
+        leaderboard = LeaderboardEntry.objects.order_by('-points')[:10]
+        notifications = Notification.objects.filter(user=request.user).order_by('-date')
+        print(notifications)
+        return render(request, 'KidVenture/student_page.html', {
+            # 'activities': activities,
+            # 'completed_activities': completed_activities,
+            # 'pending_activities': pending_activities,
+            # 'progress': progress,
+            # 'achievements': achievements,
+            # 'announcements': announcements,
+            # 'leaderboard': leaderboard,
+            'notifications': notifications,
+            'classroom': classroom,
+            'teacher': classroom.teacher if classroom else None,
+        })
+    else:
+        return HttpResponseForbidden("You are not authorized to view this page.")
 
 
 # def student(request):
@@ -149,6 +196,7 @@ def create_class(request):
             my_class = form.save(commit=False)
             my_class.teacher = request.user
             my_class.access_token = createToken()
+            print("Generated Token:", my_class.access_token)  # Debugging
             my_class.save()
             return redirect('classes')
     else:
@@ -159,35 +207,55 @@ def is_student(user):
     return user.user_type == 'student'
     
 @login_required
-@user_passes_test(is_student)
 def student_homepage(request):
-    # Get the current user's student profile
+    print("classroom")
+    if not request.user.is_student:
+        return HttpResponseForbidden("You are not authorized to access this page.")
+    
+    # Get the current users student profile
     try:
         student = Student.objects.get(user=request.user)
+        classroom = student.classroom
+        activites = Activity.objects.filter(student=student)
     except Student.DoesNotExist:
-        return HttpResponseForbidden("You are not authorized to access this page.")
-
+        classroom = None
+        activities = None
+        
+    # If the student hasn't joined a class, redirect them to the join class page
+    # if classroom is None:
+    #     return redirect('join_class')
+    print(classroom)
     # Fetch activities linked to the student
-    completed_activities = Activity.objects.filter(student=student, completed=True)
-    pending_activities = Activity.objects.filter(student=student, completed=False)
+    # completed_activities = Activity.objects.filter(student=student, completed=True)
+    # pending_activities = Activity.objects.filter(student=student, completed=False)
     
-    progress = Progress.objects.filter(student=student)
-    achievements = Achievement.objects.filter(student=student)
+    # progress = Progress.objects.filter(student=student)
+    # achievements = Achievement.objects.filter(student=student)
     # announcements = Announcement.objects.filter(classroom=student.classroom)
     leaderboard = LeaderboardEntry.objects.order_by('-points')[:10]
     notifications = Notification.objects.filter(user=request.user).order_by('-date')
-
+    print(classroom.teacher)
     return render(request, 'KidVenture/student_page.html', {
         # 'activities': activities,
-        'completed_activities': completed_activities,
-        'pending_activities': pending_activities,
-        'progress': progress,
-        'achievements': achievements,
+        # 'completed_activities': completed_activities,
+        # 'pending_activities': pending_activities,
+        # 'progress': progress,
+        # 'achievements': achievements,
         # 'announcements': announcements,
         'leaderboard': leaderboard,
         'notifications': notifications,
+        'classroom': classroom,
+        'teacher': classroom.teacher if classroom else None,
     })
 
+@login_required
+def calendar_view(request):
+    if not request.user.is_student:
+        return HttpResponseForbidden("You are not authorized to access this page.")
+    
+    # You can add additional logic here, such as fetching calendar events.
+    # For now, we’ll just render a basic calendar page.
+    return render(request, 'KidVenture/calendar_page.html', {})
     
 
 def classes(request):
@@ -255,6 +323,68 @@ def add_student(request, class_id):
 """
 
 # View for allowing student to join classes by entering their respective tokens
+# @login_required
+# def join_class(request):
+#     logger.info("Test1")
+#     # If user not student don't let them join a class
+#     if not request.user.is_student:
+#         return HttpResponseForbidden("Only students can join classes.")
+
+#     if request.method == 'POST':
+#         form = JoinClassForm(request.POST)
+#         if form.is_valid():
+#             logger.info("Test22")
+#             # Get token from form
+#             access_token = request.POST.get('token')
+#             logger.info("Test2")
+
+#             try:
+#                 # Find class that has the given token
+#                 classroom = Class.objects.get(access_token=access_token)
+#             # If not class has a token, say invlaid token  
+#             except Class.DoesNotExist:
+#                 messages.error(request, "Invalid access token. Please try again.")
+#                 logger.info("Test3")
+#                 return render(request, 'KidVenture/join_class.html', {"form": form})
+        
+#             # Check if student is already enrolled
+#             if Student.objects.filter(user=request.user, classroom=classroom).exists():
+#                 messages.error(request, f"You are already enrolled in {classroom.name}.")
+#                 logger.info("Test4")
+#                 return render(request, 'KidVenture/join_class.html', {"form": form})
+            
+#             if Student.objects.filter(user=request.user).exists():
+#                 messages.error(request, "You are already enrolled in another class. Leave your current class before joining a new one.")
+#                 logger.info("Test5")
+#                 return render(request, 'KidVenture/join_class.html', {"form": form})
+
+#             # Create student-class relationship
+#             Student.objects.create(user=request.user, classroom=classroom)
+#             messages.success(request, f"You have successfully joined {classroom.name} with {classroom.teacher.get_full_name()}!")
+#             return redirect('student_homepage')
+        
+#         else:
+#             print(form.errors)
+#             return render(request, 'KidVenture/join_class.html', {"form": form})  # Handle invalid form
+        
+#     else:
+#         form = JoinClassForm()
+
+#         # try:
+#         #     student = Student.objects.get(user=request.user)
+#         #     if student.classroom == classroom:
+#         #         messages.error(request, f"You are already enrolled in {classroom.name}.")
+#         #     else:
+#         #         messages.error(request, "You are already enrolled in another class. Leave your current class before joining a new one.")
+#         #     return redirect('join_class')
+#         # except Student.DoesNotExist:
+#         #     # Student is not enrolled in any class, so add them to this one
+#         #     Student.objects.create(user=request.user, classroom=classroom)
+#         #     messages.success(request, f"You have successfully joined {classroom.name}.")
+#         #     return redirect('classes')
+
+#     return render(request, 'KidVenture/join_class.html', {"form": form})   
+
 @login_required
 def join_class(request):
     # If user not student don't let them join a class
@@ -265,31 +395,36 @@ def join_class(request):
 
         # Get toke from form
         access_token = request.POST.get('access_token')
-
+        print("test")
         try:
             # Find class that has the given token
             classroom = Class.objects.get(access_token=access_token)
+            print("test1")
         # If not class has a token, say invlaid token  
         except Class.DoesNotExist:
             messages.error(request, "Invalid access token. Please try again.")
+            print("test2")
             return redirect('join_class')
+    
 
         try:
             student = Student.objects.get(user=request.user)
+            print(student.classroom)
             if student.classroom == classroom:
                 messages.error(request, f"You are already enrolled in {classroom.name}.")
+                print("test4")
             else:
                 messages.error(request, "You are already enrolled in another class. Leave your current class before joining a new one.")
-            return redirect('join_class')
+                print("test5")
+            return redirect('/')
         except Student.DoesNotExist:
             # Student is not enrolled in any class, so add them to this one
             Student.objects.create(user=request.user, classroom=classroom)
+            Notification.objects.create(user=request.user, title="Enrolled", message=f"You have successfully joined {classroom.name}")
             messages.success(request, f"You have successfully joined {classroom.name}.")
             return redirect('classes')
 
-    return render(request, 'KidVenture/join_class.html')   
-
-
+    return render(request, 'KidVenture/join_class.html') 
 
 
 

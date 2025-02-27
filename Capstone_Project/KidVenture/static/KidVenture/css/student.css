@@ -1,267 +1,71 @@
-body {
-    font-family: Arial, sans-serif;
+/* RESET */
+* {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    background-color: #f4f4f9;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-    height: 100vh;
-     /* Background image */
-    background-image: url('/static/KidVenture/images/background-image.jpg');
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
-    background-repeat: no-repeat;
-}
-
-header {
-    background-color: #4CAF50;
-    color: white;
-    text-align: center;
-    padding: 1.5rem 0;
-}
-
-header h1 {
-    margin: 0;
-    /* font-size: 2rem; */
-    font-size: revert-layer;
-    font-family: initial
-}
-
-.header-left {
-    flex: 1; /* Allows it to take space */
-    text-align: left;
-    font-size: revert-layer;
-    font-family: fantasy;
-    margin-top: -35px;
-}
-
-.kidventure-logo {
-    font-size: 24px;
-    font-weight: bold;
-    margin: 0;
-    color: white;
-}
-
-main {
-    flex: 0.95; /* Fills remaining space to push the footer down */
-    padding: 2rem;
-    max-width: 900px;
-    margin: 2rem auto;
-    background-color: rgba(255, 255, 255, 0.8);
-    border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-
-}
-
-section {
-    margin-bottom: 2rem;
-    padding: 1.5rem;
-    background-color: white;
-    border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-section h2 {
-    margin-bottom: 1rem;
-    font-size: 1.5rem;
-    color: #333;
-}
-
-/* Footer Styling */
-footer {
-    text-align: center;
-    /* padding: 1rem 0; */
-    background-color: #333;
-    color: white;
-    font-size: 0.9rem;
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    margin-top: 10px;
-    height: 2rem;
-}
-
-.tabs {
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
-    margin-bottom: 1rem;
-}
-
-.tab-link {
-    padding: 0.5rem 1.5rem;
-    border: none;
-    background-color: #4CAF50;
-    color: white;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-    font-size: 1rem;
-    text-align: center;
-}
-
-.tab-link.active {
-    background-color: #007BFF;
-    color: white;
-    font-weight: bold;
-}
-
-.tab-link:hover {
-    background-color: #0056b3;
-    transform: scale(1.05);
-}
-
-.tab-content.hidden {
-    display: none;
-}
-
-.tab-content {
-    display: block;
-}
-.progress-bar {
-    background-color: #4CAF50;
-    height: 20px;
-    border-radius: 10px;
-    transition: width 0.5s;
-    position: relative;
-}
-
-.progress-bar::after {
-    content: attr(data-progress) "%";
-    position: absolute;
-    right: 10px;
-    top: 0;
-    font-size: 0.8rem;
-    color: white;
-}
-
-.milestone {
-    font-style: italic;
-    color: #555;
-    margin-top: 5px;
-    font-size: 0.9rem;
-}
-
-.milestone:before {
-    content: "💡 "; /* Add an icon before the message */
-}
-
-.leaderboard-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-    text-align: left;
+  }
+  
+  /* BODY STYLES */
+  body {
     font-family: Arial, sans-serif;
-}
-
-.leaderboard-table th, .leaderboard-table td {
-    padding: 10px;
-    border-bottom: 1px solid #ddd;
-}
-
-.leaderboard-table th {
-    background-color: #4caf50;
-    color: white;
-}
-
-.leaderboard-table tr:nth-child(even) {
-    background-color: #f9f9f9;
-}
-
-.leaderboard-table tr:hover {
-    background-color: #f1f1f1;
-}
-
-.leaderboard-table td {
-    color: #333;
-}
-
-.status.completed {
-    color: green;
-    font-weight: bold;
-}
-
-.status.pending {
-    color: red;
-    font-weight: bold;
-}
-
-@media (max-width: 768px) {
-    .tabs {
-        flex-direction: column;
-        gap: 0.5rem;
-    }
-
-    .leaderboard-table {
-        font-size: 0.8rem;
-    }
-
-    section {
-        padding: 1rem;
-    }
-}
-
-button {
-    background-color: #ffcc00;
-    color: #333;
-    border: none;
-    padding: 10px 15px;
-    font-size: 16px;
-    border-radius: 5px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-button:hover {
-    background-color: #ff9900;
-}
-
-button i {
-    font-size: 20px;
-}
-
-.game-button {
-    margin-bottom: 1rem;
-}
-
-.game-container {
-    display: flex;
-    background: cornsilk;
-    gap: 3rem;
-}
-
-.game-header {
-    font-size: medium;
-    font-family: cursive;
-}
-
-.game-item {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 1rem;
-}
-.logout-container {
+    background-color: #f0f0f0;
+  }
+  
+  /****************************************************
+   * HEADER WRAPPER with top & bottom parts
+   ****************************************************/
+  .header__wrapper {
+    position: relative;
+    width: 100%;
+    background-color: #00A8E8; /* Main teal background for the header */
+    overflow: hidden; /* So wave shapes or other elements don’t overflow */
+    min-height: 140px; /* Enough space for top and bottom parts */
+  }
+  
+  /* LOGO inside the header__wrapper */
+  .header__logoWrapper {
     position: absolute;
-    top: 20px;
-    right: 20px;
-    margin-top: 10px;
-}
-
-.logout-button {
-    font-size: 24px;
-    color: white;
-    text-decoration: none;
-    padding: 10px;
-    background-color: transparent;
-    border: none;
+    top: 10px;   /* Adjust to control vertical positioning */
+    left: 20px;  /* Adjust for horizontal positioning */
+    z-index: 5;  /* Ensure logo is on top */
+  }
+  .header__logoWrapper img {
+    height: 60px;   /* Make sure we see the image */
+    object-fit: contain;
+  }
+  
+  /****************************************************
+   * TOP PART 
+   ****************************************************/
+  .header__topPart {
+    height: 60px;
+    background-color: transparent; /* Or a slightly different teal, if you prefer */
+    display: flex;
+    align-items: center;
+    justify-content: flex-end; /* Right-align channel finder + zip code */
+    padding-right: 20px;
+    position: relative;
+    z-index: 1;
+  }
+  
+  /* Channel Finder & Zip Code group */
+  .cf-zip-container {
+    display: flex;
+    gap: 20px;
+  }
+  .channel-finder {
+    background: #fff;
+    color: #666;
+    font-weight: bold;
+    text-transform: uppercase;
+    padding: 6px 8px;
+    border-radius: 4px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
     cursor: pointer;
+<<<<<<< Updated upstream
 }
 
 /* .logout-button i { */
@@ -301,3 +105,102 @@ button i {
 
 
 
+=======
+  }
+  .channel-finder:hover {
+    background: #eee;
+  }
+  .zip-code {
+    background: #cbeffe;
+    color: #666;
+    font-weight: bold;
+    text-transform: uppercase;
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+  }
+  .zip-code:hover {
+    background: #b6e4fa;
+  }
+  
+  /****************************************************
+   * BOTTOM PART (tabs bar, wave, etc.)
+   ****************************************************/
+  .header__bottomPart {
+    height: 80px;  /* Enough room for tabs or wave shape */
+    background-color: #00BEE5;
+    position: relative;
+    z-index: 2;  /* above or below the logo as needed */
+    display: flex;
+    align-items: flex-end; /* anchor tabs at bottom if you want a wave above them */
+  }
+  
+  /* Sample wave shape on the top edge of bottom part, if you want it */
+  .header__bottomPart::before {
+    content: "";
+    position: absolute;
+    top: -40px; /* position wave upward */
+    left: 0;
+    width: 100%;
+    height: 40px;
+    background: url('data:image/svg+xml;utf8,<svg width="100%%" height="40" viewBox="0 0 100 20" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg"><path d="M0 20 C25 0, 75 0, 100 20 V0 H0 V20 Z" fill=\'%%2300BEE5\'/></svg>') no-repeat;
+    background-size: cover;
+  }
+  
+  /* NAV TABS (white uppercase) */
+  .nav-tabs {
+    list-style: none;
+    display: flex;
+    gap: 30px;
+    margin: 0;
+    padding: 0 20px 10px; /* some bottom padding so text doesn't hug the bottom */
+  }
+  .nav-tabs li {
+    color: #fff;
+    font-size: 18px;
+    font-weight: bold;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+  }
+  .nav-tabs li:hover {
+    opacity: 0.7;
+  }
+  
+  /****************************************************
+   * RESPONSIVE
+   ****************************************************/
+  @media (max-width: 768px) {
+    .header__wrapper {
+      min-height: 120px;
+    }
+    .header__topPart {
+      height: 50px;
+      padding-right: 10px;
+    }
+    .cf-zip-container {
+      gap: 10px;
+    }
+    .channel-finder, .zip-code {
+      font-size: 12px;
+    }
+    .header__bottomPart {
+      height: 60px;
+    }
+    .header__bottomPart::before {
+      top: -30px;
+      height: 30px;
+    }
+    .nav-tabs {
+      gap: 15px;
+      padding: 0 10px 5px;
+    }
+    .nav-tabs li {
+      font-size: 14px;
+    }
+  }
+>>>>>>> Stashed changes
