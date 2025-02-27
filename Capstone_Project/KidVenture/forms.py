@@ -152,3 +152,11 @@ class CreateClassForm(forms.ModelForm):
         fields = ['name']
 
 
+class JoinClassForm(forms.Form):
+    token = forms.CharField(max_length=4, label="Enter Access Token")
+    
+    def clean_token(self):
+        token = self.cleaned_data.get("token")
+        if not Class.objects.filter(access_token=token).exists():
+            raise forms.ValidationError("Invalid access token.")
+        return token

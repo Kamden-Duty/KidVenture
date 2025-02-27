@@ -91,6 +91,7 @@ class Class(models.Model):
 
 class Student(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
+
     classroom = models.ForeignKey(Class,  on_delete=models.CASCADE, related_name='students')
 
     def __str__(self):

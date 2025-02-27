@@ -12,6 +12,9 @@ urlpatterns = [
     path('logout/', views.logout_view, name='logout_view'),
     path('create_class/', views.create_class, name='create_class'),
     path('student/', views.student_homepage, name='student_homepage'),
+    path('student/home/', views.student_homepage, name='student_home'),
+    path('calendar/', views.calendar_view, name='calendar'),
+
     path('teacher_page/', views.home, name='teacher'),
     path('alphabet_matching/', views.alphabet_matching, name='alphabet_matching'),
     path('alphabet_memory/', views.alphabet_memory, name='alphabet_memory'),
@@ -24,7 +27,7 @@ urlpatterns = [
     path('save_game_progress/', views.save_game_progress, name='save_game_progress'),    path('assign_activity/', views.assign_activity, name='assign_activity'),
     path('leaderboard/', views.leaderboard_view, name='leaderboard'),
     path("edit-avatar/", views.edit_avatar, name="edit_avatar"),
-     path("update-avatar-preview/", views.update_avatar_preview, name="update_avatar_preview"),
+    path("update-avatar-preview/", views.update_avatar_preview, name="update_avatar_preview"),
 
 
     path('get_last_session/', get_last_session, name='get_last_session'),
