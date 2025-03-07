@@ -21,16 +21,14 @@ from django.db.models import Count, Prefetch
 
 from django.contrib import messages
 
-<<<<<<< Updated upstream
+
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 import json
-=======
+
 import logging
 
 logger = logging.getLogger(__name__)
-
->>>>>>> Stashed changes
 
 
 
