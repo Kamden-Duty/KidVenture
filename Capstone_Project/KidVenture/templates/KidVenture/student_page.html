@@ -584,7 +584,6 @@
   </style>
 </head>
 <body>
-<<<<<<< Updated upstream
     <header>
         <h1>Welcome {{ request.user.username }}!</h1>
     
@@ -605,50 +604,6 @@
         </div>
     </header>
     
-=======
-
-  <!-- LEFT NAV -->
-  <div class="left-nav">
-    <div class="account-button" id="accountBtn">TN</div>
-    <!-- Home Icon -->
-    <div class="nav-item" title="Dashboard">
-      <a href="{% url 'student_homepage' %}">
-        <i class="fas fa-home" style="color: white;"></i>
-      </a>
-    </div>
-    <div class="nav-item" title="Courses">
-      <i class="fas fa-book"></i>
-    </div>
-    <div class="nav-item" title="Calendar">
-      <a href="{% url 'calendar' %}">
-        <i class="fas fa-calendar" style="color: white;"></i>
-      </a>
-    </div>
-    <div class="nav-item" title="Inbox">
-      <i class="fas fa-inbox"></i>
-    </div>
-  </div>
-
-  <!-- ACCOUNT PANEL -->
-  <div class="account-panel" id="accountPanel">
-    <div class="account-header">
-      <div class="user-info">
-        <div class="user-initials">TN</div>
-        <div class="user-details">
-          <span class="name">{{ request.user.get_full_name|default:request.user.username }}</span>
-          <button class="logout-button" onclick="location.href='{% url 'logout_view' %}'">Logout</button>
-        </div>
-      </div>
-      <button class="close-btn" id="closeBtn">✕</button>
-    </div>
-    <div class="account-links">
-      <a href="#">Notifications</a>
-      <a href="#">Profile</a>
-      <a href="#">Files</a>
-      <a href="#">Settings</a>
-    </div>
-  </div>
->>>>>>> Stashed changes
 
   <!-- TWO-PART HEADER -->
   <div class="header__wrapper" role="navigation">
