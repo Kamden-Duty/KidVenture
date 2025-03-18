@@ -92,14 +92,9 @@ function saveGameProgress(level, timeTaken, mistakes, mismatchedLetters) {
     })
     .then(response => response.json())
     .then(data => {
-        console.log('Server response:', data);
-        if (data.status === 'success') {
-            console.log('Game progress saved successfully.');
-        } else {
-            console.error('Error saving game progress.');
-        }
+        console.log('Success:', data);
     })
-    .catch(error => {
+    .catch((error) => {
         console.error('Error:', error);
     });
 }
@@ -306,10 +301,9 @@ document.getElementById("level-up-sound").addEventListener("ended", advanceToNex
 
 document.addEventListener("DOMContentLoaded", () => {
     fetch('/get_last_session/')
-        .then(response => response.text()) // Change to response.text() to log the raw response
-        .then(text => {
-            console.log('Raw response:', text); // Log the raw response
-            const data = JSON.parse(text); // Parse the response text as JSON
+        .then(response => response.json())
+        .then(data => {
+            console.log('Raw response:', data); // Log the raw response
             if (data.last_level && data.last_level > 1) {
                 console.log('Last level:', data.last_level);
                 showSessionModal(data.last_level);
@@ -324,25 +318,36 @@ document.addEventListener("DOMContentLoaded", () => {
             initializeGame();
             showGameElements();
         });
+
+    // Add event listeners for the modal buttons
+    document.getElementById("continue-btn").addEventListener("click", () => {
+        fetch('/get_last_session/')
+            .then(response => response.json())
+            .then(data => {
+                currentLevel = data.last_level + 1;
+                totalMatches = currentLevel + 1;
+                document.getElementById("session-modal").style.display = "none"; // Hide the modal
+                initializeGame();
+                showGameElements();
+            })
+            .catch(error => {
+                console.error('Error fetching last session:', error);
+                document.getElementById("session-modal").style.display = "none"; // Hide the modal
+                initializeGame();
+                showGameElements();
+            });
+    });
+
+    document.getElementById("start-over-btn").addEventListener("click", () => {
+        document.getElementById("session-modal").style.display = "none"; // Hide the modal
+        initializeGame();
+        showGameElements();
+    });
 });
 
 function showSessionModal(lastLevel) {
     const modal = document.getElementById("session-modal");
-    modal.style.display = "block";
-
-    document.getElementById("continue-btn").addEventListener("click", () => {
-        currentLevel = lastLevel;
-        totalMatches = currentLevel + 1;
-        modal.style.display = "none";
-        initializeGame();
-        showGameElements();
-    });
-
-    document.getElementById("start-over-btn").addEventListener("click", () => {
-        modal.style.display = "none";
-        initializeGame();
-        showGameElements();
-    });
+    modal.style.display = "flex"; // Show the modal
 }
 
 function showGameElements() {

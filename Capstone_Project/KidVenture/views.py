@@ -1,3 +1,9 @@
+import random
+
+import string
+
+import json
+
 from django.shortcuts import render, redirect, get_object_or_404
 
 from django.http import HttpResponse, HttpResponseForbidden
@@ -6,33 +12,22 @@ from .forms import SignUpForm, LoginForm, CreateClassForm, JoinClassForm
 
 from django.contrib.auth import authenticate, login, logout
 
-
 from django.contrib.auth.decorators import login_required
 
 from django.contrib.auth.decorators import login_required, user_passes_test
 
 from .models import *
 
-import random
-
-import string
-
 from django.db.models import Count, Prefetch
 
 from django.contrib import messages
 
-<<<<<<< Updated upstream
 from django.views.decorators.csrf import csrf_exempt
+
 from django.http import JsonResponse
-import json
-=======
-import logging
 
-logger = logging.getLogger(__name__)
-
->>>>>>> Stashed changes
-
-
+from django.db.models import Max, Sum, Avg, F
+from django.db.models.functions import Length
 
 # Avatar imports
 from py_avataaars import (
@@ -208,44 +203,28 @@ def is_student(user):
     
 @login_required
 def student_homepage(request):
-    print("classroom")
-    if not request.user.is_student:
-        return HttpResponseForbidden("You are not authorized to access this page.")
-    
-    # Get the current users student profile
-    try:
-        student = Student.objects.get(user=request.user)
-        classroom = student.classroom
-        activites = Activity.objects.filter(student=student)
-    except Student.DoesNotExist:
-        classroom = None
-        activities = None
-        
-    # If the student hasn't joined a class, redirect them to the join class page
-    # if classroom is None:
-    #     return redirect('join_class')
-    print(classroom)
-    # Fetch activities linked to the student
-    # completed_activities = Activity.objects.filter(student=student, completed=True)
-    # pending_activities = Activity.objects.filter(student=student, completed=False)
-    
-    # progress = Progress.objects.filter(student=student)
-    # achievements = Achievement.objects.filter(student=student)
-    # announcements = Announcement.objects.filter(classroom=student.classroom)
-    leaderboard = LeaderboardEntry.objects.order_by('-points')[:10]
+    # Fetch leaderboard data
+    leaderboard = (
+        GameProgress.objects.values('user__username', 'user__avatar')  # Assuming 'avatar' is a field in the User model
+        .annotate(
+            max_level=Max('level'),
+            total_mistakes=Sum('mistakes'),
+            avg_time=Avg('time_taken'),
+            total_mismatches=Sum(Length('mismatched_letters'))  # Count mismatches
+        )
+        .order_by('-max_level', 'total_mistakes', 'avg_time', 'total_mismatches')
+    )
+
+    # Fetch other necessary data
+    classroom = request.user.classroom if hasattr(request.user, 'classroom') else None
+    teacher = classroom.teacher if classroom else None
     notifications = Notification.objects.filter(user=request.user).order_by('-date')
-    print(classroom.teacher)
+
     return render(request, 'KidVenture/student_page.html', {
-        # 'activities': activities,
-        # 'completed_activities': completed_activities,
-        # 'pending_activities': pending_activities,
-        # 'progress': progress,
-        # 'achievements': achievements,
-        # 'announcements': announcements,
         'leaderboard': leaderboard,
-        'notifications': notifications,
         'classroom': classroom,
-        'teacher': classroom.teacher if classroom else None,
+        'teacher': teacher,
+        'notifications': notifications,
     })
 
 @login_required
@@ -501,10 +480,31 @@ def save_game_progress(request):
 def get_last_session(request):
     try:
         last_progress = GameProgress.objects.filter(user=request.user).latest('timestamp')
-        return JsonResponse({'last_level': last_progress.level})
+        data = {
+            'last_level': last_progress.level,
+            'time_taken': last_progress.time_taken,
+            'mistakes': last_progress.mistakes,
+            'mismatched_letters': last_progress.mismatched_letters,
+        }
+        return JsonResponse(data)
     except GameProgress.DoesNotExist:
-        return JsonResponse({'last_level': None})
+        return JsonResponse({'last_level': 1})  # Default to level 1 if no progress found
 
+
+@login_required
+def get_leaderboard(request):
+    leaderboard = (
+        GameProgress.objects.values('user__username', 'user__avatar')  # Assuming 'avatar' is a field in the User model
+        .annotate(
+            max_level=Max('level'),
+            total_mistakes=Sum('mistakes'),
+            avg_time=Avg('time_taken'),
+            total_mismatches=Sum(Length('mismatched_letters'))  # Count mismatches
+        )
+        .order_by('-max_level', 'total_mistakes', 'avg_time', 'total_mismatches')
+    )
+
+    return JsonResponse({'leaderboard': list(leaderboard)})
 
 
 def assign_activity(request):
