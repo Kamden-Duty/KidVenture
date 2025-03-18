@@ -652,6 +652,7 @@
         </div>
         <div>
           <span class="name">
+            <h1>request: {{ request }}</h1>
             Welcome to KidVenture, {{
             request.user.get_full_name|default:request.user.username }}</span
           >
@@ -781,7 +782,7 @@
                 <th>Max Level</th>
                 <th>Total Mistakes</th>
                 <th>Average Time</th>
-                <th>Total Mismatches</th>
+                <th>Total Matches</th>
               </tr>
             </thead>
             <tbody>
