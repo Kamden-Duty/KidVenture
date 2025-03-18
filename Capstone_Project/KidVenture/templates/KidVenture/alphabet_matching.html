@@ -1,75 +1,131 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Matching Game</title>
     {% load static %}
-    <link
-      rel="stylesheet"
-      href="{% static 'KidVenture/css/alphabet_matching.css' %}"
-    />
-  </head>
-  <body>
+    <link rel="stylesheet" href="{% static 'KidVenture/css/alphabet_matching.css' %}" />
+</head>
+<body>
     <div>
-      <a href="{% url 'game_selection' %}">Back to Game Selection</a>
+        <a id="back-link" href="{% url 'game_selection' %}">Back to Game Selection</a>
     </div>
-    <h1>Welcome {{ request.user.username }}!</h1>
-    <h1>Matching Game</h1>
-    <p>Match the uppercase and lowercase letters</p>
-    <div id="timer" class="hidden">Time: 0 seconds</div>
-    <div class="score-container hidden">
-      <div id="score">Score: 0 / 10</div>
-      <div id="mismatched">Mismatched: 0</div>
-    </div>
-    <div id="game-board" class="hidden"></div>
 
-    <!-- Modal for session prompt -->
-    <div id="session-modal" class="modal">
-      <div class="modal-content">
-        <p>
-          Do you want to continue from your last session or start from the first
-          level?
-        </p>
-        <button id="continue-btn">Continue</button>
-        <button id="start-over-btn">Start Over</button>
-      </div>
+    <h1>Welcome {{ request.user.username }}!</h1>
+
+    <h1 id="game-title">Matching Game</h1>
+
+    <!-- Display the mode -->
+    <p id="game-mode-text"><strong>Mode:</strong> <span id="game-type"></span></p>
+
+    <p id="instruction-text">Match the uppercase and lowercase letters</p>
+
+    <div id="timer">Time: 0 seconds</div>
+
+    <div class="score-container">
+        <div id="score">Score: 0 / 10</div>
+        <div id="mismatched">Mismatched: 0</div>
+    </div>
+
+    <div id="game-board"></div>
+
+    <!-- Modal for session prompt (Only for Free Play Mode) -->
+    <div id="session-modal" class="modal hidden">
+        <div class="modal-content">
+            <p>Do you want to continue from your last session or start from the first level?</p>
+            <button id="continue-btn">Continue</button>
+            <button id="start-over-btn">Start Over</button>
+        </div>
     </div>
 
     <!-- Overlay for end level messages -->
     <div id="end-level-overlay" class="overlay">
-      <div id="end-level-message" class="message"></div>
+        <div id="end-level-message" class="message"></div>
     </div>
 
-    <!-- #region Audio elements for sound effects -->
-    <audio
-      id="card-click-sound"
-      src="{% static 'KidVenture/sound_effects/card_click_sound.mp3' %}"
-      preload="auto"
-    ></audio>
-    <audio
-      id="match-sound"
-      src="{% static 'KidVenture/sound_effects/correct.mp3' %}"
-      preload="auto"
-    ></audio>
-    <audio
-      id="mismatch-sound"
-      src="{% static 'KidVenture/sound_effects/mismatch-sound.mp3' %}"
-      preload="auto"
-    ></audio>
-    <audio
-      id="level-up-sound"
-      src="{% static 'KidVenture/sound_effects/LevelUp.mp3' %}"
-      preload="auto"
-    ></audio>
-    <!-- #endregion -->
+    <!-- Audio elements for sound effects -->
+    <audio id="card-click-sound" src="{% static 'KidVenture/sound_effects/card_click_sound.mp3' %}" preload="auto"></audio>
+    <audio id="match-sound" src="{% static 'KidVenture/sound_effects/correct.mp3' %}" preload="auto"></audio>
+    <audio id="mismatch-sound" src="{% static 'KidVenture/sound_effects/mismatch-sound.mp3' %}" preload="auto"></audio>
+    <audio id="level-up-sound" src="{% static 'KidVenture/sound_effects/LevelUp.mp3' %}" preload="auto"></audio>
 
-    <!-- Include the main script with type="module" -->
-    <script
-      type="module"
-      src="{% static 'KidVenture/js/alphabet_matching.js' %}"
-    ></script>
+    <!-- Include the main script -->
+    <script type="module" src="{% static 'KidVenture/js/alphabet_matching.js' %}"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
     {% csrf_token %}
-  </body>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const activityId = urlParams.get('activity');  // Check if the game is an assigned activity
+
+            const sessionModal = document.getElementById("session-modal");
+            const gameModeText = document.getElementById("game-mode-text");
+            const gameTypeText = document.getElementById("game-type");
+            const backLink = document.getElementById("back-link");
+
+            if (activityId) {
+                // Activity Mode: Hide session modal and update text
+                console.log("Game started for assigned activity. No session options needed.");
+                if (sessionModal) sessionModal.classList.add("hidden"); // Ensure session modal stays hidden
+                if (gameModeText) gameModeText.innerHTML = "<strong>Mode:</strong> Activity - Complete the assigned activity!";
+                if (gameTypeText) gameTypeText.textContent = "Activity";
+                if (backLink) backLink.href = "/"; // Send back to student homepage
+
+                // Start game immediately for activities
+                initializeGame();
+            } else {
+                // Free Play Mode: Check last saved session
+                console.log("Standard game mode - Checking last session progress.");
+                if (gameTypeText) gameTypeText.textContent = "Free Play - Play at your own pace!";
+                
+                fetch('/get_last_session/')
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Server response:', data);
+                        
+                        if (data.last_level && data.last_level > 1) {
+                            console.log('Last level found:', data.last_level);
+                            if (sessionModal) {
+                                sessionModal.classList.remove("hidden"); // Show session modal for Free Play Mode
+                                sessionModal.style.display = "block";  // Ensure visibility
+                            }
+
+                            // Handle session buttons
+                            document.getElementById("continue-btn").addEventListener("click", () => {
+                                currentLevel = data.last_level;
+                                totalMatches = currentLevel + 1;
+                                if (sessionModal) sessionModal.style.display = "none"; // Hide modal
+                                initializeGame();
+                                showGameElements();
+                            });
+
+                            document.getElementById("start-over-btn").addEventListener("click", () => {
+                                if (sessionModal) sessionModal.style.display = "none"; // Hide modal
+                                initializeGame(); // Start fresh
+                                showGameElements();
+                            });
+
+                        } else {
+                            console.log("No previous session found. Starting new game.");
+                            initializeGame();
+                            showGameElements();
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching last session:', error);
+                        initializeGame(); // If error, start a new game
+                        showGameElements();
+                    });
+            }
+        });
+
+        function showGameElements() {
+            document.getElementById("timer").classList.remove("hidden");
+            document.querySelector(".score-container").classList.remove("hidden");
+            document.getElementById("game-board").classList.remove("hidden");
+        }
+    </script>
+</body>
 </html>

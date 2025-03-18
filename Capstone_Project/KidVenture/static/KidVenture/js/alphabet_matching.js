@@ -1,5 +1,9 @@
 import { messages, MessageCategories } from '/static/KidVenture/js/messages.js';
 
+
+const urlParams = new URLSearchParams(window.location.search);
+const activityId = urlParams.get('activity') || null;
+
 const maxLevel = 25;
 const allLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 const cardClickSound = document.getElementById("card-click-sound");
@@ -73,14 +77,19 @@ function updateScore() {
     ).textContent = `Mismatched: ${mismatchCount}`;
 }
 
-function saveGameProgress(level, timeTaken, mistakes, mismatchedLetters) {
+function saveGameProgress(level, timeTaken, mistakes, mismatchedLetters, activityId = null) {
     const data = {
         level: level,
         time_taken: timeTaken,
         mistakes: mistakes,
         mismatched_letters: mismatchedLetters
     };
-    console.log('Sending data to server:', data);
+
+    if (activityId) {
+        data.activity_id = activityId;  // Attach activity ID if available
+    }
+
+    console.log('Sending game progress data:', data);
 
     fetch('/save_game_progress/', {
         method: 'POST',
@@ -93,14 +102,9 @@ function saveGameProgress(level, timeTaken, mistakes, mismatchedLetters) {
     .then(response => response.json())
     .then(data => {
         console.log('Server response:', data);
-        if (data.status === 'success') {
-            console.log('Game progress saved successfully.');
-        } else {
-            console.error('Error saving game progress.');
-        }
     })
     .catch(error => {
-        console.error('Error:', error);
+        console.error('Error saving game progress:', error);
     });
 }
 
@@ -120,34 +124,75 @@ function getCookie(name) {
 }
 
 function advanceToNextLevel() {
-    console.log("Advancing to next level...");
-    console.log("Current Level:", currentLevel);
-    console.log("Elapsed Seconds:", elapsedSeconds);
-    console.log("Mismatch Count:", mismatchCount);
-    console.log("Mismatched Letters:", mismatchedLetters);
+    if (matches === totalMatches) {  // Ensure user completed the level
+        console.log("Level complete! Moving to next level...");
+        console.log("Current Level:", currentLevel);
+        console.log("Elapsed Seconds:", elapsedSeconds);
+        console.log("Mismatch Count:", mismatchCount);
+        console.log("Mismatched Letters:", mismatchedLetters);
+       
+        if (activityId) {
+            // If it's an Activity, check if the full activity is completed
+            saveGameProgress(currentLevel, elapsedSeconds, mismatchCount, mismatchedLetters, activityId);
+            fetch(`/check_activity_progress/${activityId}/`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.completed) {
+                        alert("Activity completed! Redirecting...");
 
-    saveGameProgress(currentLevel, elapsedSeconds, mismatchCount, mismatchedLetters);
-    currentLevel++;
-    console.log("New Level:", currentLevel);
+                        // Call the Django view to mark the activity as completed
+                        fetch(`/complete_activity/${activityId}/`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRFToken': getCookie('csrftoken')
+                            },
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            console.log("Activity completion response:", data);
+                            window.location.href = "/"; // Redirect home after marking complete
+                        })
+                        .catch(error => {
+                            console.error("Error marking activity complete:", error);
+                        });
 
-    if (currentLevel > maxLevel) {
-        alert(
-            `Congratulations! You completed all levels in ${elapsedSeconds} seconds.`
-        );
-        return;
+                    } else {
+                        // If not complete, move to the next level
+                        currentLevel++;
+                        saveGameProgress(currentLevel, elapsedSeconds, mismatchCount, mismatchedLetters, activityId);
+                        matches = 0;  
+                        totalMatches = currentLevel + 1;
+                        initializeGame();
+                    }
+                })
+                .catch(error => {
+                    console.error("Error checking activity progress:", error);
+                    alert("There was an issue checking activity progress. Please try again.");
+                });
+
+        } else {
+            // Free Play: Move to the next level normally
+            currentLevel++;
+            saveGameProgress(currentLevel, elapsedSeconds, mismatchCount, mismatchedLetters, activityId);
+            matches = 0;
+            totalMatches = currentLevel + 1;
+
+            if (currentLevel > maxLevel) {
+                alert(`Congratulations! You completed all levels in ${elapsedSeconds} seconds.`);
+                return;
+            }
+            initializeGame();
+        }
+    } else {
+        console.log("User hasn't completed the level yet. Waiting for all matches.");
     }
-
-    matches = 0;
-    totalMatches = currentLevel + 1;
-    elapsedSeconds = 0;
-    timerStarted = false;
-    firstCard = null;
-    secondCard = null;
-    mismatchedLetters = []; // Reset mismatched letters for the new level
-
-    document.getElementById("timer").textContent = "Time: 0 seconds";
-    initializeGame();
 }
+
+
+
+
+
 
 function triggerConfetti() {
     confetti({
@@ -198,13 +243,16 @@ function onCardClick(event) {
             if (matches === totalMatches) {
                 stopTimer();
                 playSound("level-up-sound");
-                triggerConfetti(); 
-                displayEndLevelMessages(timerInterval, mismatchCount);
-
-                // Add an event listener to call advanceToNextLevel once the level-up sound ends
+                triggerConfetti();
+                displayEndLevelMessages(elapsedSeconds, mismatchCount);
+            
+                // Ensure the next level only advances when the user got all matches
                 const levelUpSound = document.getElementById("level-up-sound");
+                levelUpSound.removeEventListener("ended", advanceToNextLevel);
                 levelUpSound.addEventListener("ended", advanceToNextLevel);
             }
+            
+            
         } else {
             playSound("mismatch-sound");
             mismatchCount++; 
@@ -304,30 +352,96 @@ function displayEndLevelMessages(elapsedSeconds, mismatchCount) {
 // Add this event listener to call advanceToNextLevel once the sound has finished playing
 document.getElementById("level-up-sound").addEventListener("ended", advanceToNextLevel);
 
+
 document.addEventListener("DOMContentLoaded", () => {
-    fetch('/get_last_session/')
-        .then(response => response.text()) // Change to response.text() to log the raw response
-        .then(text => {
-            console.log('Raw response:', text); // Log the raw response
-            const data = JSON.parse(text); // Parse the response text as JSON
-            if (data.last_level && data.last_level > 1) {
-                console.log('Last level:', data.last_level);
-                showSessionModal(data.last_level);
-            } else {
-                console.log('No last session found.');
+    const urlParams = new URLSearchParams(window.location.search);
+    const activityId = urlParams.get('activity'); // Check if it's an assigned activity
+
+    const sessionModal = document.getElementById("session-modal");
+    const gameModeText = document.getElementById("game-mode-text");
+    const gameTypeText = document.getElementById("game-type");
+
+    if (activityId) {
+        console.log("Game started for assigned activity. Checking last progress...");
+
+        // Fetch last saved progress for this activity
+        fetch(`/get_activity_progress/${activityId}/`)
+            .then(response => response.json())
+            .then(data => {
+                console.log("Activity progress response:", data);
+
+                if (data.last_level && data.last_level > 1) {
+                    currentLevel = data.last_level; // Restore last completed level
+                    totalMatches = currentLevel + 1;
+                    console.log(`Resuming activity from level ${currentLevel}`);
+                }
+
+                if (gameModeText) gameModeText.textContent = "Complete the assigned activity!";
+                if (gameTypeText) gameTypeText.textContent = "Mode: Activity";
+
+                initializeGame(); // Start game at last saved level
+            })
+            .catch(error => {
+                console.error("Error fetching activity progress:", error);
+                alert("There was an issue loading your progress. Starting from Level 1.");
+                initializeGame();
+            });
+
+    } else {
+        console.log("Standard game mode - Checking last session progress.");
+        if (gameTypeText) gameTypeText.textContent = "Mode: Free Play";
+
+        fetch('/get_last_session/')
+            .then(response => response.json())
+            .then(data => {
+                console.log('Free play session response:', data);
+
+                if (data.last_level && data.last_level > 1) {
+                    console.log('Last level found:', data.last_level);
+                    if (sessionModal) {
+                        sessionModal.classList.remove("hidden"); 
+                        sessionModal.style.display = "block";  
+                    }
+
+                    document.getElementById("continue-btn").addEventListener("click", () => {
+                        currentLevel = data.last_level;
+                        totalMatches = currentLevel + 1;
+                        sessionModal.style.display = "none"; // Hide modal
+                        initializeGame();
+                        showGameElements();
+                    });
+
+                    document.getElementById("start-over-btn").addEventListener("click", () => {
+                        sessionModal.style.display = "none"; // Hide modal
+                        initializeGame();
+                        showGameElements();
+                    });
+
+                } else {
+                    console.log("No previous session found. Starting new game.");
+                    initializeGame();
+                    showGameElements();
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching last session:', error);
                 initializeGame();
                 showGameElements();
-            }
-        })
-        .catch(error => {
-            console.error('Error fetching last session:', error);
-            initializeGame();
-            showGameElements();
-        });
+            });
+    }
 });
 
+
+
+
 function showSessionModal(lastLevel) {
+    if (activityId) {
+        return; // Skip modal for activity mode
+    }
+
     const modal = document.getElementById("session-modal");
+    if (!modal) return;  // Prevent errors if modal is missing
+
     modal.style.display = "block";
 
     document.getElementById("continue-btn").addEventListener("click", () => {
@@ -339,11 +453,49 @@ function showSessionModal(lastLevel) {
     });
 
     document.getElementById("start-over-btn").addEventListener("click", () => {
-        modal.style.display = "none";
-        initializeGame();
+        sessionModal.style.display = "none"; // Hide modal
+    
+        if (!activityId) {  // Only reset if NOT in activity mode
+            console.log("Resetting free play progress...");
+    
+            // Reset all variables
+            currentLevel = 1;
+            totalMatches = 2;
+            elapsedSeconds = 0;
+            matches = 0;
+            mismatchCount = 0;
+            mismatchedLetters = [];
+            timerStarted = false;
+    
+            // Clear backend progress in free play mode
+            fetch('/reset_free_play_progress/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log("Free play progress reset:", data);
+                initializeGame(); // Start fresh after reset
+            })
+            .catch(error => {
+                console.error("Error resetting free play progress:", error);
+                alert("There was an issue resetting progress. Please try again.");
+            });
+    
+        } else {
+            console.log("Start Over clicked in activity mode - Progress remains saved.");
+            initializeGame(); // Just restart the game without resetting progress
+        }
+    
         showGameElements();
     });
+    
 }
+
+
 
 function showGameElements() {
     document.getElementById("timer").classList.remove("hidden");

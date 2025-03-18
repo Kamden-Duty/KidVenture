@@ -1,0 +1,62 @@
+{% extends 'KidVenture/teacher_base.html' %}
+
+{% block title %}Progress Overview{% endblock %}
+
+{% block pageName %}
+    <span style="font-size: 30px; cursor: pointer; color: white;" class="nav">&#9776; Progress</span>
+    <span style="font-size: 30px; cursor: pointer; color: white;" class="nav2">&#9776; Progress</span>
+{% endblock %}
+
+{% block content %}
+<div class="content-box">
+    <h2>Progress Overview</h2>
+
+    <!-- Class Filter Dropdown -->
+    <label for="class-filter">Select Class:</label>
+    <select id="class-filter" onchange="filterByClass()" style="margin-bottom: 10px; padding: 5px;">
+        <option value="all">All Classes</option>
+        {% for classroom in classes %}
+            <option value="{{ classroom.name }}">{{ classroom.name }}</option>
+        {% endfor %}
+    </select>
+
+    <!-- Search Bar -->
+    <input type="text" id="search-bar" placeholder="Search by student..." onkeyup="filterTable()" style="width: 100%; padding: 10px; margin-bottom: 20px;">
+
+    <!-- Export Button -->
+    <button onclick="exportTableToCSV()" style="margin-bottom: 20px; padding: 10px 20px; background-color: #84aca3; color: #4c6f66; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">Export as CSV</button>
+
+    <div class="table-container">
+        <table class="progress-overview-table" id="progress-table">
+            <thead>
+                <tr>
+                    <th onclick="sortTable(0)" style="cursor: pointer;">Student Name</th>
+                    <th onclick="sortTable(1)" style="cursor: pointer;">Class</th>
+                    <th>Activity</th>
+                    <th onclick="sortTable(2)" style="cursor: pointer;">Progress</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for progress in progress_data %}
+                <tr class="student-row" data-class="{{ progress.class_name }}">
+                    <td>{{ progress.student_name }}</td>
+                    <td>{{ progress.class_name }}</td>
+                    <td>{{ progress.activity_name }}</td>
+                    <td>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar" data-progress="{{ progress.percent_complete }}">
+                                {{ progress.percent_complete }}%
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% load static %}
+<script src="{% static 'KidVenture/js/progress_overview.js' %}"></script>
+
+{% endblock %}

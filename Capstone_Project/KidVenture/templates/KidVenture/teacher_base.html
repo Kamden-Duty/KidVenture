@@ -23,8 +23,8 @@
         <a href="{% url 'home' %}" class="icon-a"><i class="fa fa-tachometer-alt icons"></i>&nbsp;&nbsp;Dashboard</a>
         <a href="{% url 'classes' %}" class="icon-a"><i class="fa fa-chalkboard-teacher icons"></i>&nbsp;&nbsp;Classes</a>
         <a href="{% url 'teacher_students' %}" class="icon-a"><i class="fa fa-user-graduate icons"></i>&nbsp;&nbsp;Students</a>
-        <a href="#" class="icon-a"><i class="fa fa-chart-line icons"></i>&nbsp;&nbsp;Progress</a>
-        <a href="{% url 'leaderboard' %}"" class="icon-a"><i class="fa fa-trophy icons"></i>&nbsp;&nbsp;Leaderboard</a>
+        <a href="{% url 'progress_overview' %}" class="icon-a"><i class="fa fa-chart-line icons"></i>&nbsp;&nbsp;Progress</a>
+        <a href="{% url 'leaderboard' %}" class="icon-a"><i class="fa fa-trophy icons"></i>&nbsp;&nbsp;Leaderboard</a>
         <a href="{% url 'logout_view' %}" class="icon-a"><i class="fa fa-sign-out-alt icons"></i>&nbsp;&nbsp;Logout</a>
     </div>
     {%endif%}
