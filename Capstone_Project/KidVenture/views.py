@@ -215,6 +215,8 @@ def student_homepage(request):
         .order_by('-max_level', 'total_mistakes', 'avg_time', 'total_mismatches')
     )
 
+    print('Leaderboard data:', leaderboard)  # Add this line for debugging
+
     # Fetch other necessary data
     classroom = request.user.classroom if hasattr(request.user, 'classroom') else None
     teacher = classroom.teacher if classroom else None
@@ -491,6 +493,9 @@ def get_last_session(request):
         return JsonResponse({'last_level': 1})  # Default to level 1 if no progress found
 
 
+from django.db.models import Max, Sum, Avg
+from django.db.models.functions import Length
+
 @login_required
 def get_leaderboard(request):
     leaderboard = (
@@ -505,7 +510,6 @@ def get_leaderboard(request):
     )
 
     return JsonResponse({'leaderboard': list(leaderboard)})
-
 
 def assign_activity(request):
     if request.method == "POST":
