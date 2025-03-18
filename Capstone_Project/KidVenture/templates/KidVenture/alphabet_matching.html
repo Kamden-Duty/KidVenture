@@ -12,9 +12,14 @@
   </head>
   <body>
     <div>
-      <a href="{% url 'game_selection' %}">Back to Game Selection</a>
+      {% if request.user.is_teacher %}
+      <a href="{% url 'teacher_homepage' %}">Back to Homepage</a>
+      {% elif request.user.is_student %}
+      <a href="{% url 'student_homepage' %}">Back to Homepage</a>
+      {% else %}
+      <a href="{% url 'home' %}">Back to Homepage</a>
+      {% endif %}
     </div>
-    <h1>Welcome {{ request.user.username }}!</h1>
     <h1>Matching Game</h1>
     <p>Match the uppercase and lowercase letters</p>
     <div id="timer" class="hidden">Time: 0 seconds</div>
