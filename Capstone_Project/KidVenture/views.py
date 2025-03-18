@@ -200,9 +200,22 @@ def create_class(request):
 
 def is_student(user):
     return user.user_type == 'student'
-    
+
 @login_required
 def student_homepage(request):
+    print("classroom")
+    if not request.user.is_student:
+        return HttpResponseForbidden("You are not authorized to access this page.")
+    
+    # Get the current user's student profile
+    try:
+        student = Student.objects.get(user=request.user)
+        classroom = student.classroom
+        activities = Activity.objects.filter(student=student)
+    except Student.DoesNotExist:
+        classroom = None
+        activities = None
+
     # Fetch leaderboard data
     leaderboard = (
         GameProgress.objects.values('user__username', 'user__avatar')  # Assuming 'avatar' is a field in the User model
@@ -218,15 +231,13 @@ def student_homepage(request):
     print('Leaderboard data:', leaderboard)  # Add this line for debugging
 
     # Fetch other necessary data
-    classroom = request.user.classroom if hasattr(request.user, 'classroom') else None
-    teacher = classroom.teacher if classroom else None
     notifications = Notification.objects.filter(user=request.user).order_by('-date')
 
     return render(request, 'KidVenture/student_page.html', {
         'leaderboard': leaderboard,
-        'classroom': classroom,
-        'teacher': teacher,
         'notifications': notifications,
+        'classroom': classroom,
+        'teacher': classroom.teacher if classroom else None,
     })
 
 @login_required
