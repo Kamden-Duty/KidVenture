@@ -53,6 +53,8 @@
     <!-- Include the main script -->
     <script type="module" src="{% static 'KidVenture/js/alphabet_matching.js' %}"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     {% csrf_token %}
 
     <script>
@@ -127,5 +129,6 @@
             document.getElementById("game-board").classList.remove("hidden");
         }
     </script>
+
 </body>
 </html>

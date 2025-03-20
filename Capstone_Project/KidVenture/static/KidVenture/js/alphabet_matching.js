@@ -76,8 +76,9 @@ function updateScore() {
         "mismatched"
     ).textContent = `Mismatched: ${mismatchCount}`;
 }
-
 function saveGameProgress(level, timeTaken, mistakes, mismatchedLetters, activityId = null) {
+
+    
     const data = {
         level: level,
         time_taken: timeTaken,
@@ -91,7 +92,7 @@ function saveGameProgress(level, timeTaken, mistakes, mismatchedLetters, activit
 
     console.log('Sending game progress data:', data);
 
-    fetch('/save_game_progress/', {
+    return fetch('/save_game_progress/', {  // <-- Return the fetch Promise
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -99,14 +100,17 @@ function saveGameProgress(level, timeTaken, mistakes, mismatchedLetters, activit
         },
         body: JSON.stringify(data)
     })
-    .then(response => response.json())
+    .then(response => response.json())  // Parse JSON response
     .then(data => {
         console.log('Server response:', data);
+        return data;  // Return the response data for further chaining
     })
     .catch(error => {
         console.error('Error saving game progress:', error);
+        throw error;  // Rethrow to be caught in calling function
     });
 }
+
 
 function getCookie(name) {
     let cookieValue = null;
@@ -122,70 +126,72 @@ function getCookie(name) {
     }
     return cookieValue;
 }
-
 function advanceToNextLevel() {
     if (matches === totalMatches) {  // Ensure user completed the level
-        console.log("Level complete! Moving to next level...");
-        console.log("Current Level:", currentLevel);
-        console.log("Elapsed Seconds:", elapsedSeconds);
-        console.log("Mismatch Count:", mismatchCount);
-        console.log("Mismatched Letters:", mismatchedLetters);
-       
         if (activityId) {
-            // If it's an Activity, check if the full activity is completed
-            saveGameProgress(currentLevel, elapsedSeconds, mismatchCount, mismatchedLetters, activityId);
-            fetch(`/check_activity_progress/${activityId}/`)
+            // Wait for saveGameProgress to complete before checking progress
+            currentLevel++;
+            saveGameProgress(currentLevel, elapsedSeconds, mismatchCount, mismatchedLetters, activityId)
+                .then(() => fetch(`/check_activity_progress/${activityId}/`))
                 .then(response => response.json())
                 .then(data => {
-                    if (data.completed) {
-                        alert("Activity completed! Redirecting...");
-
-                        // Call the Django view to mark the activity as completed
-                        fetch(`/complete_activity/${activityId}/`, {
+                    if (data && data.completed) {
+                        return fetch(`/complete_activity/${activityId}/`, {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
                                 'X-CSRFToken': getCookie('csrftoken')
                             },
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            console.log("Activity completion response:", data);
-                            window.location.href = "/"; // Redirect home after marking complete
-                        })
-                        .catch(error => {
-                            console.error("Error marking activity complete:", error);
-                        });
-
+                        }).then(response => response.json());
                     } else {
                         // If not complete, move to the next level
-                        currentLevel++;
-                        saveGameProgress(currentLevel, elapsedSeconds, mismatchCount, mismatchedLetters, activityId);
-                        matches = 0;  
-                        totalMatches = currentLevel + 1;
-                        initializeGame();
+                        return saveGameProgress(currentLevel, elapsedSeconds, mismatchCount, mismatchedLetters, activityId)
+                            .then(() => {
+                                matches = 0;  
+                                totalMatches = currentLevel + 1;
+                                initializeGame();
+                            });
                     }
                 })
-                .catch(error => {
-                    console.error("Error checking activity progress:", error);
-                    alert("There was an issue checking activity progress. Please try again.");
-                });
+                .then(data => {
+                    if (data && data.status === "success") {
+                        Swal.fire({
+                            title: "Congratulations!",
+                            text: "You have successfully completed the activity!",
+                            icon: "success",
+                            confirmButtonText: "OK",
+                            allowOutsideClick: false
+                        }).then(() => {
+                            window.location.href = "/"; // Redirect home after clicking OK
+                        });
+                    }
+                })
+                .catch(error => console.error("Error checking activity progress:", error));
 
         } else {
             // Free Play: Move to the next level normally
             currentLevel++;
-            saveGameProgress(currentLevel, elapsedSeconds, mismatchCount, mismatchedLetters, activityId);
-            matches = 0;
-            totalMatches = currentLevel + 1;
+            saveGameProgress(currentLevel, elapsedSeconds, mismatchCount, mismatchedLetters, activityId)
+                .then(() => {
+                    matches = 0;
+                    totalMatches = currentLevel + 1;
 
-            if (currentLevel > maxLevel) {
-                alert(`Congratulations! You completed all levels in ${elapsedSeconds} seconds.`);
-                return;
-            }
-            initializeGame();
+                    if (currentLevel > maxLevel) {
+                        Swal.fire({
+                            title: "Well Done!",
+                            text: `Congratulations! You completed all levels in ${elapsedSeconds} seconds.`,
+                            icon: "success",
+                            confirmButtonText: "OK",
+                            allowOutsideClick: false
+                        }).then(() => {
+                            window.location.href = "/";
+                        });
+                        return;
+                    }
+                    initializeGame();
+                })
+                .catch(error => console.error("Error saving game progress:", error));
         }
-    } else {
-        console.log("User hasn't completed the level yet. Waiting for all matches.");
     }
 }
 

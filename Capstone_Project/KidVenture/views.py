@@ -117,7 +117,18 @@ def login_view(request):
 def home(request):
     if request.user.is_teacher:
         total_students = request.user.classes.aggregate(total=Count('students'))['total'] or 0
-        return render(request, "KidVenture/teacher_page.html", {'total_students': total_students })
+
+        # Fetch first 4 students with their progress from all classes
+        students_progress = (
+            Activity.objects.filter(student__classroom__teacher=request.user)
+            .values("student__user__username", "name", "progress", "student__classroom__name")
+            .order_by("student__user__username")[:4]  # Limit to first 4 students
+        )
+
+        return render(request, "KidVenture/teacher_page.html", {
+            'total_students': total_students,
+            'students_progress': students_progress
+        })
     
     elif request.user.is_student:
         if not request.user.is_student:
@@ -536,8 +547,10 @@ def save_game_progress(request):
         # Update activity progress if applicable
         if activity_id:
             activity = get_object_or_404(Activity, id=activity_id, student__user=request.user)
+            print(f'updating progress level our current level is {level}')
             activity.update_progress(level - 1)
 
+        print('saving stuff')
         return JsonResponse({'status': 'success'})
 
     return JsonResponse({'status': 'error'}, status=400)
@@ -721,10 +734,11 @@ import math
 
 @login_required
 def check_activity_progress(request, activity_id):
+    print('complete have been called')
     activity = get_object_or_404(Activity, id=activity_id, student__user=request.user)
 
-    
-    levels_completed = max(1, math.ceil((activity.progress / 100) * activity.max_levels)) + 1
+    print(f'calculating activity prog: {activity.progress} / 100 * {activity.max_levels}')
+    levels_completed = max(1, math.ceil((activity.progress / 100) * activity.max_levels))
 
     print(f"l====={levels_completed}")
     
@@ -732,8 +746,9 @@ def check_activity_progress(request, activity_id):
     if levels_completed >= activity.max_levels:
         activity.completed = True
         activity.save()
+        print(f'returning completed is true')
         return JsonResponse({'completed': True})
-
+    print(f'returning completed is false')
     return JsonResponse({'completed': False})
 
 
@@ -868,3 +883,32 @@ def progress_overview(request):
         'classes': classes,
         'progress_data': progress_data,
     })
+
+
+
+
+
+
+@login_required
+def get_class_total_progress(request, class_id):
+    """Fetch the total average progress across all activities in a class."""
+    activities = Activity.objects.filter(student__classroom_id=class_id)
+
+    if not activities.exists():
+        return JsonResponse({'total_progress': 0})  # No activities, progress is 0%
+
+    total_progress = activities.aggregate(total_progress=Avg("progress"))["total_progress"] or 0
+    return JsonResponse({'total_progress': round(total_progress, 2)})
+
+
+
+
+
+@login_required
+def get_class_activities(request, class_id):
+    """Fetch all unique activities assigned to students in a class."""
+    classroom = get_object_or_404(Class, id=class_id, teacher=request.user)
+
+    activities = Activity.objects.filter(student__classroom=classroom).values_list('name', flat=True).distinct()
+
+    return JsonResponse({"activities": list(activities)})

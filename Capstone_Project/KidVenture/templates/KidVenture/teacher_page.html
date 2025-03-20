@@ -47,54 +47,66 @@
     <div class="col-div-8">
         <div class="box-8">
             <div class="content-box">
-                <p>Progress report<span>View All</span></p>
+                <p>Progress report 
+                    <a href="{% url 'progress_overview' %}" class="view-all-btn">View All</a>
+                </p>
                 <br/>
                 <table>
-                    
                     <tr>
                         <th>Student</th>
-                        <th>Game</th>
+                        <th>Class</th>
+                        <th>Activity</th>
                         <th>Progression</th>
                     </tr>
+                    {% for progress in students_progress %}
                     <tr>
-                        <td>test something</td>
-                        <td>test</td>
-                        <td>something</td>
+                        <td>{{ progress.student__user__username }}</td>
+                        <td>{{ progress.student__classroom__name }}</td>
+                        <td>{{ progress.name }}</td>
+                        <td>{{ progress.progress }}%</td>
                     </tr>
+                    {% empty %}
                     <tr>
-                        <td>test something</td>
-                        <td>test</td>
-                        <td>something</td>
+                        <td colspan="4">No progress data available</td>
                     </tr>
-                    <tr>
-                        <td>testsomething</td>
-                        <td>test</td>
-                        <td>something</td>
-                    </tr>
-                    
+                    {% endfor %}
                 </table>
             </div>
         </div>
     </div>
+    
 
     <div class="col-div-4">
         <div class="box-4">
             <div class="content-box">
-                <p>Task Complete<span>View All</span></p>
+                <p>Task Complete 
+                    <span class="class-dropdown-container">
+                        <select id="class-select" class="class-dropdown">
+                            <option value="">Select a Class</option>
+                            {% for classroom in request.user.classes.all %}
+                                <option value="{{ classroom.id }}">{{ classroom.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </span>
+                </p>
+    
                 <div class="circle-wrap">
-                <div class="circle">
-                    <div class="mask full">
-                        <div class="fill"></div>
+                    <div class="circle">
+                        <div class="mask full">
+                            <div class="fill"></div>
+                        </div>
+                        <div class="mask half">
+                            <div class="fill"></div>
+                        </div>
+                        <div class="inside-circle" id="task-progress">0%</div>
                     </div>
-                    <div class="mask half">
-                        <div class="fill"></div>
-                    </div>
-                    <div class="inside-circle">70%</div>
-                </div>
                 </div>
             </div>
         </div>
     </div>
+    
+    
+    
 
     <div class="clearfix"></div>
 
@@ -129,6 +141,46 @@
         $(".nav2").css('display', 'none');
         
     });
+
+
+
+    document.addEventListener("DOMContentLoaded", function () {
+    const classSelect = document.getElementById("class-select");
+    const progressCircle = document.getElementById("task-progress");
+
+    classSelect.addEventListener("change", function () {
+        const classId = this.value;
+
+        if (!classId) {
+            progressCircle.textContent = "0%"; // Reset progress if no class selected
+            updateProgressCircle(0);
+            return;
+        }
+
+        // Fetch class-wide total progress
+        fetch(`/get_class_total_progress/${classId}/`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.total_progress !== undefined) {
+                    updateProgressCircle(data.total_progress);
+                }
+            })
+            .catch(error => console.error("Error fetching class total progress:", error));
+    });
+
+    // Function to update the progress circle visually
+    function updateProgressCircle(progress) {
+        const progressText = document.getElementById("task-progress");
+        progressText.textContent = `${progress}%`;
+
+        // Update the CSS to show progress visually
+        const fillElements = document.querySelectorAll(".fill");
+        fillElements.forEach(fill => {
+            fill.style.transform = `rotate(${progress * 1.8}deg)`; // Convert % to degrees
+        });
+    }
+});
+
 </script>
 
 

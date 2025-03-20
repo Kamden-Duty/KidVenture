@@ -36,8 +36,10 @@ urlpatterns = [
     path('complete_activity/<int:activity_id>/', views.complete_activity, name='complete_activity'),
     path('reset_free_play_progress/', views.reset_free_play_progress, name='reset_free_play_progress'),
     path('delete_activity/<int:activity_id>/', views.delete_activity, name='delete_activity'),
-    path('complete_class_activity/<int:activity_id>/', views.complete_class_activity, name='complete_class_activity'),
+    path('complete_class_activitsy/<int:activity_id>/', views.complete_class_activity, name='complete_class_activity'),
     path('progress-overview/', views.progress_overview, name='progress_overview'),
+    path('get_class_total_progress/<int:class_id>/', views.get_class_total_progress, name='get_class_total_progress'),
+     path("get_class_activities/<int:class_id>/", views.get_class_activities, name="get_class_activities"),
 ]
 
 if settings.DEBUG:

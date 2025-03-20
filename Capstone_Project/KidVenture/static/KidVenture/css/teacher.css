@@ -262,3 +262,64 @@ table tr:nth-child(odd) {
     background: white; /* Keep header visible */
     z-index: 2;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+.class-dropdown-container {
+    float: right; /* Align it to the right */
+    display: inline-block;
+}
+
+.class-dropdown {
+    background-color: #84aca3; /* Match "View All" */
+    color: #25433d; /* Match text color */
+    font-size: 15px;
+    border: none;
+    border-radius: 10px;  /* Increase for better rounding */
+    padding: 6px 12px;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    outline: none;  /* Removes default browser outline */
+    box-shadow: none;  /* Ensures no extra shadow effect */
+}
+
+/* Dropdown hover effect */
+.class-dropdown:hover,
+.class-dropdown:focus {
+    background-color: #6e9189; /* Slightly darker teal */
+}
+
+/* Style dropdown options */
+.class-dropdown option {
+    background-color: white;
+    color: black;
+}
+
+/* Ensure View All button and dropdown have identical border-radius */
+.view-all-btn {
+    float: right;
+    background-color: #84aca3; /* Light Teal */
+    color: #25433d; /* Deep Green */
+    padding: 6px 12px;
+    font-size: 15px;
+    text-decoration: none;
+    /* border-radius: 10px;  Ensure the same roundness */
+    outline: none;
+    border: none;
+}
+
+.view-all-btn:hover {
+    background-color: #6e9189; /* Slightly darker teal */
+}
