@@ -584,28 +584,6 @@
   </style>
 </head>
 <body>
-<<<<<<< Updated upstream
-    <header>
-        <h1>Welcome {{ request.user.username }}!</h1>
-    
-        <div class="header-left">
-            <h1 class="kidventure-logo">KidVenture</h1>
-        </div>
-    
-        <div class="header-right">
-            <!-- Profile Image beside Logout Button -->
-            <a href="{% url 'edit_avatar' %}" class="profile-link">
-                <img src="{{ user.avatar.url }}" alt="Profile" class="profile-image">
-            </a>
-    
-            <!-- Logout Icon -->
-            <a href="{% url 'logout_view' %}" class="logout-button" title="Logout">
-                <i class="fa fa-sign-out-alt"></i>
-            </a>
-        </div>
-    </header>
-    
-=======
 
   <!-- LEFT NAV -->
   <div class="left-nav">
@@ -739,28 +717,53 @@
   </section>
 
     <!-- ACTIVITIES SECTION (Hidden by default) -->
-    <section id="activities-tab" class="tab-content hidden">
-      <h2>Games</h2>
-      <p>Select a game to play:</p>
-      <div class="game-container">
-        <div class="game-item">
+    <!-- ACTIVITIES SECTION -->
+<section id="activities-tab" class="tab-content hidden">
+  <h2>Games</h2>
+  <p>Select a game to play:</p>
+
+  <!-- Free Play Mode
+  <div class="game-container">
+      <div class="game-item">
           <h2 class="game-header">Alphabet Matching Game</h2>
           <iframe src="{% static 'KidVenture/images/alphabet-matching.jpg' %}" 
                   width="250px" height="250px" style="border:none;"></iframe>
           <button class="game-button" onclick="window.location.href='{% url 'alphabet_matching' %}'">
-            <i class="fas fa-play-circle"></i> Play
+              <i class="fas fa-play-circle"></i> Free Play
           </button>
-        </div>
-        <div class="game-item">
+      </div>
+      <div class="game-item">
           <h2 class="game-header">Alphabet Memory Game</h2>
           <iframe src="{% static 'KidVenture/images/memory_game.jpg' %}" 
                   width="250px" height="250px" style="border:none;"></iframe>
           <button class="game-button" onclick="window.location.href='{% url 'alphabet_memory' %}'">
-            <i class="fas fa-play-circle"></i> Play
+              <i class="fas fa-play-circle"></i> Free Play
           </button>
-        </div>
       </div>
-    </section>
+  </div> -->
+
+  <!-- Assigned Activities -->
+  <h2>Assigned Activities</h2>
+  <p>Complete the assigned activities from your teacher:</p>
+
+  <div class="activity-container">
+    {% for activity in activities %}
+        <div class="activity-item">
+            <h3 class="activity-header">{{ activity.name }}</h3>
+            <!-- <p>{{ activity.description }}</p> -->
+            <p><strong>Progress:</strong> {{ activity.completed_levels|floatformat:0 }} / {{ activity.max_levels }} levels ({{ activity.percent_complete|floatformat:0 }}%)</p>
+
+            <button class="activity-button" onclick="window.location.href='{% url activity.url_name %}?activity={{ activity.id }}'">
+                <i class="fas fa-play-circle"></i> Continue Activity
+            </button>
+        </div>
+    {% empty %}
+        <p>No assigned activities yet.</p>
+    {% endfor %}
+</div>
+
+</section>
+
 
     <!-- LEADERBOARD SECTION (Hidden by default) -->
     <section id="leaderboard-tab" class="tab-content hidden">
