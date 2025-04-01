@@ -98,15 +98,37 @@ class Student(models.Model):
          return self.user.username if self.user else "Unassigned Student"
 
 class Activity(models.Model):
-    name = models.CharField(max_length=255)  # Name of the activity
-    description = models.TextField(blank=True, null=True)  # Optional description
-    progress = models.IntegerField(default=0)  # Progress percentage (0-100)
-    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='activities')  # Link to a student
-    url_name = models.CharField(max_length=50, blank=True, null=True)  # URL name for activity navigation
+    name = models.CharField(max_length=255)  
+    description = models.TextField(blank=True, null=True)  
+    progress = models.IntegerField(default=0)  
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='activities')  
+    url_name = models.CharField(max_length=50, blank=True, null=True)  
     completed = models.BooleanField(default=False)
+    max_levels = models.IntegerField(default=1)  # Track max levels for this activity
+
+    def update_progress(self, completed_levels):
+        """Update activity progress based on completed levels"""
+        # Ensure progress is updated correctly
+        self.progress = int((completed_levels / float(self.max_levels)) * 100)
+
+    
+     
+
+        # Check if activity is completed
+        if completed_levels >= self.max_levels:
+            self.completed = True
+            self.progress = 100  # Ensure it's fully completed
+
+        if self.completed:
+            self.progress = 100
+      
+
+        # Save updates
+        self.save()
 
     def __str__(self):
         return f"{self.name} - {self.student.user.username if self.student and self.student.user else 'Unassigned'}"
+
     
 class LeaderboardEntry(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='leaderboard_entry')
