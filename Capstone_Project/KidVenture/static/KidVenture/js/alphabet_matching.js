@@ -343,6 +343,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const sessionModal = document.getElementById("session-modal");
     const gameModeText = document.getElementById("game-mode-text");
     const gameTypeText = document.getElementById("game-type");
+    const continueBtn = document.getElementById("continue-btn");
+    const startOverBtn = document.getElementById("start-over-btn");
+
+    function hideModal() {
+        if (sessionModal) {
+            sessionModal.style.display = "none"; // Hide modal
+        }
+    }
 
     if (activityId) {
         console.log("Game started for assigned activity. Checking last progress...");
@@ -385,16 +393,16 @@ document.addEventListener("DOMContentLoaded", () => {
                         sessionModal.style.display = "block";
                     }
 
-                    document.getElementById("continue-btn").addEventListener("click", () => {
+                    continueBtn.addEventListener("click", () => {
                         currentLevel = data.last_level;
                         totalMatches = currentLevel + 1;
-                        sessionModal.style.display = "none";
+                        hideModal();
                         initializeGame();
                         showGameElements();
                     });
 
-                    document.getElementById("start-over-btn").addEventListener("click", () => {
-                        sessionModal.style.display = "none";
+                    startOverBtn.addEventListener("click", () => {
+                        hideModal();
                         initializeGame();
                         showGameElements();
                     });
@@ -412,6 +420,7 @@ document.addEventListener("DOMContentLoaded", () => {
             });
     }
 });
+
 
 function showGameElements() {
     document.getElementById("timer").classList.remove("hidden");
