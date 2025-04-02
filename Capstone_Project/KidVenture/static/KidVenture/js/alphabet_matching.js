@@ -341,15 +341,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const activityId = urlParams.get('activity');
 
     const sessionModal = document.getElementById("session-modal");
+    const modalText = document.getElementById("modal-text");
     const gameModeText = document.getElementById("game-mode-text");
     const gameTypeText = document.getElementById("game-type");
     const continueBtn = document.getElementById("continue-btn");
     const startOverBtn = document.getElementById("start-over-btn");
 
     function hideModal() {
-        if (sessionModal) {
-            sessionModal.style.display = "none"; // Hide modal
-        }
+        sessionModal.style.display = "none"; // Hide modal
     }
 
     if (activityId) {
@@ -360,16 +359,39 @@ document.addEventListener("DOMContentLoaded", () => {
             .then(data => {
                 console.log("Activity progress response:", data);
 
-                if (data.last_level && data.last_level > 1) {
+                console.log("data.last_level: " + data.last_level);
+                if (data.last_level && data.last_level >= 1) {
                     currentLevel = data.last_level;
                     totalMatches = currentLevel + 1;
                     console.log(`Resuming activity from level ${currentLevel}`);
+                    if (sessionModal) {
+                        modalText.textContent = "Do you want to continue from your last activity or start from the first level?";
+                        sessionModal.classList.remove("hidden");
+                    }
+
+                    continueBtn.addEventListener("click", () => {
+                        currentLevel = data.last_level;
+                        totalMatches = currentLevel + 1;
+                        hideModal();
+                        initializeGame();
+                        showGameElements();
+                    });
+
+                    startOverBtn.addEventListener("click", () => {
+                        hideModal();
+                        initializeGame();
+                        showGameElements();
+                    });
+
+                } else {
+                    console.log("No previous activity progress found. Starting new game.");
+                    initializeGame();
+                    showGameElements();
                 }
 
                 if (gameModeText) gameModeText.textContent = "Complete the assigned activity!";
                 if (gameTypeText) gameTypeText.textContent = "Mode: Activity";
 
-                initializeGame();
             })
             .catch(error => {
                 console.error("Error fetching activity progress:", error);
@@ -389,8 +411,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (data.last_level && data.last_level > 1) {
                     console.log('Last level found:', data.last_level);
                     if (sessionModal) {
+                        modalText.textContent = "Do you want to continue from your last session or start from the first level?";
                         sessionModal.classList.remove("hidden");
-                        sessionModal.style.display = "block";
                     }
 
                     continueBtn.addEventListener("click", () => {
@@ -420,7 +442,6 @@ document.addEventListener("DOMContentLoaded", () => {
             });
     }
 });
-
 
 function showGameElements() {
     document.getElementById("timer").classList.remove("hidden");
