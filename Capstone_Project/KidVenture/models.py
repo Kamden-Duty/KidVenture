@@ -156,12 +156,12 @@ class Notification(models.Model):
         return f"Notification for {self.user.username}: {self.title}"
 
 class GameProgress(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='game_progress')  # Link to the user
-    level = models.IntegerField(default=1) # The level of the game
-    time_taken = models.IntegerField(default=0)  # Time in seconds
-    mistakes = models.IntegerField(default=0) # Number of mistakes made
-    mismatched_letters = models.TextField()  # Store as a JSON string
-    timestamp = models.DateTimeField(auto_now_add=True)  # Automatically set when the progress is created
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    level = models.IntegerField()
+    time_taken = models.FloatField()
+    mistakes = models.IntegerField()
+    mismatched_letters = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"{self.user.username} - Level {self.level}"

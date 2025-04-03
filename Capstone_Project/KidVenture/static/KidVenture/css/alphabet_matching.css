@@ -1,7 +1,7 @@
 body {
     font-family: "Comic Sans MS", "Comic Sans", cursive;
     text-align: center;
-    background-color: #fce4ec;
+    background-color: #b0c9c4; /* Cool Gray */
     margin: 0;
     padding: 0;
     display: flex;
@@ -12,7 +12,7 @@ body {
 
 h1 {
     font-size: 36px;
-    color: #d81b60;
+    color: #25433d; /* Deep Green */
     margin-bottom: 20px;
 }
 
@@ -21,7 +21,7 @@ h1 {
 #mismatched {
     font-size: 24px;
     margin: 10px 0;
-    color: #6a1b9a;
+    color: #25433d; /* Deep Green */
 }
 
 .score-container {
@@ -46,12 +46,12 @@ h1 {
     display: inline-flex;
     justify-content: center;
     align-items: center;
-    background-color: #ffecb3;
-    color: #5c6bc0;
+    background-color: #cadec8; /* Soft Mint */
+    color: #25433d; /* Deep Green */
     font-size: 36px;
     font-weight: bold;
     border-radius: 15px;
-    border: 2px solid #3e2723;
+    border: 2px solid #25433d; /* Deep Green */
     box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2);
     cursor: pointer;
     transition: transform 0.3s, background-color 0.3s;
@@ -62,7 +62,7 @@ h1 {
 }
 
 .card.correct-match {
-  background-color: #a5d6a7 !important; /* Bright green for a correct match */
+  background-color: #84aca3 !important; /* Light Teal */
   color: white; /* Contrast text for accessibility */
   transition: background-color 0.3s, transform 0.3s;
   transform: scale(1.1); /* Slight pop effect to draw attention */
@@ -78,14 +78,14 @@ h1 {
 }
 
 .matched {
-    background-color: #a5d6a7;
+    background-color: #84aca3; /* Light Teal */
     pointer-events: none;
 }
 
 button {
     font-size: 18px;
     padding: 10px 20px;
-    background-color: #8e24aa;
+    background-color: #4c6f66; /* Dark Teal */
     color: white;
     border: none;
     border-radius: 10px;
@@ -94,12 +94,12 @@ button {
 }
 
 button:hover {
-    background-color: #ab47bc;
+    background-color: #25433d; /* Deep Green */
     transform: scale(1.05);
 }
 
 button:active {
-    background-color: #6a1b9a;
+    background-color: #718f89; /* Gray-Green */
     transform: scale(0.95);
 }
 
@@ -128,4 +128,52 @@ button:active {
 
 .hidden {
     display: none;
+}
+
+/* Modal styles */
+#session-modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1000; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgba(0, 0, 0, 0.8); /* Black w/ opacity */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#session-modal .modal-content {
+    background-color: #4c6f66; /* Dark Teal */
+    color: #cadec8; /* Soft Mint */
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    width: 80%;
+    max-width: 500px;
+}
+
+#session-modal .modal-content button {
+    font-size: 18px;
+    padding: 10px 20px;
+    background-color: #25433d; /* Deep Green */
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    margin: 10px;
+}
+
+#session-modal .modal-content button:hover {
+    background-color: #718f89; /* Gray-Green */
+    transform: scale(1.05);
+}
+
+#session-modal .modal-content button:active {
+    background-color: #84aca3; /* Light Teal */
+    transform: scale(0.95);
 }
