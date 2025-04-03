@@ -347,8 +347,48 @@ document.addEventListener("DOMContentLoaded", () => {
     const continueBtn = document.getElementById("continue-btn");
     const startOverBtn = document.getElementById("start-over-btn");
 
+    const activityModal = document.getElementById("activity-modal");
+    const modalContent = document.querySelector(".modal-content");
+    const levelContainer = document.getElementById("level-container");
+    const openModalBtn = document.querySelector(".open-level-select-btn");
+    const closeModalBtn = document.getElementById("close-level-select-btn");
+
     function hideModal() {
         sessionModal.style.display = "none"; // Hide modal
+    }
+
+    function hideModalContent() {
+        modalContent.style.display = "none"; // Hide modal content
+    }
+
+    function generateLevels(numLevels) {
+        levelContainer.innerHTML = ''; // Clear any existing levels
+
+        for (let i = 1; i <= numLevels; i++) {
+            const button = document.createElement('button');
+            button.textContent = `Level ${i}`;
+            button.className = 'level-button';
+            button.onclick = () => selectLevel(i); // Add an event listener for level selection
+            levelContainer.appendChild(button);
+        }
+    }
+
+    function selectLevel(level) {
+        currentLevel = level;
+        totalMatches = level + 1;
+        hideModal();
+        initializeGame();
+        showGameElements();
+    }
+
+    function showActivityModal() {
+        activityModal.classList.remove('hidden');
+        activityModal.style.display = 'block'; // Explicitly set display to block
+    }
+
+    function hideActivityModal() {
+        activityModal.classList.add('hidden');
+        activityModal.style.display = 'none'; // Explicitly set display to none
     }
 
     if (activityId) {
@@ -400,48 +440,63 @@ document.addEventListener("DOMContentLoaded", () => {
             });
 
     } else {
-        console.log("Standard game mode - Checking last session progress.");
         if (gameTypeText) gameTypeText.textContent = "Mode: Free Play";
 
-        fetch('/get_last_session/')
-            .then(response => response.json())
-            .then(data => {
-                console.log('Free play session response:', data);
+        // Ensure the session modal is hidden
+        hideModal();
+        hideActivityModal();
 
-                if (data.last_level && data.last_level > 1) {
-                    console.log('Last level found:', data.last_level);
-                    if (sessionModal) {
-                        modalText.textContent = "Do you want to continue from your last session or start from the first level?";
-                        sessionModal.classList.remove("hidden");
-                    }
+        openModalBtn.addEventListener("click", () => {
+            console.log("openModalBtn clicked");
+            showActivityModal();
+        });
 
-                    continueBtn.addEventListener("click", () => {
-                        currentLevel = data.last_level;
-                        totalMatches = currentLevel + 1;
-                        hideModal();
-                        initializeGame();
-                        showGameElements();
-                    });
+        closeModalBtn.addEventListener("click", () => {
+            console.log("closeModalBtn clicked");
+            hideActivityModal();
+            hideModalContent();
+            initializeGame();
+            showGameElements();
+        });
 
-                    startOverBtn.addEventListener("click", () => {
-                        hideModal();
-                        initializeGame();
-                        showGameElements();
-                    });
-
-                } else {
-                    console.log("No previous session found. Starting new game.");
-                    initializeGame();
-                    showGameElements();
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching last session:', error);
-                initializeGame();
-                showGameElements();
-            });
+        generateLevels(maxLevel);
+        initializeGame();
+        showGameElements();
     }
 });
+
+// Get the modal
+var modal = document.getElementById("modal");
+
+// Get the button that opens the modal
+var btn = document.getElementById("menuButton");
+
+// Get the <span> element that closes the modal
+var span = document.getElementsByClassName("close-button")[0];
+
+// When the user clicks the button, open the modal 
+btn.onclick = function() {
+    modal.style.display = "block";
+}
+
+// When the user clicks on <span> (x), close the modal
+span.onclick = function() {
+    modal.style.display = "none";
+}
+
+// When the user clicks anywhere outside of the modal, close it
+window.onclick = function(event) {
+    if (event.target == modal) {
+        modal.style.display = "none";
+    }
+}
+
+// Add event listener for level select button
+document.getElementById("levelSelectButton").onclick = function() {
+    // Add your level select logic here
+    alert("Level Select button clicked!");
+}
+
 
 function showGameElements() {
     document.getElementById("timer").classList.remove("hidden");
