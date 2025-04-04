@@ -1,55 +1,83 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Matching Game</title>
-  {% load static %}
-  <link
-    rel="stylesheet"
-    href="{% static 'KidVenture/css/alphabet_matching.css' %}"
-  />
-</head>
-<body>
-  <div>
-    {% if request.user.is_teacher %}
-    <a href="{% url 'home' %}">Back to Homepage</a>
-    {% elif request.user.is_student %}
-    <a href="{% url 'home' %}">Back to Homepage</a>
-    {% else %}
-    <a href="{% url 'home' %}">Back to Homepage</a>
-    {% endif %}
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Matching Game</title>
+    {% load static %}
+    <link
+      rel="stylesheet"
+      href="{% static 'KidVenture/css/alphabet_matching.css' %}"
+    />
+  </head>
+  <body>
+    <button id="menuButton" class="menu-btn">Menu</button>
+
+    <div id="menu-modal" class="modal">
+      <div class="modal-content">
+          <div class="menu-spacing">
+            <button class="open-level-select-btn">Level Select</button>  
+          </div>
+  
+          <div class="menu-spacing">
+            {% if request.user.is_teacher %}
+            <a href="{% url 'teacher_homepage' %}" class="button-link">Back to Homepage</a>
+            {% else %}
+            <a href="{% url 'home' %}" class="button-link">Back to Homepage</a>
+            {% endif %}
+          </div>
+  
+          <div class="menu-spacing">
+            <button id="close-button" class="button-link">Close</button>
+          </div>
+      </div>
+    </div>
   </div>
 
-  <h1>Welcome {{ request.user.username }}!</h1>
-  <h1 id="game-title">Matching Game</h1>
 
-  <!-- Display the mode -->
-  <p id="game-mode-text">
-    <strong>Mode:</strong> <span id="game-type"></span>
-  </p>
-
-  <p id="instruction-text">Match the uppercase and lowercase letters</p>
-
-  <div id="timer">Time: 0 seconds</div>
-
-  <div class="score-container">
-    <div id="score">Score: 0 / 10</div>
-    <div id="mismatched">Mismatched: 0</div>
+  <div class="username-container">
+    <div class="username-content">
+      {{ request.user.username }} <img src="{{ user.avatar.url }}" class="pro-img">
+    </div>
+    <p id="game-mode-text"> <!-- Display the mode -->
+      <span id="game-type"></span>
+    </p>
   </div>
+
+
+    </div>
+
+    <h1 id="game-title">Matching Game</h1>
+
+    <p id="instruction-text">Match the uppercase and lowercase letters</p>
+
+    <div class="score-container">
+      <div id="timer">Time: 0 seconds</div>
+      <div id="score">Score: 0 / 10</div>
+      <div id="mismatched">Mismatched: 0</div>
+    </div>
 
   <div id="game-board"></div>
 
-  <!-- Modal for session prompt (Only for Free Play Mode) -->
-  <div id="session-modal" class="modal hidden">
-    <div class="modal-content">
-      <p id="modal-text">
-        Do you want to continue from your last session or start from the first level?
-      </p>
-      <button id="continue-btn">Continue</button>
-      <button id="start-over-btn">Start Over</button>
+    <!-- Modal for session prompt (Only for Assigned Activity Only)
+    <div id="session-modal" class="modal hidden">
+        <div class="modal-content">
+            <p id="modal-text">Do you want to continue from your last session or start from the first level?</p>
+            <button id="continue-btn">Continue</button>
+            <button id="start-over-btn">Start Over</button>
+        </div>
+    </div> -->
+
+    <!-- Modal for Level Selection -->
+    <div id="activity-modal" class="modal hidden">
+      <div class="modal-content">
+        <p>Level Select</p>
+        <div id="level-container"></div>
+        <!-- Button to close level select modal -->
+        <button id="close-level-select-btn">Close</button>
+      </div>
     </div>
-  </div>
+
 
   <!-- Overlay for end level messages -->
   <div id="end-level-overlay" class="overlay">
