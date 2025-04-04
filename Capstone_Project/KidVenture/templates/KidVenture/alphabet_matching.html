@@ -11,37 +11,33 @@
     />
   </head>
   <body>
-    <button id="menuButton">Menu</button>
+    <button id="menuButton" class="menu-btn">Menu</button>
 
-    <div id="modal" class="modal">
-        <div class="modal-content">
-            <span class="close-button">&times;</span>
-              {% if request.user.is_teacher %}
-              <a href="{% url 'teacher_homepage' %}">Back to Homepage</a>
-              {% elif request.user.is_student %}
-              <a href="{% url 'student_homepage' %}">Back to Homepage</a>
-              {% else %}
-              <a href="{% url 'home' %}">Back to Homepage</a>
-              {% endif %}
-            <button id="levelSelectButton">Level Select</button>
-        </div>
+    <div id="menu-modal" class="modal">
+      <div class="modal-content">
+          <div class="menu-spacing">
+            <button class="open-level-select-btn">Level Select</button>  
+          </div>
+  
+          <div class="menu-spacing">
+            {% if request.user.is_teacher %}
+            <a href="{% url 'teacher_homepage' %}" class="button-link">Back to Homepage</a>
+            {% else %}
+            <a href="{% url 'home' %}" class="button-link">Back to Homepage</a>
+            {% endif %}
+          </div>
+  
+          <div class="menu-spacing">
+            <button id="close-button" class="button-link">Close</button>
+          </div>
+      </div>
     </div>
+  </div>
 
-
-    <div>
-      {% if request.user.is_teacher %}
-      <a href="{% url 'teacher_homepage' %}">Back to Homepage</a>
-      {% elif request.user.is_student %}
-      <a href="{% url 'student_homepage' %}">Back to Homepage</a>
-      {% else %}
-      <a href="{% url 'home' %}">Back to Homepage</a>
-      {% endif %}
-    </div>
 
     <div class="username-container">
       {{ request.user.username }} {{ request.user.avatar}}
       <p id="game-mode-text"> <!-- Display the mode -->
-        <button class="open-level-select-btn">Level Select</button> 
         <span id="game-type"></span>
       </p>
 

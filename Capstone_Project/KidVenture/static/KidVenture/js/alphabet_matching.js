@@ -331,6 +331,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const openModalBtn = document.querySelector(".open-level-select-btn");
     const closeModalBtn = document.getElementById("close-level-select-btn");
 
+    function hideMenuModal() {
+        menuModal.style.visibility = "hidden";
+        modalContent.style.visibility = "hidden"; // Hide modal content
+    }
+
     function hideModal() {
         sessionModal.style.display = "none"; // Hide modal
     }
@@ -395,16 +400,18 @@ document.addEventListener("DOMContentLoaded", () => {
         // Ensure the session modal is hidden
         hideModal();
         hideActivityModal();
+        hideMenuModal();
 
         openModalBtn.addEventListener("click", () => {
-            console.log("openModalBtn clicked");
             showActivityModal();
         });
 
         closeModalBtn.addEventListener("click", () => {
-            console.log("closeModalBtn clicked");
+            menuModal.style.visibility = "hidden";
+            modalContent.style.visibility = "hidden"; // Hide modal content
             hideActivityModal();
             hideModalContent();
+            hideMenuModal();
             initializeGame();
             showGameElements();
         });
@@ -416,36 +423,23 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // Get the modal
-var modal = document.getElementById("modal");
+const menuModal = document.getElementById("menu-modal");
+const menuButton = document.getElementById("menuButton");
+const modalContent = document.querySelector(".modal-content");
+const closeButton = document.getElementById("close-button");
 
-// Get the button that opens the modal
-var btn = document.getElementById("menuButton");
-
-// Get the <span> element that closes the modal
-var span = document.getElementsByClassName("close-button")[0];
-
-// When the user clicks the button, open the modal 
-btn.onclick = function() {
-    modal.style.display = "block";
+menuButton.onclick = function() {
+    menuModal.style.visibility = "visible";
+    modalContent.style.visibility = "visible"; // Show modal content
+    menuModal.style.display = "flex"; // Show modal
+    modalContent.style.display = "flex"; // Show modal content
 }
 
-// When the user clicks on <span> (x), close the modal
-span.onclick = function() {
-    modal.style.display = "none";
+closeButton.onclick = function() {
+    menuModal.style.visibility = "hidden";
+    modalContent.style.visibility = "hidden"; // Hide modal content
 }
 
-// When the user clicks anywhere outside of the modal, close it
-window.onclick = function(event) {
-    if (event.target == modal) {
-        modal.style.display = "none";
-    }
-}
-
-// Add event listener for level select button
-document.getElementById("levelSelectButton").onclick = function() {
-    // Add your level select logic here
-    alert("Level Select button clicked!");
-}
 
 
 function showGameElements() {
