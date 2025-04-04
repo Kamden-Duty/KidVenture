@@ -33,6 +33,9 @@ from django.http import JsonResponse
 from django.db.models import Max, Sum, Avg, F
 from django.db.models.functions import Length
 
+from django.views.decorators.http import require_POST
+import json
+
 # Avatar imports
 from py_avataaars import (
     PyAvataaar, AvatarStyle, SkinColor, HairColor, FacialHairType,
@@ -538,17 +541,15 @@ def save_game_progress(request):
             mistakes = data.get('mistakes')
             mismatched_letters = data.get('mismatched_letters')
             activity_id = data.get('activity_id')
+            game_type = data.get('game_type', 'matching')
 
-            # Default values
             activity = None
             is_free_play = True
 
-            # If activity_id is present, it's activity mode
             if activity_id:
                 activity = get_object_or_404(Activity, id=activity_id, student__user=request.user)
                 is_free_play = False
 
-            # Save progress entry
             GameProgress.objects.create(
                 user=request.user,
                 level=level,
@@ -556,10 +557,10 @@ def save_game_progress(request):
                 mistakes=mistakes,
                 mismatched_letters=json.dumps(mismatched_letters),
                 activity=activity,
-                is_free_play=is_free_play
+                is_free_play=is_free_play,
+                game_type=game_type
             )
 
-            # Update activity progress only if in activity mode
             if activity:
                 print(f'Updating progress — current level: {level}')
                 activity.update_progress(level - 1)
@@ -573,11 +574,13 @@ def save_game_progress(request):
     return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=400)
 
 
+
 @login_required
 def get_last_session(request):
     try:
-    
-        last_progress = GameProgress.objects.filter(user=request.user, is_free_play=True).latest('timestamp')
+        game_type = request.GET.get('game_type', 'matching')
+
+        last_progress = GameProgress.objects.filter(user=request.user, is_free_play=True, game_type=game_type).latest('timestamp')
 
         data = {
             'last_level': last_progress.level,
@@ -588,23 +591,28 @@ def get_last_session(request):
         return JsonResponse(data)
 
     except GameProgress.DoesNotExist:
-        return JsonResponse({'last_level': 1})  
+        return JsonResponse({'last_level': 1})
+
 
 
 @login_required
 def get_leaderboard(request):
+    game_type = request.GET.get('game_type', 'matching')
+
     leaderboard = (
-        GameProgress.objects.values('user__username', 'user__avatar')  # Assuming 'avatar' is a field in the User model
+        GameProgress.objects.filter(game_type=game_type)
+        .values('user__username', 'user__avatar')
         .annotate(
             max_level=Max('level'),
             total_mistakes=Sum('mistakes'),
             avg_time=Avg('time_taken'),
-            total_mismatches=Sum(Length('mismatched_letters'))  # Count mismatches
+            total_mismatches=Sum(Length('mismatched_letters'))
         )
         .order_by('-max_level', 'total_mistakes', 'avg_time', 'total_mismatches')
     )
 
     return JsonResponse({'leaderboard': list(leaderboard)})
+
 
 def assign_activity(request):
     if request.method == "POST":
@@ -612,11 +620,11 @@ def assign_activity(request):
         activity_name = request.POST.get("activity_name")
         description = request.POST.get("description")
         url_name = request.POST.get("url_name")
-        max_levels = int(request.POST.get("max_level", 1))  # Get max levels from form
+        max_levels = int(request.POST.get("max_level", 1))
+        game_type = request.POST.get("game_type", "matching")
 
         classroom = get_object_or_404(Class, id=class_id)
 
-        # Assign the activity to all students in the class
         for student in classroom.students.all():
             Activity.objects.create(
                 name=activity_name,
@@ -624,12 +632,14 @@ def assign_activity(request):
                 progress=0,
                 student=student,
                 url_name=url_name,
-                max_levels=max_levels  # Save max levels in database
+                max_levels=max_levels,
+                game_type=game_type
             )
 
-        return redirect('classes')  # Redirect back to the page
+        return redirect('classes')
 
     return redirect('classes')
+
 
 
 
@@ -832,13 +842,20 @@ def complete_activity(request, activity_id):
 
 
 @csrf_exempt
+@require_POST
 @login_required
 def reset_free_play_progress(request):
-    """Reset only free play progress without affecting activity mode."""
+    """Reset free play progress for the given game type only."""
     try:
-        # Delete all past free play progress for the user
-        GameProgress.objects.filter(user=request.user).delete()
-        return JsonResponse({'status': 'success', 'message': 'Free play progress reset.'})
+        body = json.loads(request.body)
+        game_type = body.get('game_type')
+
+        if not game_type:
+            return JsonResponse({'status': 'error', 'message': 'Missing game_type parameter.'}, status=400)
+
+        # Delete progress only for this game type
+        GameProgress.objects.filter(user=request.user, game_type=game_type).delete()
+        return JsonResponse({'status': 'success', 'message': f'{game_type} progress reset.'})
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
 

@@ -83,7 +83,11 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
   <!-- Load your main JS last to ensure all DOM is ready -->
+  <script>
+    window.GAME_TYPE = "matching";
+  </script>
   <script type="module" src="{% static 'KidVenture/js/alphabet_matching.js' %}"></script>
+
 
   {% csrf_token %}
 </body>

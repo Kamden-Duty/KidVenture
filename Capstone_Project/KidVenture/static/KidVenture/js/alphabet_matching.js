@@ -6,6 +6,11 @@ const activityId = urlParams.get('activity') || null;
 const maxLevel = 25;
 const allLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 const cardClickSound = document.getElementById("card-click-sound");
+
+// GLobal for identifing the game
+const gameType = window.GAME_TYPE || 'matching';
+
+
 let currentLevel = 1;
 let totalMatches = 2;
 let selectedPairs = [];
@@ -74,7 +79,8 @@ function saveGameProgress(level, timeTaken, mistakes, mismatchedLetters, activit
         level: level,
         time_taken: timeTaken,
         mistakes: mistakes,
-        mismatched_letters: mismatchedLetters
+        mismatched_letters: mismatchedLetters,
+        game_type: gameType
     };
 
     if (activityId) {
@@ -95,6 +101,7 @@ function saveGameProgress(level, timeTaken, mistakes, mismatchedLetters, activit
         throw error;
     });
 }
+
 
 function getCookie(name) {
     let cookieValue = null;
@@ -278,43 +285,42 @@ function reshuffleCards() {
 }
 
 function displayEndLevelMessages(elapsedSeconds, mismatchCount) {
-    if (activityId) return;
-
     let message = "";
-
+  
     if (mismatchCount === 0) {
-        message = messages[MessageCategories.REALLY_WELL][Math.floor(Math.random() * messages[MessageCategories.REALLY_WELL].length)];
+      message = messages[MessageCategories.REALLY_WELL][Math.floor(Math.random() * messages[MessageCategories.REALLY_WELL].length)];
     } else if (mismatchCount < 3) {
-        message = messages[MessageCategories.LOW_MISTAKES][Math.floor(Math.random() * messages[MessageCategories.LOW_MISTAKES].length)];
+      message = messages[MessageCategories.LOW_MISTAKES][Math.floor(Math.random() * messages[MessageCategories.LOW_MISTAKES].length)];
     } else if (elapsedSeconds < 30) {
-        message = messages[MessageCategories.FAST_COMPLETION][Math.floor(Math.random() * messages[MessageCategories.FAST_COMPLETION].length)];
+      message = messages[MessageCategories.FAST_COMPLETION][Math.floor(Math.random() * messages[MessageCategories.FAST_COMPLETION].length)];
     } else if (elapsedSeconds < 60) {
-        const options = [
-            ...messages[MessageCategories.GENERAL_PRAISE],
-            ...messages[MessageCategories.FRIENDLY_ENCOURAGEMENT],
-            ...messages[MessageCategories.CREATIVE_AND_FUN]
-        ];
-        message = options[Math.floor(Math.random() * options.length)];
+      const options = [
+        ...messages[MessageCategories.GENERAL_PRAISE],
+        ...messages[MessageCategories.FRIENDLY_ENCOURAGEMENT],
+        ...messages[MessageCategories.CREATIVE_AND_FUN]
+      ];
+      message = options[Math.floor(Math.random() * options.length)];
     } else {
-        const options = [
-            ...messages[MessageCategories.MOTIVATION_FOR_IMPROVEMENT],
-            ...messages[MessageCategories.FRIENDLY_ENCOURAGEMENT],
-            ...messages[MessageCategories.CREATIVE_AND_FUN]
-        ];
-        message = options[Math.floor(Math.random() * options.length)];
+      const options = [
+        ...messages[MessageCategories.MOTIVATION_FOR_IMPROVEMENT],
+        ...messages[MessageCategories.FRIENDLY_ENCOURAGEMENT],
+        ...messages[MessageCategories.CREATIVE_AND_FUN]
+      ];
+      message = options[Math.floor(Math.random() * options.length)];
     }
-
+  
     message = message.replace('{time}', elapsedSeconds).replace('{mistakes}', mismatchCount);
-
+  
     const overlay = document.getElementById("end-level-overlay");
     const messageElement = document.getElementById("end-level-message");
     messageElement.textContent = message;
     overlay.style.visibility = "visible";
-
+  
     setTimeout(() => {
-        overlay.style.visibility = "hidden";
+      overlay.style.visibility = "hidden";
     }, 3500);
-}
+  }
+  
 
 document.getElementById("level-up-sound").addEventListener("ended", advanceToNextLevel);
 
@@ -349,7 +355,7 @@ document.addEventListener("DOMContentLoaded", () => {
     } else {
         if (gameTypeText) gameTypeText.textContent = "Mode: Free Play";
 
-        fetch('/get_last_session/')
+        fetch(`/get_last_session/?game_type=${gameType}`)
             .then(response => response.json())
             .then(data => {
                 if (data.last_level && data.last_level > 1) {
@@ -404,13 +410,14 @@ function setupModalButtons() {
         mismatchCount = 0;
         mismatchedLetters = [];
         timerStarted = false;
-
+    
         fetch('/reset_free_play_progress/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRFToken': getCookie('csrftoken')
             },
+            body: JSON.stringify({ game_type: gameType })
         })
         .then(response => response.json())
         .then(() => {
@@ -421,6 +428,7 @@ function setupModalButtons() {
             console.error("Error resetting progress:", error);
         });
     });
+    
 }
 
 

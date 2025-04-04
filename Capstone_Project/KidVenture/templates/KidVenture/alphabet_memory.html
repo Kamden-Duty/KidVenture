@@ -11,19 +11,46 @@
     />
   </head>
   <body>
+    <script>
+      window.GAME_TYPE = 'memory';
+    </script>
+
     <div>
       <a href="{% url 'game_selection' %}">Back to Game Selection</a>
     </div>
-    <h1>Memory Game</h1>
-    <p>Match the uppercase and lowercase letters</p>
+
+    <h1>Welcome {{ request.user.username }}!</h1>
+    <h1 id="game-title">Memory Game</h1>
+
+    <p id="game-mode-text">
+      <strong>Mode:</strong> <span id="game-type"></span>
+    </p>
+
+    <p id="instruction-text">Match the uppercase and lowercase letters</p>
+
     <div id="timer">Time: 0 seconds</div>
+
     <div class="score-container">
       <div id="score">Score: 0 / 10</div>
       <div id="mismatched">Mismatched: 0</div>
     </div>
+
     <div id="game-board"></div>
 
-    <!-- Audio elements for sound effects -->
+    <div id="session-modal" class="modal hidden">
+      <div class="modal-content">
+        <p id="modal-text">
+          Do you want to continue from your last session or start from the first level?
+        </p>
+        <button id="continue-btn">Continue</button>
+        <button id="start-over-btn">Start Over</button>
+      </div>
+    </div>
+
+    <div id="end-level-overlay" class="overlay">
+      <div id="end-level-message" class="message"></div>
+    </div>
+
     <audio
       id="card-click-sound"
       src="{% static 'KidVenture/sound_effects/card_click_sound.mp3' %}"
@@ -45,6 +72,11 @@
       preload="auto"
     ></audio>
 
-    <script src="{% static 'KidVenture/js/alphabet_memory.js' %}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script type="module" src="{% static 'KidVenture/js/alphabet_memory.js' %}"></script>
+
+    {% csrf_token %}
   </body>
 </html>

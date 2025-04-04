@@ -103,28 +103,6 @@ button:active {
     transform: scale(0.95);
 }
 
-.overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.8);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-    visibility: hidden;
-}
-
-.overlay .message {
-    color: white;
-    font-size: 24px;
-    text-align: center;
-    padding: 20px;
-    background-color: rgba(0, 0, 0, 0.7);
-    border-radius: 10px;
-}
 
 .hidden {
     display: none;
@@ -177,3 +155,43 @@ button:active {
     background-color: #84aca3; /* Light Teal */
     transform: scale(0.95);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(176, 201, 196, 0.85); /* Soft background */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    visibility: hidden;
+    z-index: 1000;
+  }
+  
+  .message {
+    background-color: #ffffff;
+    color: #25433d;
+    font-size: 24px;
+    padding: 25px 40px;
+    border-radius: 15px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+    font-weight: bold;
+    text-align: center;
+  }
+  

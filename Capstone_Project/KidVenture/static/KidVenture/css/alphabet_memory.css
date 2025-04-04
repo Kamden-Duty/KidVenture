@@ -1,87 +1,218 @@
 body {
-    font-family: "Comic Sans MS", "Comic Sans", cursive;
-    text-align: center;
-    background-color: #fce4ec;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    height: 100vh;
-  }
+  font-family: "Comic Sans MS", "Comic Sans", cursive;
+  text-align: center;
+  background-color: #b0c9c4; /* Cool Gray */
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100vh;
+}
 
-  h1 {
-    font-size: 36px;
-    color: #d81b60;
-    margin-bottom: 20px;
-  }
+h1 {
+  font-size: 36px;
+  color: #25433d; /* Deep Green */
+  margin-bottom: 20px;
+}
 
-  #timer,
-  #score,
-  #mismatched {
-    font-size: 24px;
-    margin: 10px 0;
-    color: #6a1b9a;
-  }
+#timer,
+#score,
+#mismatched {
+  font-size: 24px;
+  margin: 10px 0;
+  color: #25433d; /* Deep Green */
+}
 
-  .score-container {
-    display: flex;
-    gap: 20px; 
-    justify-content: center;
-    margin-top: 10px;
-  }
+.score-container {
+  display: flex;
+  gap: 20px; 
+  justify-content: center;
+  margin-top: 10px;
+}
 
-  #game-board {
-    display: flex;
-    flex-wrap: wrap; 
-    gap: 15px;
-    justify-content: center;
-    max-width: 80%;
-    margin: 30px auto;
-  }
+#game-board {
+  display: flex;
+  flex-wrap: wrap; 
+  gap: 15px;
+  justify-content: center;
+  max-width: 80%;
+  margin: 30px auto;
+}
 
-  .card {
-    width: 100px;
-    height: 100px;
-    perspective: 1000px;
-    cursor: pointer;
-    position: relative;
-  }
+.card {
+  width: 100px;
+  height: 100px;
+  perspective: 1000px;
+  cursor: pointer;
+  position: relative;
+}
 
-  .card-inner {
-    width: 100%;
-    height: 100%;
-    position: relative;
-    transform-style: preserve-3d;
-    transform: rotateY(180deg); /* Start with back side visible */
-    transition: transform 0.6s ease-in-out;
-  }
+.card-inner {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transform: rotateY(180deg); /* Start with back side visible */
+  transition: transform 0.6s ease-in-out;
+}
 
-  .card.flip .card-inner {
-    transform: rotateY(0deg); /* Flip to reveal front side */
-  }
+.card.flip .card-inner {
+  transform: rotateY(0deg); /* Flip to reveal front side */
+}
 
-  .card-front,
-  .card-back {
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    backface-visibility: hidden;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 15px;
-    box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2);
-    background-color: #ffecb3;
-    border: 2px solid #3e2723;
-    color: #5c6bc0;
-  }
+.card-front,
+.card-back {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  backface-visibility: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 15px;
+  box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2);
+  background-color: #cadec8; /* Soft Mint */
+  border: 2px solid #25433d; /* Deep Green */
+  color: #25433d; /* Deep Green */
+}
 
-  .card-front {
-    font-size: 36px;
-    font-weight: bold;
-  }
+.card-front {
+  font-size: 36px;
+  font-weight: bold;
+}
 
-  .card-back {
-    transform: rotateY(180deg); 
-  }
+.card-back {
+  transform: rotateY(180deg); 
+}
+
+
+/* Game mode and instructions */
+#game-mode-text,
+#instruction-text {
+  font-size: 20px;
+  margin: 10px 0;
+  color: #25433d;
+}
+
+/* Modal styling */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+}
+
+.modal.hidden {
+  display: none;
+}
+
+.modal-content {
+  background-color: #ffffff;
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+  text-align: center;
+}
+
+.modal-content button {
+  margin: 10px;
+  padding: 10px 20px;
+  background-color: #25433d;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.modal-content button:hover {
+  background-color: #1b302b;
+}
+/* 
+End level overlay and message
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(176, 201, 196, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  visibility: hidden;
+  z-index: 20;
+}
+
+.message {
+  background-color: #ffffff;
+  color: #25433d;
+  font-size: 24px;
+  padding: 20px 30px;
+  border-radius: 15px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+} */
+
+
+
+
+
+/* .overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  visibility: hidden;
+  z-index: 9999;
+}
+
+.message {
+  background: white;
+  padding: 20px 40px;
+  border-radius: 10px;
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: #333;
+}
+
+
+
+ */
+
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(176, 201, 196, 0.85); /* Soft background */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  visibility: hidden;
+  z-index: 1000;
+}
+
+.message {
+  background-color: #ffffff;
+  color: #25433d;
+  font-size: 24px;
+  padding: 25px 40px;
+  border-radius: 15px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+  font-weight: bold;
+  text-align: center;
+}
