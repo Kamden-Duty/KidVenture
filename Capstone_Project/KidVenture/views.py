@@ -118,39 +118,27 @@ def home(request):
     if request.user.is_teacher:
         total_students = request.user.classes.aggregate(total=Count('students'))['total'] or 0
 
-        # Fetch first 4 students with their progress from all classes
         students_progress = (
             Activity.objects.filter(student__classroom__teacher=request.user)
             .values("student__user__username", "name", "progress", "student__classroom__name")
-            .order_by("student__user__username")[:4]  # Limit to first 4 students
+            .order_by("student__user__username")[:4]
         )
 
         return render(request, "KidVenture/teacher_page.html", {
             'total_students': total_students,
             'students_progress': students_progress
         })
-    
-    elif request.user.is_student:
-        if not request.user.is_student:
-            return HttpResponseForbidden("You are not authorized to access this page.")
 
+    elif request.user.is_student:
         try:
-            student = Student.objects.get(user=request.user)
+            student = Student.objects.select_related('classroom').get(user=request.user)
             classroom = student.classroom
             activities = Activity.objects.filter(student=student, completed=False)
 
-
-            # Adjust progress calculation
             for activity in activities:
                 if activity.max_levels > 0:
-                    if activity.progress > 0:
-                        completed_levels = (round((activity.progress / 100) * activity.max_levels, 2))  # Convert back from percentage
-                      
-                     
-                        percent_complete = (round((completed_levels / activity.max_levels) * 100, 2))
-                    else: 
-                        completed_levels = (round((activity.progress / 100) * activity.max_levels, 2))
-                        percent_complete = (round((completed_levels / activity.max_levels) * 100, 2))
+                    completed_levels = round((activity.progress / 100) * activity.max_levels, 2)
+                    percent_complete = round((completed_levels / activity.max_levels) * 100, 2)
                 else:
                     completed_levels = 0
                     percent_complete = 0
@@ -158,11 +146,26 @@ def home(request):
                 activity.completed_levels = completed_levels
                 activity.percent_complete = percent_complete
 
+            leaderboard = (
+                GameProgress.objects.filter(user__student__classroom=classroom)
+                .values('user__username', 'user__avatar')
+                .annotate(
+                    max_level=Max('level'),
+                    total_mistakes=Sum('mistakes'),
+                    avg_time=Avg('time_taken'),
+                    total_mismatches=Sum(Length('mismatched_letters'))
+                )
+                .order_by('-max_level', 'total_mistakes', 'avg_time', 'total_mismatches')
+            )
+
+            badges = Badge.objects.filter(user=request.user) if hasattr(request.user, 'badge_set') else []
+
         except Student.DoesNotExist:
             classroom = None
-            activities = None
+            activities = []
+            leaderboard = []
+            badges = []
 
-        leaderboard = LeaderboardEntry.objects.order_by('-points')[:10]
         notifications = Notification.objects.filter(user=request.user).order_by('-date')
 
         return render(request, 'KidVenture/student_page.html', {
@@ -170,6 +173,8 @@ def home(request):
             'notifications': notifications,
             'classroom': classroom,
             'teacher': classroom.teacher if classroom else None,
+            'leaderboard': leaderboard,
+            'badges': badges,
         })
 
 
@@ -218,44 +223,44 @@ def create_class(request):
 def is_student(user):
     return user.user_type == 'student'
 
-@login_required
-def student_homepage(request):
-    print("classroom")
-    if not request.user.is_student:
-        return HttpResponseForbidden("You are not authorized to access this page.")
+# @login_required
+# def student_homepage(request):
+#     print("classroom")
+#     if not request.user.is_student:
+#         return HttpResponseForbidden("You are not authorized to access this page.")
     
-    # Get the current user's student profile
-    try:
-        student = Student.objects.get(user=request.user)
-        classroom = student.classroom
-        activities = Activity.objects.filter(student=student)
-    except Student.DoesNotExist:
-        classroom = None
-        activities = None
+#     # Get the current user's student profile
+#     try:
+#         student = Student.objects.get(user=request.user)
+#         classroom = student.classroom
+#         activities = Activity.objects.filter(student=student)
+#     except Student.DoesNotExist:
+#         classroom = None
+#         activities = None
 
-    # Fetch leaderboard data
-    leaderboard = (
-        GameProgress.objects.values('user__username', 'user__avatar')  # Assuming 'avatar' is a field in the User model
-        .annotate(
-            max_level=Max('level'),
-            total_mistakes=Sum('mistakes'),
-            avg_time=Avg('time_taken'),
-            total_mismatches=Sum(Length('mismatched_letters'))  # Count mismatches
-        )
-        .order_by('-max_level', 'total_mistakes', 'avg_time', 'total_mismatches')
-    )
+#     # Fetch leaderboard data
+#     leaderboard = (
+#         GameProgress.objects.values('user__username', 'user__avatar')  # Assuming 'avatar' is a field in the User model
+#         .annotate(
+#             max_level=Max('level'),
+#             total_mistakes=Sum('mistakes'),
+#             avg_time=Avg('time_taken'),
+#             total_mismatches=Sum(Length('mismatched_letters'))  # Count mismatches
+#         )
+#         .order_by('-max_level', 'total_mistakes', 'avg_time', 'total_mismatches')
+#     )
 
-    print('Leaderboard data:', leaderboard)  # Add this line for debugging
+#     print('Leaderboard data:', leaderboard)  # Add this line for debugging
 
-    # Fetch other necessary data
-    notifications = Notification.objects.filter(user=request.user).order_by('-date')
+#     # Fetch other necessary data
+#     notifications = Notification.objects.filter(user=request.user).order_by('-date')
 
-    return render(request, 'KidVenture/student_page.html', {
-        'leaderboard': leaderboard,
-        'notifications': notifications,
-        'classroom': classroom,
-        'teacher': classroom.teacher if classroom else None,
-    })
+#     return render(request, 'KidVenture/student_page.html', {
+#         'leaderboard': leaderboard,
+#         'notifications': notifications,
+#         'classroom': classroom,
+#         'teacher': classroom.teacher if classroom else None,
+#     })
 
 @login_required
 def calendar_view(request):
@@ -525,38 +530,55 @@ def game_selection(request):
 @login_required
 def save_game_progress(request):
     if request.method == 'POST':
-        data = json.loads(request.body)
-        level = data.get('level')
-        time_taken = data.get('time_taken')
-        mistakes = data.get('mistakes')
-        mismatched_letters = data.get('mismatched_letters')
-        activity_id = data.get('activity_id')
+        try:
+            data = json.loads(request.body)
 
-        # Save general game progress
-        GameProgress.objects.create(
-            user=request.user,
-            level=level,
-            time_taken=time_taken,
-            mistakes=mistakes,
-            mismatched_letters=json.dumps(mismatched_letters)
-        )
+            level = data.get('level')
+            time_taken = data.get('time_taken')
+            mistakes = data.get('mistakes')
+            mismatched_letters = data.get('mismatched_letters')
+            activity_id = data.get('activity_id')
 
-        # Update activity progress if applicable
-        if activity_id:
-            activity = get_object_or_404(Activity, id=activity_id, student__user=request.user)
-            print(f'updating progress level our current level is {level}')
-            activity.update_progress(level - 1)
+            # Default values
+            activity = None
+            is_free_play = True
 
-        print('saving stuff')
-        return JsonResponse({'status': 'success'})
+            # If activity_id is present, it's activity mode
+            if activity_id:
+                activity = get_object_or_404(Activity, id=activity_id, student__user=request.user)
+                is_free_play = False
 
-    return JsonResponse({'status': 'error'}, status=400)
+            # Save progress entry
+            GameProgress.objects.create(
+                user=request.user,
+                level=level,
+                time_taken=time_taken,
+                mistakes=mistakes,
+                mismatched_letters=json.dumps(mismatched_letters),
+                activity=activity,
+                is_free_play=is_free_play
+            )
+
+            # Update activity progress only if in activity mode
+            if activity:
+                print(f'Updating progress — current level: {level}')
+                activity.update_progress(level - 1)
+
+            return JsonResponse({'status': 'success'})
+
+        except Exception as e:
+            print(f"Error saving game progress: {e}")
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=400)
 
 
 @login_required
 def get_last_session(request):
     try:
-        last_progress = GameProgress.objects.filter(user=request.user).latest('timestamp')
+    
+        last_progress = GameProgress.objects.filter(user=request.user, is_free_play=True).latest('timestamp')
+
         data = {
             'last_level': last_progress.level,
             'time_taken': last_progress.time_taken,
@@ -564,8 +586,10 @@ def get_last_session(request):
             'mismatched_letters': last_progress.mismatched_letters,
         }
         return JsonResponse(data)
+
     except GameProgress.DoesNotExist:
-        return JsonResponse({'last_level': 1})  # Default to level 1 if no progress found
+        return JsonResponse({'last_level': 1})  
+
 
 @login_required
 def get_leaderboard(request):
