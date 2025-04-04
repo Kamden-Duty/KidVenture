@@ -95,6 +95,21 @@ p {
     font-size: 1.5em;
     font-weight: bold;
     color: #25433d; /* Cool Gray */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.username-content {
+    display: flex;
+    align-items: center;
+}
+
+.pro-img {
+    width: 50px; /* Reduced width */
+    height: 50px; /* Reduced height */
+    border-radius: 50%;
+    margin-left: 10px; /* Add some space between the username and the image */
 }
 
 .menu-btn {

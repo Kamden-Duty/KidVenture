@@ -35,11 +35,14 @@
   </div>
 
 
-    <div class="username-container">
-      {{ request.user.username }} {{ request.user.avatar}}
-      <p id="game-mode-text"> <!-- Display the mode -->
-        <span id="game-type"></span>
-      </p>
+  <div class="username-container">
+    <div class="username-content">
+      {{ request.user.username }} <img src="{{ user.avatar.url }}" class="pro-img">
+    </div>
+    <p id="game-mode-text"> <!-- Display the mode -->
+      <span id="game-type"></span>
+    </p>
+  </div>
 
 
     </div>
