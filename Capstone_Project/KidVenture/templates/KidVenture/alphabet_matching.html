@@ -58,7 +58,7 @@
       <div id="mismatched">Mismatched: 0</div>
     </div>
 
-    <div id="game-board"></div>
+  <div id="game-board"></div>
 
     <!-- Modal for session prompt (Only for Assigned Activity Only) -->
     <div id="session-modal" class="modal hidden">
@@ -80,42 +80,40 @@
     </div>
 
 
-    <!-- Overlay for end level messages -->
-    <div id="end-level-overlay" class="overlay">
-        <div id="end-level-message" class="message"></div>
-    </div>
+  <!-- Overlay for end level messages -->
+  <div id="end-level-overlay" class="overlay">
+    <div id="end-level-message" class="message"></div>
+  </div>
 
-    <!-- Audio elements for sound effects -->
-    <audio
-      id="card-click-sound"
-      src="{% static 'KidVenture/sound_effects/card_click_sound.mp3' %}"
-      preload="auto"
-    ></audio>
-    <audio
-      id="match-sound"
-      src="{% static 'KidVenture/sound_effects/correct.mp3' %}"
-      preload="auto"
-    ></audio>
-    <audio
-      id="mismatch-sound"
-      src="{% static 'KidVenture/sound_effects/mismatch-sound.mp3' %}"
-      preload="auto"
-    ></audio>
-    <audio
-      id="level-up-sound"
-      src="{% static 'KidVenture/sound_effects/LevelUp.mp3' %}"
-      preload="auto"
-    ></audio>
+  <!-- Audio elements for sound effects -->
+  <audio
+    id="card-click-sound"
+    src="{% static 'KidVenture/sound_effects/card_click_sound.mp3' %}"
+    preload="auto"
+  ></audio>
+  <audio
+    id="match-sound"
+    src="{% static 'KidVenture/sound_effects/correct.mp3' %}"
+    preload="auto"
+  ></audio>
+  <audio
+    id="mismatch-sound"
+    src="{% static 'KidVenture/sound_effects/mismatch-sound.mp3' %}"
+    preload="auto"
+  ></audio>
+  <audio
+    id="level-up-sound"
+    src="{% static 'KidVenture/sound_effects/LevelUp.mp3' %}"
+    preload="auto"
+  ></audio>
 
-    <!-- Include the main script -->
-    <script
-      type="module"
-      src="{% static 'KidVenture/js/alphabet_matching.js' %}"
-    ></script>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <!-- Load third-party libraries first -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    {% csrf_token %}
+  <!-- Load your main JS last to ensure all DOM is ready -->
+  <script type="module" src="{% static 'KidVenture/js/alphabet_matching.js' %}"></script>
 
-  </body>
+  {% csrf_token %}
+</body>
 </html>
