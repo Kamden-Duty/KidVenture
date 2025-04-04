@@ -6,6 +6,9 @@ const activityId = urlParams.get('activity') || null;
 const maxLevel = 25;
 const allLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 const cardClickSound = document.getElementById("card-click-sound");
+
+const gameType = window.GAME_TYPE || 'matching';
+
 let currentLevel = 1;
 let totalMatches = 2;
 let selectedPairs = [];
@@ -74,7 +77,8 @@ function saveGameProgress(level, timeTaken, mistakes, mismatchedLetters, activit
         level: level,
         time_taken: timeTaken,
         mistakes: mistakes,
-        mismatched_letters: mismatchedLetters
+        mismatched_letters: mismatchedLetters,
+        game_type: gameType
     };
 
     if (activityId) {
@@ -151,7 +155,6 @@ function advanceToNextLevel() {
             currentLevel++;
             saveGameProgress(currentLevel, elapsedSeconds, mismatchCount, mismatchedLetters)
                 .then(() => {
-                    localStorage.removeItem("skipSessionModal");
                     matches = 0;
                     totalMatches = currentLevel + 1;
 
@@ -278,8 +281,6 @@ function reshuffleCards() {
 }
 
 function displayEndLevelMessages(elapsedSeconds, mismatchCount) {
-    if (activityId) return;
-
     let message = "";
 
     if (mismatchCount === 0) {
@@ -316,65 +317,74 @@ function displayEndLevelMessages(elapsedSeconds, mismatchCount) {
     }, 3500);
 }
 
-document.getElementById("level-up-sound").addEventListener("ended", advanceToNextLevel);
+function showGameElements() {
+    document.getElementById("timer").classList.remove("hidden");
+    document.querySelector(".score-container").classList.remove("hidden");
+    document.getElementById("game-board").classList.remove("hidden");
+}
 
 document.addEventListener("DOMContentLoaded", () => {
-    const sessionModal = document.getElementById("session-modal");
-    const gameModeText = document.getElementById("game-mode-text");
     const gameTypeText = document.getElementById("game-type");
-    const continueBtn = document.getElementById("continue-btn");
-    const startOverBtn = document.getElementById("start-over-btn");
-
     const activityModal = document.getElementById("activity-modal");
     const modalContent = document.querySelector(".modal-content");
     const levelContainer = document.getElementById("level-container");
     const openModalBtn = document.querySelector(".open-level-select-btn");
     const closeModalBtn = document.getElementById("close-level-select-btn");
-
-    function hideMenuModal() {
-        menuModal.style.visibility = "hidden";
-        modalContent.style.visibility = "hidden"; // Hide modal content
-    }
-
-    function hideModal() {
-        sessionModal.style.display = "none"; // Hide modal
-    }
-
-    function hideModalContent() {
-        modalContent.style.display = "none"; // Hide modal content
-    }
+    const menuModal = document.getElementById("menu-modal");
+    const closeButton = document.getElementById("close-button");
+    const menuButton = document.getElementById("menuButton");
+    const levelSelectWrapper = openModalBtn ? openModalBtn.parentElement : null;
 
     function generateLevels(numLevels) {
-        levelContainer.innerHTML = ''; // Clear any existing levels
-
+        levelContainer.innerHTML = '';
         for (let i = 1; i <= numLevels; i++) {
             const button = document.createElement('button');
             button.textContent = `Level ${i}`;
             button.className = 'level-button';
-            button.onclick = () => selectLevel(i); // Add an event listener for level selection
+            button.onclick = () => {
+                currentLevel = i;
+                totalMatches = currentLevel + 1;
+                hideActivityModal();
+                initializeGame();
+                showGameElements();
+            };
             levelContainer.appendChild(button);
         }
     }
 
-    function selectLevel(level) {
-        currentLevel = level;
-        totalMatches = level + 1;
-        hideModal();
-        initializeGame();
-        showGameElements();
-    }
-
     function showActivityModal() {
-        activityModal.classList.remove('hidden');
-        activityModal.style.display = 'block'; // Explicitly set display to block
+        activityModal.classList.remove("hidden");
+        activityModal.style.display = "block";
     }
 
     function hideActivityModal() {
-        activityModal.classList.add('hidden');
-        activityModal.style.display = 'none'; // Explicitly set display to none
+        activityModal.classList.add("hidden");
+        activityModal.style.display = "none";
     }
 
+    closeModalBtn?.addEventListener("click", hideActivityModal);
+    closeButton?.addEventListener("click", () => {
+        menuModal.style.visibility = "hidden";
+        modalContent.style.visibility = "hidden";
+    });
+
+    menuButton?.addEventListener("click", () => {
+        menuModal.style.visibility = "visible";
+        modalContent.style.visibility = "visible";
+        menuModal.style.display = "flex";
+        modalContent.style.display = "flex";
+    });
+
     if (activityId) {
+        if (levelSelectWrapper) levelSelectWrapper.style.display = "none";
+        if (gameTypeText) gameTypeText.textContent = "Mode: Activity";
+
+        // Hide menu modal and modal content initially for activity mode
+        menuModal.style.visibility = "hidden";
+        modalContent.style.visibility = "hidden";
+        menuModal.style.display = "none";
+        modalContent.style.display = "none";
+
         fetch(`/get_activity_progress/${activityId}/`)
             .then(response => response.json())
             .then(data => {
@@ -382,70 +392,17 @@ document.addEventListener("DOMContentLoaded", () => {
                     currentLevel = data.last_level;
                     totalMatches = currentLevel + 1;
                 }
-
-                if (gameModeText) gameModeText.textContent = "Complete the assigned activity!";
-                if (gameTypeText) gameTypeText.textContent = "Mode: Activity";
-                if (sessionModal) sessionModal.style.display = "none";
-
                 initializeGame();
             })
             .catch(error => {
                 console.error("Error fetching activity progress:", error);
-                alert("There was an issue loading your progress. Starting from Level 1.");
                 initializeGame();
             });
     } else {
         if (gameTypeText) gameTypeText.textContent = "Mode: Free Play";
-
-        // Ensure the session modal is hidden
-        hideModal();
-        hideActivityModal();
-        hideMenuModal();
-
-        openModalBtn.addEventListener("click", () => {
-            showActivityModal();
-        });
-
-        closeModalBtn.addEventListener("click", () => {
-            menuModal.style.visibility = "hidden";
-            modalContent.style.visibility = "hidden"; // Hide modal content
-            hideActivityModal();
-            hideModalContent();
-            hideMenuModal();
-            initializeGame();
-            showGameElements();
-        });
-
+        openModalBtn?.addEventListener("click", showActivityModal);
         generateLevels(maxLevel);
         initializeGame();
-        showGameElements();
     }
+    updateScore();
 });
-
-// Get the modal
-const menuModal = document.getElementById("menu-modal");
-const menuButton = document.getElementById("menuButton");
-const modalContent = document.querySelector(".modal-content");
-const closeButton = document.getElementById("close-button");
-
-menuButton.onclick = function() {
-    menuModal.style.visibility = "visible";
-    modalContent.style.visibility = "visible"; // Show modal content
-    menuModal.style.display = "flex"; // Show modal
-    modalContent.style.display = "flex"; // Show modal content
-}
-
-closeButton.onclick = function() {
-    menuModal.style.visibility = "hidden";
-    modalContent.style.visibility = "hidden"; // Hide modal content
-}
-
-
-
-function showGameElements() {
-    document.getElementById("timer").classList.remove("hidden");
-    document.querySelector(".score-container").classList.remove("hidden");
-    document.getElementById("game-board").classList.remove("hidden");
-}
-
-updateScore();

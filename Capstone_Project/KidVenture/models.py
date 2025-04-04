@@ -98,6 +98,12 @@ class Student(models.Model):
          return self.user.username if self.user else "Unassigned Student"
 
 class Activity(models.Model):
+
+    GAME_CHOICES = [
+        ('matching', 'Matching Game'),
+        ('memory', 'Memory Game'),
+    ]
+
     name = models.CharField(max_length=255)  
     description = models.TextField(blank=True, null=True)  
     progress = models.IntegerField(default=0)  
@@ -105,6 +111,8 @@ class Activity(models.Model):
     url_name = models.CharField(max_length=50, blank=True, null=True)  
     completed = models.BooleanField(default=False)
     max_levels = models.IntegerField(default=1)  # Track max levels for this activity
+    game_type = models.CharField(max_length=20, choices=GAME_CHOICES, default='matching')
+
 
     def update_progress(self, completed_levels):
         """Update activity progress based on completed levels"""
@@ -156,6 +164,13 @@ class Notification(models.Model):
         return f"Notification for {self.user.username}: {self.title}"
 
 class GameProgress(models.Model):
+
+    GAME_CHOICES = [
+        ('matching', 'Matching Game'),
+        ('memory', 'Memory Game'),
+    ]
+
+
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     level = models.IntegerField()
     time_taken = models.FloatField()
@@ -165,6 +180,7 @@ class GameProgress(models.Model):
     
     activity = models.ForeignKey(Activity, null=True, blank=True, on_delete=models.SET_NULL) 
     is_free_play = models.BooleanField(default=True) 
+    game_type = models.CharField(max_length=20, choices=GAME_CHOICES, default='matching')
 
     def __str__(self):
-        return f"{self.user.username} - Level {self.level} ({'Free Play' if self.is_free_play else 'Activity'})"
+        return f"{self.user.username} - Level {self.level} ({'Free Play' if self.is_free_play else 'Activity'}) - {self.game_type}"

@@ -5,46 +5,110 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Memory Game</title>
     {% load static %}
-    <link
-      rel="stylesheet"
-      href="{% static 'KidVenture/css/alphabet_memory.css' %}"
-    />
+    <!-- Your Memory game CSS (similar to the matching game CSS) -->
+    <link rel="stylesheet" href="{% static 'KidVenture/css/alphabet_memory.css' %}">
   </head>
+
   <body>
-    <div>
-      <a href="{% url 'game_selection' %}">Back to Game Selection</a>
+    <script>
+      // Identify this as memory game so your JS knows which game_type to use
+      window.GAME_TYPE = 'memory';
+    </script>
+
+    <!-- Menu button in the top-left corner -->
+    <button id="menuButton" class="menu-btn">Menu</button>
+
+    <!-- The menu modal that appears when "Menu" is clicked -->
+    <div id="menu-modal" class="modal hidden">
+      <div class="modal-content">
+        <div class="menu-spacing">
+          <!-- Button that opens the Level Select modal -->
+          <button class="open-level-select-btn">Level Select</button>
+        </div>
+        <div class="menu-spacing">
+          <!-- A link or button back to your homepage/teacher_homepage -->
+          {% if request.user.is_teacher %}
+            <a href="{% url 'teacher_homepage' %}" class="button-link">Back to Homepage</a>
+          {% else %}
+            <a href="{% url 'home' %}" class="button-link">Back to Homepage</a>
+          {% endif %}
+        </div>
+        <div class="menu-spacing">
+          <!-- Close button to hide this menu modal -->
+          <button id="close-button" class="button-link">Close</button>
+        </div>
+      </div>
     </div>
-    <h1>Memory Game</h1>
-    <p>Match the uppercase and lowercase letters</p>
-    <div id="timer">Time: 0 seconds</div>
+
+
+    <div class="username-container">
+      <div class="username-content">
+        {{ request.user.username }}
+        <img src="{{ user.avatar.url }}" class="pro-img" id="user-avatar">
+      </div>
+      <p id="game-mode-text">
+        <span id="game-type"></span>
+      </p>
+    </div>
+    
+
+    <!-- Page content: Title, instructions, scoreboard -->
+    <h1>Welcome {{ request.user.username }}!</h1>
+    <h1 id="game-title">Memory Game</h1>
+
+    <p id="game-mode-text">
+      <strong>Mode:</strong> <span id="game-type"></span>
+    </p>
+
+    <p id="instruction-text">Match the uppercase and lowercase letters</p>
+
+    <!-- Timer + Score container -->
     <div class="score-container">
+      <div id="timer">Time: 0 seconds</div>
       <div id="score">Score: 0 / 10</div>
       <div id="mismatched">Mismatched: 0</div>
     </div>
+
+    <!-- The game board where cards appear -->
     <div id="game-board"></div>
 
-    <!-- Audio elements for sound effects -->
-    <audio
-      id="card-click-sound"
-      src="{% static 'KidVenture/sound_effects/card_click_sound.mp3' %}"
-      preload="auto"
-    ></audio>
-    <audio
-      id="match-sound"
-      src="{% static 'KidVenture/sound_effects/correct.mp3' %}"
-      preload="auto"
-    ></audio>
-    <audio
-      id="mismatch-sound"
-      src="{% static 'KidVenture/sound_effects/mismatch-sound.mp3' %}"
-      preload="auto"
-    ></audio>
-    <audio
-      id="level-up-sound"
-      src="{% static 'KidVenture/sound_effects/LevelUp.mp3' %}"
-      preload="auto"
-    ></audio>
+    <!-- If you’re showing a session modal for continue vs start-over, keep it:
+    <div id="session-modal" class="modal hidden">
+      <div class="modal-content">
+        <p id="modal-text">Continue or start from level 1?</p>
+        <button id="continue-btn">Continue</button>
+        <button id="start-over-btn">Start Over</button>
+      </div>
+    </div>
+    -->
 
-    <script src="{% static 'KidVenture/js/alphabet_memory.js' %}"></script>
+    <!-- Modal for Level Selection -->
+    <div id="activity-modal" class="modal hidden">
+      <div class="modal-content">
+        <p>Level Select</p>
+        <div id="level-container"></div>
+        <button id="close-level-select-btn" class="button-link">Close</button>
+      </div>
+    </div>
+
+    <!-- Overlay for end-level messages -->
+    <div id="end-level-overlay" class="overlay">
+      <div id="end-level-message" class="message"></div>
+    </div>
+
+    <!-- Audio elements for sound effects -->
+    <audio id="card-click-sound"    src="{% static 'KidVenture/sound_effects/card_click_sound.mp3' %}" preload="auto"></audio>
+    <audio id="match-sound"         src="{% static 'KidVenture/sound_effects/correct.mp3' %}"            preload="auto"></audio>
+    <audio id="mismatch-sound"      src="{% static 'KidVenture/sound_effects/mismatch-sound.mp3' %}"      preload="auto"></audio>
+    <audio id="level-up-sound"      src="{% static 'KidVenture/sound_effects/LevelUp.mp3' %}"             preload="auto"></audio>
+
+    <!-- Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Finally load the memory-game JS, which references all these elements -->
+    <script type="module" src="{% static 'KidVenture/js/alphabet_memory.js' %}"></script>
+
+    {% csrf_token %}
   </body>
 </html>

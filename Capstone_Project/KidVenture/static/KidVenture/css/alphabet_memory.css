@@ -1,87 +1,315 @@
+/* Full Matching Game Style for Memory Game */
+
 body {
-    font-family: "Comic Sans MS", "Comic Sans", cursive;
-    text-align: center;
-    background-color: #fce4ec;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    height: 100vh;
-  }
+  font-family: "Comic Sans MS", "Comic Sans", cursive;
+  text-align: center;
+  background-color: #b0c9c4;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100vh;
+}
 
-  h1 {
-    font-size: 36px;
-    color: #d81b60;
-    margin-bottom: 20px;
-  }
+h1 {
+  font-size: 36px;
+  color: #25433d;
+  margin-bottom: 20px;
+}
 
-  #timer,
-  #score,
-  #mismatched {
-    font-size: 24px;
-    margin: 10px 0;
-    color: #6a1b9a;
-  }
+p {
+  font-size: 18px;
+  color: #25433d;
+  margin-bottom: 20px;
+}
 
-  .score-container {
-    display: flex;
-    gap: 20px; 
-    justify-content: center;
-    margin-top: 10px;
-  }
+#timer, #score, #mismatched {
+  font-size: 24px;
+  margin: 10px 0;
+  color: #25433d;
+}
 
-  #game-board {
-    display: flex;
-    flex-wrap: wrap; 
-    gap: 15px;
-    justify-content: center;
-    max-width: 80%;
-    margin: 30px auto;
-  }
+.score-container {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  margin-top: 10px;
+}
 
-  .card {
-    width: 100px;
-    height: 100px;
-    perspective: 1000px;
-    cursor: pointer;
-    position: relative;
-  }
+#game-board {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  justify-content: center;
+  max-width: 80%;
+  margin: 30px auto;
+}
 
-  .card-inner {
-    width: 100%;
-    height: 100%;
-    position: relative;
-    transform-style: preserve-3d;
-    transform: rotateY(180deg); /* Start with back side visible */
-    transition: transform 0.6s ease-in-out;
-  }
+.card {
+  width: 100px;
+  height: 100px;
+  perspective: 1000px;
+  cursor: pointer;
+  position: relative;
+}
 
-  .card.flip .card-inner {
-    transform: rotateY(0deg); /* Flip to reveal front side */
-  }
+.card-inner {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transform: rotateY(180deg);
+  transition: transform 0.6s ease-in-out;
+}
 
-  .card-front,
-  .card-back {
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    backface-visibility: hidden;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 15px;
-    box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2);
-    background-color: #ffecb3;
-    border: 2px solid #3e2723;
-    color: #5c6bc0;
-  }
+.card.flip .card-inner {
+  transform: rotateY(0deg);
+}
 
-  .card-front {
-    font-size: 36px;
-    font-weight: bold;
-  }
+.card-front, .card-back {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  backface-visibility: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 15px;
+  box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2);
+  background-color: #cadec8;
+  border: 2px solid #25433d;
+  color: #25433d;
+}
 
-  .card-back {
-    transform: rotateY(180deg); 
-  }
+.card-front {
+  font-size: 36px;
+  font-weight: bold;
+}
+
+.card-back {
+  transform: rotateY(180deg);
+}
+
+#game-mode-text, #instruction-text {
+  font-size: 20px;
+  margin: 10px 0;
+  color: #25433d;
+}
+
+.username-container {
+  position: absolute;
+  top: 10px;
+  right: 5rem;
+  font-size: 1.5em;
+  font-weight: bold;
+  color: #25433d;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.username-content {
+  display: flex;
+  align-items: center;
+}
+
+.pro-img {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  margin-left: 10px;
+}
+
+#menuButton {
+  position: absolute;
+  top: 2rem;
+  left: 2.5rem;
+  background-color: #3a524d;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.3s;
+  font-family: "Comic Sans MS", "Comic Sans", cursive;
+}
+
+#menuButton:hover {
+  background-color: #2b3e3a;
+  transform: scale(1.05);
+}
+
+button {
+  font-size: 18px;
+  padding: 10px 20px;
+  background-color: #84aca3;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+button:hover {
+  background-color: #6b8f89;
+  transform: scale(1.05);
+}
+
+button:active {
+  background-color: #718f89;
+  transform: scale(0.95);
+}
+
+.hidden {
+  display: none;
+}
+
+#session-modal, #activity-modal, #menu-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+}
+
+#session-modal.hidden,
+#activity-modal.hidden,
+#menu-modal.hidden {
+  display: none;
+}
+
+.modal-content {
+  background-color: #4c6f66;
+  color: #cadec8;
+  padding: 20px;
+  border-radius: 15px;
+  text-align: center;
+  width: 80%;
+  max-width: 500px;
+}
+
+.modal-content button {
+  font-size: 18px;
+  padding: 10px 20px;
+  background-color: #25433d;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  margin: 10px;
+}
+
+.modal-content button:hover {
+  background-color: #718f89;
+  transform: scale(1.05);
+}
+
+.modal-content button:active {
+  background-color: #84aca3;
+  transform: scale(0.95);
+}
+
+#activity-modal .modal-content {
+  margin: 15% auto;
+}
+
+#activity-modal .modal-content #level-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+#activity-modal .modal-content .level-button {
+  margin: 5px;
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #84aca3;
+  border: none;
+  border-radius: 5px;
+  color: white;
+  cursor: pointer;
+  transition: transform 0.1s, background-color 0.1s;
+}
+
+#activity-modal .modal-content .level-button:hover {
+  background-color: #6b8f89;
+}
+
+#activity-modal .modal-content .level-button:active {
+  background-color: #84aca3;
+  transform: scale(0.95);
+}
+
+#menu-modal .modal-content {
+  width: 15%;
+  height: 40%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.menu-spacing {
+  margin: 1rem;
+}
+
+.button-link, .level-button {
+  display: inline-block;
+  padding: 10px 20px;
+  font-size: 16px;
+  font-family: "Comic Sans MS", "Comic Sans", cursive;
+  color: white;
+  background-color: #84aca3;
+  border: none;
+  border-radius: 5px;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.1s, background-color 0.1s;
+}
+
+.button-link:hover, .level-button:hover {
+  background-color: #6b8f89;
+}
+
+.button-link:active, .level-button:active {
+  background-color: #84aca3;
+  transform: scale(0.95);
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(176, 201, 196, 0.85);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  visibility: hidden;
+  z-index: 1000;
+}
+
+.message {
+  background-color: #ffffff;
+  color: #25433d;
+  font-size: 24px;
+  padding: 25px 40px;
+  border-radius: 15px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+  font-weight: bold;
+  text-align: center;
+}
+
+@keyframes modalopen {
+  from { opacity: 0; transform: translateY(-50px); }
+  to { opacity: 1; transform: translateY(0); }
+}
