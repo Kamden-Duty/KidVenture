@@ -162,6 +162,9 @@ class GameProgress(models.Model):
     mistakes = models.IntegerField()
     mismatched_letters = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
+    
+    activity = models.ForeignKey(Activity, null=True, blank=True, on_delete=models.SET_NULL) 
+    is_free_play = models.BooleanField(default=True) 
 
     def __str__(self):
-        return f"{self.user.username} - Level {self.level}"
+        return f"{self.user.username} - Level {self.level} ({'Free Play' if self.is_free_play else 'Activity'})"
