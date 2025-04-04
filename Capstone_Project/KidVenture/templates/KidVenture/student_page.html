@@ -5,14 +5,13 @@
   <title>KidVenture Student Page</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   {% load static %}
-  <!-- Base CSS for your Student Page -->
-  <link rel="stylesheet" href="{% static 'KidVenture/css/student_tab.css' %}" /> 
 
-  <!-- FontAwesome for icons -->
+  <!-- <link rel="stylesheet" href="{% static 'KidVenture/css/student.css' %}" />  -->
+
+
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
 
   <style>
-    /* RESET */
     * {
       margin: 0;
       padding: 0;
@@ -200,6 +199,8 @@
       gap: 20px;
     }
     .finder {
+      background: green;
+      padding: 0.5rem;
       display: flex;
       align-items: center;
       gap: 6px;
@@ -209,7 +210,7 @@
       cursor: pointer;
     }
 
-    /* BOTTOM PART: Ribbon bar with Tabs */
+    /* BOTTOM PART */
     .header__bottomPart {
       position: relative;
     }
@@ -488,6 +489,48 @@
   color: #333;
 }
 
+.inbox-panel {
+  position: fixed;
+  top: 60px;
+  left: 0;
+  width: 300px;
+  height: calc(100% - 60px);
+  background: #ffffff;
+  border-right: 2px solid #007bff;
+  border-radius: 0 10px 10px 0;
+  padding: 15px;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+}
+
+.inbox-panel.open {
+  transform: translateX(0);
+}
+
+.teacher-message-box {
+  background-color: #f0f8ff;
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+.inbox-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.inbox-close-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+
 
     @media (max-width: 768px) {
       .header__topPart,
@@ -585,25 +628,86 @@
 </head>
 <body>
     <header>
-        <h1>Welcome {{ request.user.username }}!</h1>
+        <!-- <h1>Welcome {{ request.user.username }}!</h1> -->
     
-        <div class="header-left">
+        <!-- <div class="header-left">
             <h1 class="kidventure-logo">KidVenture</h1>
-        </div>
+        </div> -->
     
-        <div class="header-right">
+        <!-- <div class="header-right"> -->
             <!-- Profile Image beside Logout Button -->
-            <a href="{% url 'edit_avatar' %}" class="profile-link">
-                <img src="{{ user.avatar.url }}" alt="Profile" class="profile-image">
-            </a>
+            <!-- <a href="{% url 'edit_avatar' %}" class="profile-link"> -->
+                <!-- <img src="{{ user.avatar.url }}" alt="Profile" class="profile-image"> -->
+            <!-- </a> -->
     
             <!-- Logout Icon -->
-            <a href="{% url 'logout_view' %}" class="logout-button" title="Logout">
-                <i class="fa fa-sign-out-alt"></i>
-            </a>
-        </div>
+            <!-- <a href="{% url 'logout_view' %}" class="logout-button" title="Logout"> -->
+                <!-- <i class="fa fa-sign-out-alt"></i> -->
+            <!-- </a> -->
+        <!-- </div> -->
     </header>
     
+  <!-- LEFT NAV -->
+  <div class="left-nav">
+    <div class="account-button" id="accountBtn">
+       <img src="{{ user.avatar.url }}" style = "width: 3.8rem;" alt="Profile" class="profile-image"></div>
+       
+    <!-- Home Icon -->
+    <div class="nav-item" title="Dashboard">
+      <a href="{% url 'student_homepage' %}">
+        <i class="fas fa-home" style="color: white;"></i>
+      </a>
+    </div>
+    <div class="nav-item" title="Courses">
+      <i class="fas fa-book"></i>
+    </div>
+    <div class="nav-item" title="Calendar">
+      <a href="{% url 'calendar' %}">
+        <i class="fas fa-calendar" style="color: white;"></i>
+      </a>
+    </div>
+    <div class="nav-item" title="Inbox" id="inboxIcon">
+      <i class="fas fa-inbox" style="color: white;"></i>
+    </div>
+  </div>
+
+  <div id="inboxPanel" class="inbox-panel">
+    <div class="inbox-header">
+      <h3>Inbox</h3>
+      <button onclick="closeInbox()">✕</button>
+    </div>
+    
+    {% if message %}
+      <div class="teacher-message-box">
+        <strong>From: {{ message.teacher.username }}</strong><br>
+        <p>{{ message.message }}</p>
+        <small>Posted on {{ message.created_at|date:"M d, Y H:i" }}</small>
+      </div>
+    {% else %}
+      <p>No messages yet.</p>
+    {% endif %}
+    <!-- <button onclick="closeInbox()">Close</button> -->
+  </div>
+
+  <!-- ACCOUNT PANEL -->
+  <div class="account-panel" id="accountPanel">
+    <div class="account-header">
+      <div class="user-info">
+        <div class="user-initials"><a href="{% url 'edit_avatar' %}" class="profile-link"><img src="{{ user.avatar.url }}" style = "width: 3.8rem;" alt="Profile" class="profile-image"></a></div>
+        <div class="user-details">
+          <span class="name">{{ request.user.get_full_name|default:request.user.username }}</span>
+          <button class="logout-button" onclick="location.href='{% url 'logout_view' %}'">Logout</button>
+        </div>
+      </div>
+      <button class="close-btn" id="closeBtn">✕</button>
+    </div>
+    <div class="account-links">
+      <a href="#">Notifications</a>
+      <a href="#">Profile</a>
+      <a href="#">Files</a>
+      <a href="#">Settings</a>
+    </div>
+  </div>
 
   <!-- TWO-PART HEADER -->
   <div class="header__wrapper" role="navigation">
@@ -617,8 +721,7 @@
       </div>
       <div class="cf-zip-container">
         <div class="finder">
-          <i class="fas fa-search"></i>
-          Finder
+          <a href="{% url 'join_class' %}" style = "color: white;"><i class="fa fa-plus" style="--fa-primary-color: #199a51; --fa-secondary-color: #199a51;">Join Class</i></a>
         </div>
         <div class="notification-tab">
           <button id="notificationbtn" class="notification-button">
@@ -664,16 +767,18 @@
   <main>
     <div class="main-box">
     <!-- Class Information Section -->
-    <section class="class-info">
+    <!-- <section class="class-info">
       <h2>Your Class Information</h2>
       {% if classroom %}
         <p><strong>Class:</strong> {{ classroom.name }}</p>
         <p><strong>Teacher:</strong> {{ teacher }}</p>
+        <p><strong>Levels Assigned:</strong> 3</p>
+        <p><strong>Levels Completed: </strong><button class = "view-progress-btn">View Progress</button></p>
       {% else %}
         <p>You have not joined any classes yet. 
           Please <a href="{% url 'join_class' %}">join a class</a> to get started!</p>
       {% endif %}
-    </section>
+    </section> -->
 
     <!-- Notification Section -->
 
@@ -693,8 +798,20 @@
     </div>
   </section>
 
-    <!-- ACTIVITIES SECTION (Hidden by default) -->
+    <!-- ACTIVITIES SECTION -->
     <section id="activities-tab" class="tab-content hidden">
+      <section class="class-info">
+        <h2>Your Class Information</h2>
+        {% if classroom %}
+          <p><strong>Class:</strong> {{ classroom.name }}</p>
+          <p><strong>Teacher:</strong> {{ teacher }}</p>
+          <p><strong>Levels Assigned:</strong> 3</p>
+          <p><strong>Levels Completed: </strong><button class = "view-progress-btn">View Progress</button></p>
+        {% else %}
+          <p>You have not joined any classes yet. 
+            Please <a href="{% url 'join_class' %}">join a class</a> to get started!</p>
+        {% endif %}
+      </section>
       <h2>Games</h2>
       <p>Select a game to play:</p>
       <div class="game-container">
@@ -765,7 +882,6 @@
     KidVenture - Making Learning Fun!
   </footer>
 
-  <!-- SIMPLE JS for Account Panel Toggle and Tab Switching -->
   <script>
     // Account Panel Toggle
     const accountBtn = document.getElementById('accountBtn');
@@ -785,7 +901,21 @@
       notificationPanel.classList.toggle('show');
     })
 
-    <!-- JavaScript to Generate Dummy Progress Data -->
+    // Inbox toggle
+    const inboxIcon = document.getElementById('inboxIcon');
+    const inboxPanel = document.getElementById('inboxPanel');
+    const inboxCloseBtn = document.getElementById('inboxCloseBtn');
+    console.log(inboxCloseBtn);
+
+    inboxIcon.addEventListener('click', () => {
+      inboxPanel.classList.toggle("open");
+    });
+
+    window.closeInbox = function () {
+      inboxPanel.classList.remove('open');
+    };
+
+    <!-- to generate dummy progress data -->
 
     document.addEventListener("DOMContentLoaded", function () {
         const progressData = [
@@ -818,20 +948,32 @@
     document.addEventListener("DOMContentLoaded", () => {
       const tabs = document.querySelectorAll(".tab-link");
       const contents = document.querySelectorAll(".tab-content");
+      const viewProgressButtons = document.querySelectorAll(".view-progress-btn")
 
       tabs.forEach((tab) => {
         tab.addEventListener("click", () => {
-          // Remove 'active' class from all tabs
           tabs.forEach((t) => t.classList.remove("active"));
-          // Hide all tab contents by adding 'hidden'
           contents.forEach((content) => content.classList.add("hidden"));
-          // Activate clicked tab and show its content
           tab.classList.add("active");
           const tabId = tab.getAttribute("data-tab");
           document.getElementById(tabId).classList.remove("hidden");
         });
+
       });
+
+      viewProgressButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+          document.querySelectorAll(".tab-link").forEach(tab => tab.classList.remove("active"));
+          document.querySelectorAll(".tab-content").forEach(content => content.classList.add("hidden"));
+
+          // progress tab activation
+          document.querySelector("[data-tab='progress-tab']").classList.add("active");
+          document.getElementById("progress-tab").classList.remove("hidden");
+
+          document.getElementById("progress-tab").scrollIntoView({ behavior: 'smooth' });
+        });
     });
+  });
   </script>
 
 </body>
