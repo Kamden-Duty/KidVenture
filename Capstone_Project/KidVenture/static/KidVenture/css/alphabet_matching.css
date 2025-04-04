@@ -16,6 +16,12 @@ h1 {
     margin-bottom: 20px;
 }
 
+p {
+    font-size: 18px;
+    color: #25433d; /* Deep Green */
+    margin-bottom: 20px;
+}
+
 #timer,
 #score,
 #mismatched {
@@ -82,10 +88,53 @@ h1 {
     pointer-events: none;
 }
 
+.username-container {
+    position: absolute;
+    top: 10px;
+    right: 5rem;
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #25433d; /* Cool Gray */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.username-content {
+    display: flex;
+    align-items: center;
+}
+
+.pro-img {
+    width: 50px; /* Reduced width */
+    height: 50px; /* Reduced height */
+    border-radius: 50%;
+    margin-left: 10px; /* Add some space between the username and the image */
+}
+
+.menu-btn {
+    position: absolute;
+    top: 2rem;
+    left: 2.5rem;
+    background-color: #3a524d; /* Darker Teal */
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 10px; /* Rounded corners */
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+    font-family: "Comic Sans MS", "Comic Sans", cursive;
+}
+
+.menu-btn:hover {
+    background-color: #2b3e3a; /* Even Darker Teal */
+    transform: scale(1.05);
+}
+
 button {
     font-size: 18px;
     padding: 10px 20px;
-    background-color: #4c6f66; /* Dark Teal */
+    background-color: #84aca3; 
     color: white;
     border: none;
     border-radius: 10px;
@@ -94,7 +143,7 @@ button {
 }
 
 button:hover {
-    background-color: #25433d; /* Deep Green */
+    background-color: #6b8f89; /* Deep Green */
     transform: scale(1.05);
 }
 
@@ -176,4 +225,161 @@ button:active {
 #session-modal .modal-content button:active {
     background-color: #84aca3; /* Light Teal */
     transform: scale(0.95);
+}
+
+/* Modal for Level Selection */
+#activity-modal {
+    display: none; /* Hidden by default */
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4); /* Black with opacity */
+}
+
+#activity-modal .modal-content {
+    background-color: #4c6f66; /* Dark Teal */
+    color: #cadec8; /* Soft Mint */
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    animation: modalopen 0.3s;
+    border-radius: 15px; /* Add rounded corners */
+}
+
+#activity-modal .modal-content p {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+#activity-modal .modal-content #level-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+#activity-modal .modal-content .level-button {
+    margin: 5px;
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #84aca3; /* Light Teal */
+    border: none;
+    border-radius: 5px;
+    color: white;
+    cursor: pointer;
+    transition: transform 0.1s, background-color 0.1s;
+}
+
+#activity-modal .modal-content .level-button:hover {
+    background-color: #6b8f89; /* Darker Teal */
+}
+
+#activity-modal .modal-content .level-button:active {
+    background-color: #84aca3; /* Light Teal */
+    transform: scale(0.95);
+}
+
+#menu-modal {
+    display: none; /* Hidden by default */
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4); /* Black with opacity */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#menu-modal .modal-content {
+    background-color: #4c6f66; /* Dark Teal */
+    color: #cadec8; /* Soft Mint */
+    margin: 5% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 15%; /* Adjusted width to be narrower */
+    height: 40%; /* Increased height */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    animation: modalopen 0.3s;
+    border-radius: 15px; /* Add rounded corners */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#menu-modal .modal-content p {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+#menu-modal .modal-content #level-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+#menu-modal .modal-content .level-button {
+    margin: 5px;
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #84aca3; /* Light Teal */
+    border: none;
+    border-radius: 5px;
+    color: white;
+    cursor: pointer;
+    transition: transform 0.1s, background-color 0.1s;
+}
+
+#menu-modal .modal-content .level-button:hover {
+    background-color: #6b8f89; /* Darker Teal */
+}
+
+#menu-modal .modal-content .level-button:active {
+    background-color: #84aca3; /* Light Teal */
+    transform: scale(0.95);
+}
+
+.menu-spacing {    
+    margin: 1rem;
+}
+
+.button-link, .level-button {
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-family: "Comic Sans MS", "Comic Sans", cursive; /* Ensure Comic Sans font */
+    color: white;
+    background-color: #84aca3; /* Light Teal */
+    border: none;
+    border-radius: 5px;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    transition: transform 0.1s, background-color 0.1s;
+}
+
+.button-link:hover, .level-button:hover {
+    background-color: #6b8f89; /* Darker Teal */
+}
+
+.button-link:active, .level-button:active {
+    background-color: #84aca3; /* Light Teal */
+    transform: scale(0.95);
+}
+
+/* Animation for modal opening */
+@keyframes modalopen {
+    from { opacity: 0; transform: translateY(-50px); }
+    to { opacity: 1; transform: translateY(0); }
 }

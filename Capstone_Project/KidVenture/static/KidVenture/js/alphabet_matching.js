@@ -322,9 +322,57 @@ document.addEventListener("DOMContentLoaded", () => {
     const sessionModal = document.getElementById("session-modal");
     const gameModeText = document.getElementById("game-mode-text");
     const gameTypeText = document.getElementById("game-type");
+    const continueBtn = document.getElementById("continue-btn");
+    const startOverBtn = document.getElementById("start-over-btn");
 
-    // Setup modal buttons once DOM is ready
-    setupModalButtons();
+    const activityModal = document.getElementById("activity-modal");
+    const modalContent = document.querySelector(".modal-content");
+    const levelContainer = document.getElementById("level-container");
+    const openModalBtn = document.querySelector(".open-level-select-btn");
+    const closeModalBtn = document.getElementById("close-level-select-btn");
+
+    function hideMenuModal() {
+        menuModal.style.visibility = "hidden";
+        modalContent.style.visibility = "hidden"; // Hide modal content
+    }
+
+    function hideModal() {
+        sessionModal.style.display = "none"; // Hide modal
+    }
+
+    function hideModalContent() {
+        modalContent.style.display = "none"; // Hide modal content
+    }
+
+    function generateLevels(numLevels) {
+        levelContainer.innerHTML = ''; // Clear any existing levels
+
+        for (let i = 1; i <= numLevels; i++) {
+            const button = document.createElement('button');
+            button.textContent = `Level ${i}`;
+            button.className = 'level-button';
+            button.onclick = () => selectLevel(i); // Add an event listener for level selection
+            levelContainer.appendChild(button);
+        }
+    }
+
+    function selectLevel(level) {
+        currentLevel = level;
+        totalMatches = level + 1;
+        hideModal();
+        initializeGame();
+        showGameElements();
+    }
+
+    function showActivityModal() {
+        activityModal.classList.remove('hidden');
+        activityModal.style.display = 'block'; // Explicitly set display to block
+    }
+
+    function hideActivityModal() {
+        activityModal.classList.add('hidden');
+        activityModal.style.display = 'none'; // Explicitly set display to none
+    }
 
     if (activityId) {
         fetch(`/get_activity_progress/${activityId}/`)
@@ -349,79 +397,49 @@ document.addEventListener("DOMContentLoaded", () => {
     } else {
         if (gameTypeText) gameTypeText.textContent = "Mode: Free Play";
 
-        fetch('/get_last_session/')
-            .then(response => response.json())
-            .then(data => {
-                if (data.last_level && data.last_level > 1) {
-                    const skipModal = localStorage.getItem("skipSessionModal") === "true";
-                    if (!skipModal) {
-                        document.getElementById("continue-btn").setAttribute("data-last-level", data.last_level);
-                        showSessionModal(data.last_level);
-                    } else {
-                        localStorage.removeItem("skipSessionModal");
-                        currentLevel = 1;
-                        totalMatches = 2;
-                        initializeGame();
-                        showGameElements();
-                    }
-                } else {
-                    initializeGame();
-                    showGameElements();
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching last session:', error);
-                initializeGame();
-                showGameElements();
-            });
+        // Ensure the session modal is hidden
+        hideModal();
+        hideActivityModal();
+        hideMenuModal();
+
+        openModalBtn.addEventListener("click", () => {
+            showActivityModal();
+        });
+
+        closeModalBtn.addEventListener("click", () => {
+            menuModal.style.visibility = "hidden";
+            modalContent.style.visibility = "hidden"; // Hide modal content
+            hideActivityModal();
+            hideModalContent();
+            hideMenuModal();
+            initializeGame();
+            showGameElements();
+        });
+
+        generateLevels(maxLevel);
+        initializeGame();
+        showGameElements();
     }
 });
 
+// Get the modal
+const menuModal = document.getElementById("menu-modal");
+const menuButton = document.getElementById("menuButton");
+const modalContent = document.querySelector(".modal-content");
+const closeButton = document.getElementById("close-button");
 
-function setupModalButtons() {
-    const modal = document.getElementById("session-modal");
-    const continueBtn = document.getElementById("continue-btn");
-    const startOverBtn = document.getElementById("start-over-btn");
-
-    if (!modal || !continueBtn || !startOverBtn) return;
-
-    continueBtn.addEventListener("click", () => {
-        const lastLevel = parseInt(continueBtn.dataset.lastLevel || "1", 10);
-        currentLevel = lastLevel;
-        totalMatches = currentLevel + 1;
-        modal.style.display = "none";
-        initializeGame();
-        showGameElements();
-    });
-
-    startOverBtn.addEventListener("click", () => {
-        modal.style.display = "none";
-        localStorage.setItem("skipSessionModal", "true");
-        currentLevel = 1;
-        totalMatches = 2;
-        elapsedSeconds = 0;
-        matches = 0;
-        mismatchCount = 0;
-        mismatchedLetters = [];
-        timerStarted = false;
-
-        fetch('/reset_free_play_progress/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': getCookie('csrftoken')
-            },
-        })
-        .then(response => response.json())
-        .then(() => {
-            initializeGame();
-            showGameElements();
-        })
-        .catch(error => {
-            console.error("Error resetting progress:", error);
-        });
-    });
+menuButton.onclick = function() {
+    menuModal.style.visibility = "visible";
+    modalContent.style.visibility = "visible"; // Show modal content
+    menuModal.style.display = "flex"; // Show modal
+    modalContent.style.display = "flex"; // Show modal content
 }
+
+closeButton.onclick = function() {
+    menuModal.style.visibility = "hidden";
+    modalContent.style.visibility = "hidden"; // Hide modal content
+}
+
 
 
 function showGameElements() {
