@@ -219,7 +219,7 @@ def logout_view(request):
 
 
 # Funtion to create a token for a teacher's class
-@login_required
+# @login_required
 def createToken():
     return ''.join(random.choices(string.ascii_uppercase + string.digits, k=4))
 
@@ -262,52 +262,85 @@ def create_class(request):
 def is_student(user):
     return user.user_type == 'student'
 
-# @login_required
-# def student_homepage(request):
-#     print("classroom")
-#     if not request.user.is_student:
-#         return HttpResponseForbidden("You are not authorized to access this page.")
+@login_required
+def student_homepage(request):
+    print("classroom")
+    if not request.user.is_student:
+        return HttpResponseForbidden("You are not authorized to access this page.")
     
-#     # Get the current user's student profile
-#     try:
-#         student = Student.objects.get(user=request.user)
-#         classroom = student.classroom
-#         activities = Activity.objects.filter(student=student)
-#     except Student.DoesNotExist:
-#         classroom = None
-#         activities = None
+    # Get the current user's student profile
+    try:
+        student = Student.objects.get(user=request.user)
+        classroom = student.classroom
+        activities = Activity.objects.filter(student=student)
+    except Student.DoesNotExist:
+        classroom = None
+        activities = None
 
-#     # Fetch leaderboard data
-#     leaderboard = (
-#         GameProgress.objects.values('user__username', 'user__avatar')  # Assuming 'avatar' is a field in the User model
-#         .annotate(
-#             max_level=Max('level'),
-#             total_mistakes=Sum('mistakes'),
-#             avg_time=Avg('time_taken'),
-#             total_mismatches=Sum(Length('mismatched_letters'))  # Count mismatches
-#         )
-#         .order_by('-max_level', 'total_mistakes', 'avg_time', 'total_mismatches')
-#     )
+    # Progress Bar + Level Table Logic
+    progress_data = []
+    if activities:
+        for activity in activities:
+            levels_qs = GameProgress.objects.filter(
+                user=request.user,
+                activity=activity,
+                is_free_play=False,
+                game=activity.game
+            ).order_by('level')
 
-#     print('Leaderboard data:', leaderboard)  # Add this line for debugging
+            level_count = levels_qs.values_list('level', flat=True).distinct().count()
+            percent_complete = int((level_count / activity.max_levels) * 100) if activity.max_levels else 0
 
-#     # Fetch other necessary data
-#     notifications = Notification.objects.filter(user=request.user).order_by('-date')
+            level_details = []
+            for level in levels_qs:
+                level_details.append({
+                    'level': level.level,
+                    'time': round(level.time_taken, 2),
+                    'mistakes': level.mistakes,
+                    'mismatches': level.mismatched_letters,
+                    'timestamp': level.timestamp.strftime('%Y-%m-%d %H:%M')
+                })
 
-#     return render(request, 'KidVenture/student_page.html', {
-#         'leaderboard': leaderboard,
-#         'notifications': notifications,
-#         'classroom': classroom,
-#         'teacher': classroom.teacher if classroom else None,
-#     })
+            progress_data.append({
+                'activity_name': activity.name,
+                'progress_percent': percent_complete,
+                'levels': level_details
+            })
+
+    # Fetch leaderboard data
+    leaderboard = (
+        GameProgress.objects.values('user__username', 'user__avatar')  # Assuming 'avatar' is a field in the User model
+        .annotate(
+            max_level=Max('level'),
+            total_mistakes=Sum('mistakes'),
+            avg_time=Avg('time_taken'),
+            total_mismatches=Sum(Length('mismatched_letters'))  # Count mismatches
+        )
+        .order_by('-max_level', 'total_mistakes', 'avg_time', 'total_mismatches')
+    )
+
+    print('Leaderboard data:', leaderboard)  # Add this line for debugging
+
+    # Fetch other necessary data
+    notifications = Notification.objects.filter(user=request.user).order_by('-date')
+    activities = Activity.objects.filter(student=student, completed=False)
+
+    return render(request, 'KidVenture/student_page.html', {
+        'leaderboard': leaderboard,
+        'notifications': notifications,
+        'classroom': classroom,
+        'teacher': classroom.teacher if classroom else None,
+        'progress_data': progress_data,
+        'activities': activities,
+        'show_freeplay': free_play,
+    })
 
 @login_required
 def calendar_view(request):
     if not request.user.is_student:
         return HttpResponseForbidden("You are not authorized to access this page.")
     
-    # You can add additional logic here, such as fetching calendar events.
-    # For now, we’ll just render a basic calendar page.
+    
     return render(request, 'KidVenture/calendar_page.html', {})
     
 
