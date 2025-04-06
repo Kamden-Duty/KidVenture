@@ -29,9 +29,8 @@ class User(AbstractUser):
     avatar = models.ImageField(upload_to="avatars/", blank=True, null=True)
 
 
-
+    # A funtion to generate avatars with deafult setting for the users intial profile
     def generate_default_avatar(self):
-        """Generate a default avatar and save it to the user's profile."""
         avatar = PyAvataaar(
             style=AvatarStyle.CIRCLE,
             skin_color=SkinColor.LIGHT,
@@ -78,55 +77,72 @@ def create_user_avatar(sender, instance, created, **kwargs):
         instance.save()
 
 
-
+# This is a class model. It will create a class with a defined name , teacher, and access token (for the student to use to jon)
 class Class(models.Model):
+    # Name of class
     name = models.CharField(max_length=255)
+    # The teacher who owns the class
     teacher = models.ForeignKey(User, on_delete=models.CASCADE, related_name='classes')
+    # access_token for students to join with 
     access_token = models.CharField(max_length=4, unique=True, editable=False)
     
     def __str__(self):
         return self.name
 
 
-
+# Student model.Has a user isntance and a foreign key to the classroom they belong to
 class Student(models.Model):
+    # User instance (the student)
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
-
+    # Inherits from the classroom and is setup to cascade delete if the classroom is deleted
     classroom = models.ForeignKey(Class,  on_delete=models.CASCADE, related_name='students')
 
     def __str__(self):
          return self.user.username if self.user else "Unassigned Student"
 
+
+# This model is for createing "activities" for our games. This difference from freeplay as in the teacher can assign the number of levels they want complete
 class Activity(models.Model):
 
-    GAME_CHOICES = [
+    # Used to distinguish between games
+    games = [
         ('matching', 'Matching Game'),
         ('memory', 'Memory Game'),
     ]
 
-    name = models.CharField(max_length=255)  
+    # Name of the activity
+    name = models.CharField(max_length=255) 
+    # The description of hte game. not really used much. could probably delete 
     description = models.TextField(blank=True, null=True)  
+    # THe students progress on the activity
     progress = models.IntegerField(default=0)  
+    # THe studetn doing the activity
     student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='activities')  
+    # The url for the game
     url_name = models.CharField(max_length=50, blank=True, null=True)  
+    # Checks if the game is completed or not
     completed = models.BooleanField(default=False)
+    # The number of levles the teacher wants to assingn
     max_levels = models.IntegerField(default=1)  # Track max levels for this activity
-    game_type = models.CharField(max_length=20, choices=GAME_CHOICES, default='matching')
+    # THe game for the activity. deafult is the matching game
+    game = models.CharField(max_length=20, choices=games, default='matching')
 
 
+    # Used to update a users progress on the game
     def update_progress(self, completed_levels):
-        """Update activity progress based on completed levels"""
-        # Ensure progress is updated correctly
+
+        # used to make sure progress is updated completely
         self.progress = int((completed_levels / float(self.max_levels)) * 100)
 
     
      
 
-        # Check if activity is completed
+        # If activiyt is > or = to the max levles it is completed so set true and progress 100
         if completed_levels >= self.max_levels:
             self.completed = True
             self.progress = 100  # Ensure it's fully completed
 
+        # IF the completed is marked true, make sure progress is 100
         if self.completed:
             self.progress = 100
       
@@ -137,14 +153,18 @@ class Activity(models.Model):
     def __str__(self):
         return f"{self.name} - {self.student.user.username if self.student and self.student.user else 'Unassigned'}"
 
-    
+
+# This models is for leaderboard entries. Has the user who made the points and the points made.
 class LeaderboardEntry(models.Model):
+    # Instance of the user. as in this is the user who has the points
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='leaderboard_entry')
+    # The number of points stored
     points = models.IntegerField(default=0)
     
     def __str__(self):
         return f"{self.user.username} - {self.points} points"
     
+
 class Badge(models.Model):
     name = models.CharField(max_length=100)
     image = models.ImageField(upload_to='badges/')
@@ -163,24 +183,37 @@ class Notification(models.Model):
     def __str__(self):
         return f"Notification for {self.user.username}: {self.title}"
 
+
+
+# Stores the progress a user had made on a game. as in their mistakes mistmatched and time taken
 class GameProgress(models.Model):
 
-    GAME_CHOICES = [
+    # Used to distinguish between games
+    games = [
         ('matching', 'Matching Game'),
         ('memory', 'Memory Game'),
     ]
 
-
+    # 
+    # A foreign key realted to the user. 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    # Keeps track of their level
     level = models.IntegerField()
+    # The time it took to complete a level
     time_taken = models.FloatField()
+    # The number of mistakes made
     mistakes = models.IntegerField()
+    # The number of mismatches they had
     mismatched_letters = models.TextField()
+    # The time they started
     timestamp = models.DateTimeField(auto_now_add=True)
-    
+
+    # Foreign key to activity. So we know what activity this progress is saving for
     activity = models.ForeignKey(Activity, null=True, blank=True, on_delete=models.SET_NULL) 
+    # Checks if it is free play. 
     is_free_play = models.BooleanField(default=True) 
-    game_type = models.CharField(max_length=20, choices=GAME_CHOICES, default='matching')
+    # Used to tell what game we are keeping progress of
+    game = models.CharField(max_length=20, choices=games, default='matching')
 
     def __str__(self):
         return f"{self.user.username} - Level {self.level} ({'Free Play' if self.is_free_play else 'Activity'}) - {self.game_type}"
