@@ -53,12 +53,7 @@
     
 
     <!-- Page content: Title, instructions, scoreboard -->
-    <h1>Welcome {{ request.user.username }}!</h1>
     <h1 id="game-title">Memory Game</h1>
-
-    <p id="game-mode-text">
-      <strong>Mode:</strong> <span id="game-type"></span>
-    </p>
 
     <p id="instruction-text">Match the uppercase and lowercase letters</p>
 
@@ -97,8 +92,8 @@
     </div>
 
     <!-- Audio elements for sound effects -->
-    <audio id="card-click-sound"    src="{% static 'KidVenture/sound_effects/card_click_sound.mp3' %}" preload="auto"></audio>
-    <audio id="match-sound"         src="{% static 'KidVenture/sound_effects/correct.mp3' %}"            preload="auto"></audio>
+    <audio id="card-click-sound"    src="{% static 'KidVenture/sound_effects/card_click_sound.mp3' %}"    preload="auto"></audio>
+    <audio id="match-sound"         src="{% static 'KidVenture/sound_effects/correct.mp3' %}"             preload="auto"></audio>
     <audio id="mismatch-sound"      src="{% static 'KidVenture/sound_effects/mismatch-sound.mp3' %}"      preload="auto"></audio>
     <audio id="level-up-sound"      src="{% static 'KidVenture/sound_effects/LevelUp.mp3' %}"             preload="auto"></audio>
 

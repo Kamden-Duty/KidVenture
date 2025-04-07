@@ -230,12 +230,12 @@ function onCardClick(event) {
                 levelUpSound.addEventListener("ended", advanceToNextLevel);
             }
         } else {
-            playSound("mismatch-sound");
             mismatchCount++;
             mismatchedLetters.push({ first: firstCard.dataset.card, second: secondCard.dataset.card });
             firstCard.classList.add("mismatched");
             secondCard.classList.add("mismatched");
             updateScore();
+            playSound("mismatch-sound");
 
             const correctMatch = Array.from(document.querySelectorAll(".card")).find(
                 card => card.dataset.card.toLowerCase() === firstCard.dataset.card.toLowerCase() && card !== firstCard

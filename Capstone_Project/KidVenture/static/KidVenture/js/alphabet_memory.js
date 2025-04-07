@@ -282,9 +282,17 @@ function onCardClick(cardElement) {
       mismatchedLetters.push({ first: firstCard.dataset.card, second: secondCard.dataset.card });
       updateScore();
       mismatchSound.play();
+
+      firstCard.classList.add("mismatch");
+      secondCard.classList.add("mismatch");
+
       setTimeout(() => {
         firstCard.parentElement.classList.remove("flip");
         secondCard.parentElement.classList.remove("flip");
+
+        firstCard.classList.remove("mismatch");
+        secondCard.classList.remove("mismatch");
+        
         firstCard = null;
         secondCard = null;
       }, 1000);
