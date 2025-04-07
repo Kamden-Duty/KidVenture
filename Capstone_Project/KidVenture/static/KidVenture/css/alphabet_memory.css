@@ -94,13 +94,20 @@ p {
   transform: rotateY(180deg);
 }
 
-.card-front.matched,
-.card-back.matched {
-  background-color: #84aca3; /* Light Teal */
-  color: white; /* Contrast text for accessibility */
+.card-inner.matched .card-front {
+  background-color: #84aca3;
+  color: white;
   transition: background-color 0.3s, transform 0.3s;
-  transform: scale(1.1); /* Slight pop effect to draw attention */
-  box-shadow: 0px 5px 15px rgba(0, 200, 0, 0.5); /* Glow effect to emphasize correctness */
+  transform: scale(1.1);
+  box-shadow: 0px 5px 15px rgba(0, 200, 0, 0.5);
+}
+
+.card-inner.mismatch .card-front {
+  background-color: #ff8a80 !important;
+  color: white !important;
+  transition: background-color 0.3s, transform 0.3s;
+  transform: scale(1.05);
+  box-shadow: 0px 5px 15px rgba(255, 0, 0, 0.3);
 }
 
 .card.correct-match {
@@ -115,17 +122,6 @@ p {
 .selected {
     background-color: #ffffff;
 }
-
-.mismatched {
-    background-color: #ff8a80;
-}
-
-.matched {
-    background-color: #84aca3; /* Light Teal */
-    pointer-events: none;
-}
-
-
 
 #game-mode-text,
 #instruction-text {
@@ -236,7 +232,7 @@ button:active {
 .modal-content button {
   font-size: 18px;
   padding: 10px 20px;
-  background-color: #25433d;
+  background-color: #84aca3;
   color: white;
   border: none;
   border-radius: 10px;
@@ -286,27 +282,82 @@ button:active {
   transform: scale(0.95);
 }
 
+#menu-modal {
+  display: none; /* Hidden by default */
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.4); /* Black with opacity */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 #menu-modal .modal-content {
-  width: 15%;
-  height: 40%;
+  background-color: #4c6f66; /* Dark Teal */
+  color: #cadec8; /* Soft Mint */
+  margin: 5% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 15%; /* Adjusted width to be narrower */
+  height: 40%; /* Increased height */
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  animation: modalopen 0.3s;
+  border-radius: 15px; /* Add rounded corners */
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
 }
 
-.menu-spacing {
+#menu-modal .modal-content p {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+#menu-modal .modal-content #level-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+#menu-modal .modal-content .level-button {
+  margin: 5px;
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #84aca3; /* Light Teal */
+  border: none;
+  border-radius: 5px;
+  color: white;
+  cursor: pointer;
+  transition: transform 0.1s, background-color 0.1s;
+}
+
+#menu-modal .modal-content .level-button:hover {
+  background-color: #6b8f89; /* Darker Teal */
+}
+
+#menu-modal .modal-content .level-button:active {
+  background-color: #84aca3; /* Light Teal */
+  transform: scale(0.95);
+}
+
+.menu-spacing {    
   margin: 1rem;
 }
 
-.button-link,
-.level-button {
+.button-link, .level-button {
   display: inline-block;
   padding: 10px 20px;
   font-size: 16px;
-  font-family: "Comic Sans MS", "Comic Sans", cursive;
+  font-family: "Comic Sans MS", "Comic Sans", cursive; /* Ensure Comic Sans font */
   color: white;
-  background-color: #84aca3;
+  background-color: #84aca3; /* Light Teal */
   border: none;
   border-radius: 5px;
   text-align: center;
@@ -315,14 +366,12 @@ button:active {
   transition: transform 0.1s, background-color 0.1s;
 }
 
-.button-link:hover,
-.level-button:hover {
-  background-color: #6b8f89;
+.button-link:hover, .level-button:hover {
+  background-color: #6b8f89; /* Darker Teal */
 }
 
-.button-link:active,
-.level-button:active {
-  background-color: #84aca3;
+.button-link:active, .level-button:active {
+  background-color: #84aca3; /* Light Teal */
   transform: scale(0.95);
 }
 
