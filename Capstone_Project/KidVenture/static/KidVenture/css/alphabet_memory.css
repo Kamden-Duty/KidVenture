@@ -24,7 +24,9 @@ p {
   margin-bottom: 20px;
 }
 
-#timer, #score, #mismatched {
+#timer,
+#score,
+#mismatched {
   font-size: 24px;
   margin: 10px 0;
   color: #25433d;
@@ -67,7 +69,8 @@ p {
   transform: rotateY(0deg);
 }
 
-.card-front, .card-back {
+.card-front,
+.card-back {
   width: 100%;
   height: 100%;
   position: absolute;
@@ -91,7 +94,41 @@ p {
   transform: rotateY(180deg);
 }
 
-#game-mode-text, #instruction-text {
+.card-front.matched,
+.card-back.matched {
+  background-color: #84aca3; /* Light Teal */
+  color: white; /* Contrast text for accessibility */
+  transition: background-color 0.3s, transform 0.3s;
+  transform: scale(1.1); /* Slight pop effect to draw attention */
+  box-shadow: 0px 5px 15px rgba(0, 200, 0, 0.5); /* Glow effect to emphasize correctness */
+}
+
+.card.correct-match {
+  background-color: #84aca3 !important; /* Light Teal */
+  color: white; /* Contrast text for accessibility */
+  transition: background-color 0.3s, transform 0.3s;
+  transform: scale(1.1); /* Slight pop effect to draw attention */
+  box-shadow: 0px 5px 15px rgba(0, 200, 0, 0.5); /* Glow effect to emphasize correctness */
+  pointer-events: none;;
+}
+
+.selected {
+    background-color: #ffffff;
+}
+
+.mismatched {
+    background-color: #ff8a80;
+}
+
+.matched {
+    background-color: #84aca3; /* Light Teal */
+    pointer-events: none;
+}
+
+
+
+#game-mode-text,
+#instruction-text {
   font-size: 20px;
   margin: 10px 0;
   color: #25433d;
@@ -165,7 +202,9 @@ button:active {
   display: none;
 }
 
-#session-modal, #activity-modal, #menu-modal {
+#session-modal,
+#activity-modal,
+#menu-modal {
   position: fixed;
   top: 0;
   left: 0;
@@ -260,7 +299,8 @@ button:active {
   margin: 1rem;
 }
 
-.button-link, .level-button {
+.button-link,
+.level-button {
   display: inline-block;
   padding: 10px 20px;
   font-size: 16px;
@@ -275,11 +315,13 @@ button:active {
   transition: transform 0.1s, background-color 0.1s;
 }
 
-.button-link:hover, .level-button:hover {
+.button-link:hover,
+.level-button:hover {
   background-color: #6b8f89;
 }
 
-.button-link:active, .level-button:active {
+.button-link:active,
+.level-button:active {
   background-color: #84aca3;
   transform: scale(0.95);
 }
@@ -310,6 +352,13 @@ button:active {
 }
 
 @keyframes modalopen {
-  from { opacity: 0; transform: translateY(-50px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-50px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
