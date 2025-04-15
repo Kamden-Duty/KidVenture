@@ -20,6 +20,7 @@ from django.http import JsonResponse
 from django.db.models import Max, Sum, Avg, F
 from django.db.models.functions import Length
 from django.views.decorators.http import require_POST
+from .utils import generate_random_username
 
 # Avatar imports
 from py_avataaars import (
@@ -169,19 +170,31 @@ def home(request):
                 activity.completed_levels = completed_levels
                 activity.percent_complete = percent_complete
 
-            # Get the leaderboard stats
-            leaderboard = (
-                # Gets values from the game progress
+            raw_leaderboard = (
                 GameProgress.objects.filter(user__student__classroom=classroom)
-                .values('user__username', 'user__avatar')
+                .values('user__id', 'user__username', 'user__avatar')
                 .annotate(
                     max_level=Max('level'),
                     total_mistakes=Sum('mistakes'),
                     avg_time=Avg('time_taken'),
-                    total_mismatches=Sum(Length('mismatched_letters'))
+                    total_mismatches=Sum('mismatched_letters')
                 )
                 .order_by('-max_level', 'total_mistakes', 'avg_time', 'total_mismatches')
             )
+
+            leaderboard = []
+            for entry in raw_leaderboard:
+                is_current_user = entry['user__id'] == request.user.id
+                display_name = entry['user__username'] if is_current_user else generate_random_username()
+                leaderboard.append({
+                    'avatar_url': entry['user__avatar'],
+                    'display_name': display_name,
+                    'max_level': entry['max_level'],
+                    'total_mistakes': entry['total_mistakes'],
+                    'avg_time': entry['avg_time'],
+                    'total_mismatches': entry['total_mismatches'],
+                })
+
 
             # Gets the students badges
             badges = Badge.objects.filter(user=request.user) if hasattr(request.user, 'badge_set') else []
@@ -581,7 +594,7 @@ def get_leaderboard(request):
             max_level=Max('level'),
             total_mistakes=Sum('mistakes'),
             avg_time=Avg('time_taken'),
-            total_mismatches=Sum(Length('mismatched_letters'))
+            total_mismatches=Sum('mismatched_letters')
         )
         .order_by('-max_level', 'total_mistakes', 'avg_time', 'total_mismatches')
     )
