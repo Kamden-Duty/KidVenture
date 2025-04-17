@@ -26,6 +26,7 @@ urlpatterns = [
     path('delete-student/<int:student_id>/<int:class_id>/', views.delete_student, name='delete_student'),
     path('save_game_progress/', views.save_game_progress, name='save_game_progress'),    path('assign_activity/', views.assign_activity, name='assign_activity'),
     path('leaderboard/', views.leaderboard_view, name='leaderboard'),
+    path('teacher-leaderboard/', views.get_teacher_leaderboard, name='get_teacher_leaderboard'),
     path("edit-avatar/", views.edit_avatar, name="edit_avatar"),
     path("update-avatar-preview/", views.update_avatar_preview, name="update_avatar_preview"),
 
