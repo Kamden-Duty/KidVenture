@@ -186,15 +186,17 @@ def home(request):
             for entry in raw_leaderboard:
                 is_current_user = entry['user__id'] == request.user.id
                 display_name = entry['user__username'] if is_current_user else generate_random_username()
-                leaderboard.append({
+                leaderboard_entry = {
                     'avatar_url': entry['user__avatar'],
                     'display_name': display_name,
                     'max_level': entry['max_level'],
                     'total_mistakes': entry['total_mistakes'],
                     'avg_time': entry['avg_time'],
                     'total_mismatches': entry['total_mismatches'],
-                })
-
+                    'is_active_user': is_current_user,  # Add the flag here
+                }
+                leaderboard.append(leaderboard_entry)
+                print(leaderboard_entry)  # Print the constructed leaderboard entry
 
             # Gets the students badges
             badges = Badge.objects.filter(user=request.user) if hasattr(request.user, 'badge_set') else []
@@ -586,7 +588,10 @@ def get_leaderboard(request):
     # Figures out what game we are using (although not that useful at the moment)
     game = request.GET.get('game', 'matching')
 
-    # Gets our leaerboard values by pulling from the game progress
+    # Get the active user's username
+    active_user_username = request.user.username
+
+    # Gets our leaderboard values by pulling from the game progress
     leaderboard = (
         GameProgress.objects.filter(game=game)
         .values('user__username', 'user__avatar')
@@ -598,7 +603,44 @@ def get_leaderboard(request):
         )
         .order_by('-max_level', 'total_mistakes', 'avg_time', 'total_mismatches')
     )
-    # Return the jjsonreposne wiht our leaderboard info
+
+    # Add a flag to indicate if the user is the active user
+    leaderboard_with_active_flag = [
+        {
+            **entry,
+            'is_active_user': entry['user__username'] == active_user_username
+        }
+        for entry in leaderboard
+    ]
+
+    # Return the JSON response with leaderboard info
+    return JsonResponse({'leaderboard': leaderboard_with_active_flag})
+
+@login_required
+def get_teacher_leaderboard(request):
+    # Get the logged-in teacher
+    teacher = request.user
+
+    # Get the class or students associated with the teacher
+    # Assuming a Class model links teachers to students
+    students = Class.objects.filter(teacher=teacher).values_list('students', flat=True)
+
+    # Get the game type (default to 'matching')
+    game = request.GET.get('game', 'matching')
+
+    # Filter leaderboard data for the teacher and their students
+    leaderboard = (
+        GameProgress.objects.filter(game=game, user__id__in=students)
+        .values('user__username', 'user__avatar')
+        .annotate(
+            max_level=Max('level'),
+            total_mistakes=Sum('mistakes'),
+            avg_time=Avg('time_taken')
+        )
+        .order_by('-max_level', 'total_mistakes', 'avg_time')
+    )
+
+    # Return the leaderboard data as JSON
     return JsonResponse({'leaderboard': list(leaderboard)})
 
 # A view used to assign activites 

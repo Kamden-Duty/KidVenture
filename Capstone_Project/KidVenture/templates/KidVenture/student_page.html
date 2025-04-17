@@ -355,11 +355,14 @@
       .leaderboard-table tr:nth-child(even) {
         background-color: #f9f9f9;
       }
-      .leaderboard-table tr:hover {
+      /* .leaderboard-table tr:hover {
         background-color: #f1f1f1;
-      }
+      } */
       .leaderboard-table td {
         color: #333;
+      }
+      .highlight {
+        background-color: #81ce85;
       }
 
       /* Notification Button */
@@ -778,42 +781,40 @@
       </div>
     </section>
 
-        <!-- LEADERBOARD SECTION (Hidden by default) -->
-        <section id="leaderboard-tab" class="tab-content hidden">
-          <h2>Leaderboard</h2>
-          <table class="leaderboard-table">
-            <thead>
-              <tr>
-                <th>Rank</th>
-                <th>Avatar</th>
-                <th>Name</th>
-                <th>Max Level</th>
-                <th>Total Mistakes</th>
-                <th>Average Time</th>
-                <th>Total Mismatches</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for user in leaderboard %}
-              <tr>
-                <td>{{ forloop.counter }}</td>
-                <td>
-                  <img src="{{ user.avatar_url }}" alt="Avatar" width="50" height="50" />
-                </td>
-                <td>{{ user.display_name }}</td>
-                <td>{{ user.max_level }}</td>
-                <td>{{ user.total_mistakes }}</td>
-                <td>{{ user.avg_time|floatformat:2 }}</td> {# 2 decimal places #}
-                <td>{{ user.total_mismatches|floatformat:0 }}</td> {# 0 decimal places #}
-              </tr>
-              {% empty %}
-              <tr>
-                <td colspan="7">No leaderboard data available yet.</td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </section>
+<!-- LEADERBOARD SECTION (Hidden by default) -->
+<section id="leaderboard-tab" class="tab-content hidden">
+  <h2>Leaderboard</h2>
+  <table class="leaderboard-table">
+    <thead>
+      <tr>
+        <th>Rank</th>
+        <th>Avatar</th>
+        <th>Name</th>
+        <th>Max Level</th>
+        <th>Total Mistakes</th>
+        <th>Average Time</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for user in leaderboard %}
+      <tr class="{% if user.is_active_user %}highlight{% endif %}"> <!-- Highlight active user row -->
+        <td>{{ forloop.counter }}</td>
+        <td>
+          <img src="{{ user.avatar_url }}" alt="Avatar" width="50" height="50" />
+        </td>
+        <td>{{ user.display_name }}</td>
+        <td>{{ user.max_level }}</td>
+        <td>{{ user.total_mistakes }}</td>
+        <td>{{ user.avg_time|floatformat:2 }}</td> <!-- 2 decimal places -->
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="8">No leaderboard data available yet.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
 
         <!-- ACHIEVEMENTS SECTION (Hidden by default) -->
         <section id="achievements-tab" class="tab-content hidden">
