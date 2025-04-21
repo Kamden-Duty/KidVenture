@@ -20,6 +20,9 @@ from django.http import JsonResponse
 from django.db.models import Max, Sum, Avg, F
 from django.db.models.functions import Length
 from django.views.decorators.http import require_POST
+from django.templatetags.static import static
+from .utils import award_badges
+
 
 # Avatar imports
 from py_avataaars import (
@@ -147,14 +150,38 @@ def home(request):
 
     # Else if hte user is a student
     elif request.user.is_student:
+        classroom        = None
+        activities       = []
+        leaderboard      = []
+        progress_data    = []
+        free_play        = False
+        earned_badges    = []
+        earned_names     = set()
+        badge_definitions = [
+            {
+                "name":      "Speedster",
+                "image_url": static("Kidventure/images/badges/speedster.png"),
+            },
+            {
+                "name":      "Accuracy Master",
+                "image_url": static("Kidventure/images/badges/accuracy_master.png"),
+            },
+            {
+                "name":      "Mismatch Minor",
+                "image_url": static("Kidventure/images/badges/mismatch_minor.png"),
+            },
+        ]
+
         try:
             # Get student
-            student = Student.objects.select_related('classroom').get(user=request.user)
+            student = Student.objects.get(user=request.user)
             # Gets the students classroom
             classroom = student.classroom
             # Gets the activities assigned to the student
             activities = Activity.objects.filter(student=student, completed=False)
 
+            #Calculate Progress for each activities
+            progress_data = []
             # Loops through the activiites checking progress. this is so we can show the students progress on the page
             for activity in activities:
                 # If the user has done any part of the actiivy get its complete nad percent complete
@@ -168,6 +195,68 @@ def home(request):
                 # update the activity
                 activity.completed_levels = completed_levels
                 activity.percent_complete = percent_complete
+
+                 # Optionally, query for level details for this activity:
+                level_details = []
+                levels_qs = GameProgress.objects.filter(
+                    user=request.user,
+                    activity=activity,
+                    is_free_play=False,
+                    game=activity.game
+                ).order_by('level')
+                for level in levels_qs:
+                    level_details.append({
+                        'level': level.level,
+                        'time': round(level.time_taken, 2),
+                        'mistakes': level.mistakes,
+                        'mismatches': level.mismatched_letters,
+                        'timestamp': level.timestamp.strftime('%Y-%m-%d %H:%M'),
+                    })
+
+                 # Append progress details for this activity
+                progress_data.append({
+                    'activity_name': activity.name,
+                    'progress_percent': percent_complete,
+                    'completed_levels': completed_levels,
+                    'max_levels': activity.max_levels,
+                    'levels': level_details,
+                })
+
+            free_play = True
+
+            # Badge instances
+            new_badges = award_badges(student)
+            earned_badges = Badge.objects.filter(student=request.user)
+
+            badge_definitions = [
+                {
+                "name": "Speedster",
+                "image_url": static("Kidventure/images/badges/speedster.png"),
+                },
+                {
+                "name": "Accuracy Master",
+                "image_url": static("Kidventure/images/badges/accuracy_master.png"),
+                },
+                {
+                "name": "Mismatch Minor",
+                "image_url": static("Kidventure/images/badges/mismatch_minor.png"),
+                },
+            ]
+
+            earned_names = { b.name for b in earned_badges }
+
+            for badge in new_badges:
+                messages.success(
+                    request,
+                    f"Congratulations! You've just earned the '{badge.name}' badge!"
+                )
+
+            # all_badges = Badge.objects.filter(student=request.user)
+            # master_badges = Badge.objects.all()
+
+            # Gets the students badges
+            badges = Badge.objects.filter(user=request.user) if hasattr(request.user, 'badge_set') else []
+
 
             # Get the leaderboard stats
             leaderboard = (
@@ -183,14 +272,14 @@ def home(request):
                 .order_by('-max_level', 'total_mistakes', 'avg_time', 'total_mismatches')
             )
 
-            # Gets the students badges
-            badges = Badge.objects.filter(user=request.user) if hasattr(request.user, 'badge_set') else []
+            
         # If user is not student set classroom activites leaderboard and badges to empty sets
         except Student.DoesNotExist:
             classroom = None
             activities = []
             leaderboard = []
             badges = []
+            progress_data = []
 
         
         notifications = Notification.objects.filter(user=request.user).order_by('-date')
@@ -202,7 +291,13 @@ def home(request):
             'classroom': classroom,
             'teacher': classroom.teacher if classroom else None,
             'leaderboard': leaderboard,
-            'badges': badges,
+            'badges': earned_badges,
+            # 'all_badges': master_badges,
+            'progress_data': progress_data,
+            'badge_definitions': badge_definitions,
+            'earned_names': earned_names,
+            'show_freeplay': free_play,
+
         })
 
 
@@ -219,7 +314,7 @@ def logout_view(request):
 
 
 # Funtion to create a token for a teacher's class
-@login_required
+# @login_required
 def createToken():
     return ''.join(random.choices(string.ascii_uppercase + string.digits, k=4))
 
@@ -262,52 +357,99 @@ def create_class(request):
 def is_student(user):
     return user.user_type == 'student'
 
-# @login_required
-# def student_homepage(request):
-#     print("classroom")
-#     if not request.user.is_student:
-#         return HttpResponseForbidden("You are not authorized to access this page.")
-    
-#     # Get the current user's student profile
-#     try:
-#         student = Student.objects.get(user=request.user)
-#         classroom = student.classroom
-#         activities = Activity.objects.filter(student=student)
-#     except Student.DoesNotExist:
-#         classroom = None
-#         activities = None
+@login_required
+def student_homepage(request):
+    # 1) get all classes this student is in
+    all_classes = Student.objects.filter(user=request.user) \
+                                 .select_related('classroom') \
+                                 .values_list('classroom', flat=True)
+    all_classes = Class.objects.filter(pk__in=all_classes)
 
-#     # Fetch leaderboard data
-#     leaderboard = (
-#         GameProgress.objects.values('user__username', 'user__avatar')  # Assuming 'avatar' is a field in the User model
-#         .annotate(
-#             max_level=Max('level'),
-#             total_mistakes=Sum('mistakes'),
-#             avg_time=Avg('time_taken'),
-#             total_mismatches=Sum(Length('mismatched_letters'))  # Count mismatches
-#         )
-#         .order_by('-max_level', 'total_mistakes', 'avg_time', 'total_mismatches')
-#     )
+    # 2) pick the class via GET 
+    selected_id = request.GET.get('class_id')
+    if selected_id:
+        classroom = get_object_or_404(Class, pk=selected_id, students__user=request.user)
+    else:
+        classroom = all_classes.first()
 
-#     print('Leaderboard data:', leaderboard)  # Add this line for debugging
+    # 3) fetch activities for that classroom
+    student = get_object_or_404(Student, user=request.user, classroom=classroom)
+    activities_qs = Activity.objects.filter(student=student, completed=False)
 
-#     # Fetch other necessary data
-#     notifications = Notification.objects.filter(user=request.user).order_by('-date')
+    # 4) build progress_data
+    progress_data = []
+    total_completed_levels = 0
+    total_freeplay_games   = 0
 
-#     return render(request, 'KidVenture/student_page.html', {
-#         'leaderboard': leaderboard,
-#         'notifications': notifications,
-#         'classroom': classroom,
-#         'teacher': classroom.teacher if classroom else None,
-#     })
+    for a in activities_qs:
+        # your existing completed_levels logic…
+        if a.max_levels:
+            completed = round((a.progress/100)*a.max_levels, 0)
+            pct       = round((completed/a.max_levels)*100, 0)
+        else:
+            completed = pct = 0
+
+        # count free‑play sessions for this activity’s game
+        fp_count = GameProgress.objects.filter(
+            user=request.user, game=a.game, is_free_play=True
+        ).count()
+        total_freeplay_games += fp_count
+
+        total_completed_levels += completed
+
+        # level_details as you already build…
+        level_details = [
+          {
+            'level': lvl.level,
+            'time': round(lvl.time_taken, 2),
+            'mistakes': lvl.mistakes,
+            'mismatches': lvl.mismatched_letters,
+          }
+          for lvl in GameProgress.objects.filter(
+            user=request.user,
+            activity=a,
+            is_free_play=False,
+            game=a.game
+          ).order_by('level')
+        ]
+
+        progress_data.append({
+          'activity_name':     a.name,
+          'progress_percent':  pct,
+          'completed_levels':  completed,
+          'max_levels':        a.max_levels,
+          'levels':            level_details,
+        })
+
+    # 5) summary cards
+    total_activities = activities_qs.count()
+    total_levels     = total_completed_levels
+    total_games      = total_freeplay_games
+
+    # 6) overall for the donut
+    overall = round(
+      sum(item['progress_percent'] for item in progress_data) / total_activities
+      if total_activities else 0,
+      1
+    )
+
+    return render(request, 'KidVenture/student_page.html', {
+      'all_classes':      all_classes,
+      'selected_class':   classroom,
+      'total_activities': total_activities,
+      'total_levels':     total_levels,
+      'total_games':      total_games,
+      'progress_data':    progress_data,
+      'overall':          overall,
+    })
+
 
 @login_required
 def calendar_view(request):
     if not request.user.is_student:
         return HttpResponseForbidden("You are not authorized to access this page.")
     
-    # You can add additional logic here, such as fetching calendar events.
-    # For now, we’ll just render a basic calendar page.
+    
     return render(request, 'KidVenture/calendar_page.html', {})
     
 
@@ -388,15 +530,12 @@ def join_class(request):
 
         # Get toke from form
         access_token = request.POST.get('access_token')
-        print("test")
         try:
             # Find class that has the given token
             classroom = Class.objects.get(access_token=access_token)
-            print("test1")
         # If not class has a token, say invlaid token  
         except Class.DoesNotExist:
             messages.error(request, "Invalid access token. Please try again.")
-            print("test2")
             return redirect('join_class')
     
         
@@ -417,17 +556,47 @@ def join_class(request):
         # If the student is not in the class allow them to join
         except Student.DoesNotExist:
             # Student is not enrolled in any class, so add them to this one
-            Student.objects.create(user=request.user, classroom=classroom)
+            student = Student.objects.create(user=request.user, classroom=classroom)
+            # assign activities to the new student
+            create_student_activities(student, classroom)
             # Notify them
             Notification.objects.create(user=request.user, title="Enrolled", message=f"You have successfully joined {classroom.name}")
             # Give the a message
             messages.success(request, f"You have successfully joined {classroom.name}.")
+
+            # teacher assigned activities.
+            # existing_activities = Activity.objects.filter(student__classroom=classroom).exclude(student=student)
+            # if existing_activities.exists(): 
+            #     templates = existing_activities.values('name', 'description', 'url_name', 'max_levels', 'game').distinct()
+            #     for template in templates:
+            #         Activity.objects.create(
+            #             name=template['name'],
+            #             description=template['description'],
+            #             progress=0,
+            #             student=student,
+            #             url_name=template['url_name'],
+            #             max_levels=template['max_levels'],
+            #             game=template['game']
+            #         )
+
             # Redirect them back to classes
             return redirect('classes')
     # Renders the join_class html
     return render(request, 'KidVenture/join_class.html') 
 
-
+def create_student_activities(student, classroom):
+    # Loop over each activity template for this class
+    for template in classroom.activity_templates.all():
+        # Create a corresponding Activity for the student
+        Activity.objects.create(
+            name=template.name,
+            description=template.description,
+            progress=0,
+            student=student,
+            url_name=template.url_name,
+            max_levels=template.max_levels,
+            game=template.game
+        )
 
 
 # A view for allowing teacher to view all of thier current students and what classes they are in.
@@ -956,3 +1125,51 @@ def get_class_activities(request, class_id):
     activities = Activity.objects.filter(student__classroom=classroom).values_list('name', flat=True).distinct()
     # Returns the activites of the classroom
     return JsonResponse({"activities": list(activities)})
+
+
+
+@login_required
+def award_badges(student):
+    """
+    Checks the student's performance data and awards badges if criteria are met
+    """
+    # Aggregate performance data from the GameProgress records for the student.
+    stats = GameProgress.objects.filter(user=student.user).aggregate(
+        avg_time=Avg('time_taken'),
+        total_mistakes=Sum('mistakes'),
+        total_mismatches=Sum(Length('mismatched_letters'))
+    )
+    
+    newly_awarded = []
+
+    # Award "Speedster" if average time is below 10 seconds.
+    if stats.get('avg_time') is not None and stats['avg_time'] < 10:
+        badge, created = Badge.objects.get_or_create(
+            student=student.user,  # Assumes Badge.student is a FK to User
+            name="Speedster",
+            defaults={'image': 'badges/speedster.png'}  # Ensure this path exists in your media/static folder.
+        )
+        if created:
+            newly_awarded.append(badge)
+
+    # Award "Accuracy Master" if total mistakes are less than 5.
+    if stats.get('total_mistakes') is not None and stats['total_mistakes'] < 5:
+        badge, created = Badge.objects.get_or_create(
+            student=student.user,
+            name="Accuracy Master",
+            defaults={'image': 'badges/accuracy_master.png'}
+        )
+        if created:
+            newly_awarded.append(badge)
+
+    # Award "Mismatch Minor" if total mismatches are less than 5.
+    if stats.get('total_mismatches') is not None and stats['total_mismatches'] < 5:
+        badge, created = Badge.objects.get_or_create(
+            student=student.user,
+            name="Mismatch Minor",
+            defaults={'image': 'badges/mismatch_minor.png'}
+        )
+        if created:
+            newly_awarded.append(badge)
+
+    return newly_awarded

@@ -1,911 +1,204 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>KidVenture Student Page</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    {% load static %}
-    <!-- Base CSS for your Student Page -->
-    <link
-      rel="stylesheet"
-      href="{% static 'KidVenture/css/student_tab.css' %}"
-    />
+{% extends 'Kidventure/student_base.html' %}
+{% load static %}
 
-    <!-- FontAwesome for icons -->
-    <link
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
-      rel="stylesheet"
-    />
+{% block title %}Student Dashboard{% endblock %}
 
-    <style>
-      /* RESET */
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
+{% block content %}
+<div class="main-box">
+  <!-- Class information section -->
+  <section class="class-info">
+    <h2>Class Information</h2>
+    {% if classroom %}
+      <p><strong>Class:</strong> {{ classroom.name }}</p>
+      <p><strong>Teacher:</strong> {{ teacher }}</p>
+    {% else %}
+      <p>
+        You have not joined any classes yet. Please
+        <a href="{% url 'join_class' %}">join a class</a> to get started!
+      </p>
+    {% endif %}
+  </section>
+  
 
-      /* PAGE BODY */
-      body {
-        font-family: Arial, sans-serif;
-        background-color: #f4f4f9;
-        color: #333;
-        margin: 0;
-        padding: 0;
-        min-height: 100vh;
-        background-image: url('{% static "KidVenture/images/background-image.jpg" %}');
-        background-size: cover;
-        background-position: center;
-        background-attachment: fixed;
-        background-repeat: no-repeat;
-        display: flex;
-        flex-direction: column;
-      }
+  <!-- PROGRESS SECTION -->
+<section id="progress-tab" class="tab-content hidden">
+  <h2>Class Progress</h2>
 
-      /* LEFT NAV */
-      .left-nav {
-        position: fixed;
-        top: 140px;
-        left: 0;
-        width: 70px;
-        height: 100vh;
-        background-color: #2c3e50;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding: 1rem 0;
-        z-index: 5;
-      }
-      .account-button {
-        width: 60px;
-        height: 60px;
-        background-color: #34495e;
-        color: #ecf0f1;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: bold;
-        cursor: pointer;
-        margin-bottom: 1rem;
-        transition: background-color 0.3s;
-      }
-      .account-button:hover {
-        background-color: #3f5670;
-      }
-      .nav-item {
-        width: 60px;
-        height: 60px;
-        margin-bottom: 1rem;
-        color: #ecf0f1;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        transition: background-color 0.3s;
-        border-radius: 5px;
-      }
-      .nav-item:hover {
-        background-color: rgba(255, 255, 255, 0.1);
-      }
-
-      /* ACCOUNT PANEL */
-      .account-panel {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 320px;
-        height: 100vh;
-        background-color: #ecf0f1;
-        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-        transform: translateX(-350px);
-        transition: transform 0.3s ease;
-        z-index: 9999;
-      }
-      .account-panel.open {
-        transform: translateX(0);
-      }
-      .account-header {
-        background-color: #dcdde1;
-        padding: 20px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-      }
-      .user-info {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-      }
-      .user-initials {
-        width: 50px;
-        height: 50px;
-        background-color: #bdc3c7;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: bold;
-        font-size: 18px;
-        color: #2c3e50;
-      }
-      .user-details {
-        display: flex;
-        flex-direction: column;
-        font-size: 16px;
-      }
-      .user-details .name {
-        font-weight: 700;
-      }
-      .logout-button {
-        font-size: 0.95rem;
-        color: #666;
-        border: none;
-        background: none;
-        cursor: pointer;
-        padding: 0;
-        text-decoration: underline;
-        margin-top: 2px;
-      }
-      .close-btn {
-        font-size: 1.4rem;
-        background: none;
-        border: none;
-        cursor: pointer;
-        color: #333;
-      }
-      .account-links {
-        padding: 20px;
-      }
-      .account-links a {
-        display: block;
-        text-decoration: none;
-        color: #333;
-        padding: 12px 0;
-        border-bottom: 1px solid #ddd;
-        transition: color 0.2s ease;
-        font-size: 16px;
-        font-weight: 600;
-      }
-      .account-links a:last-child {
-        border-bottom: none;
-      }
-      .account-links a:hover {
-        color: #2980b9;
-      }
-
-      /* TWO-PART HEADER WRAPPER */
-      .header__wrapper {
-        width: 100%;
-        overflow: hidden;
-        position: relative;
-      }
-
-      /* TOP PART */
-      .header__topPart {
-        background-color: #00a8e8;
-        height: 70px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 0 20px;
-        position: relative;
-        color: #fff;
-      }
-      .header__topPart .logo {
-        display: flex;
-        align-items: center;
-      }
-      .header__topPart .logo img {
-        height: 50px;
-        object-fit: contain;
-      }
-      .cf-zip-container {
-        display: flex;
-        align-items: center;
-        gap: 20px;
-      }
-      .finder {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        cursor: pointer;
-      }
-      .notification-tab {
-        cursor: pointer;
-      }
-
-      /* BOTTOM PART: Ribbon bar with Tabs */
-      .header__bottomPart {
-        position: relative;
-      }
-      .ribbon-wrapper {
-        position: relative;
-        height: 70px;
-        overflow: hidden;
-      }
-      .ribbon-bar {
-        background-color: #00bee5;
-        height: 70px;
-        position: relative;
-        z-index: 2;
-      }
-      .ribbon-bar::after {
-        content: "";
-        position: absolute;
-        bottom: -40px;
-        left: 0;
-        width: 100%;
-        height: 40px;
-        background: url('data:image/svg+xml;utf8,<svg width="100%" height="40" viewBox="0 0 100 20" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg"><path d="M0 0 C 25 20, 75 20, 100 0 V 20 H 0 V 0 Z" fill=\'%2300BEE5\' /></svg>')
-          no-repeat;
-        background-size: cover;
-      }
-      .nav-tabs {
-        list-style: none;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 60px;
-        height: 70px;
-        margin: 0;
-        padding: 0 20px;
-        font-size: 1.4rem;
-        font-weight: bold;
-        text-transform: uppercase;
-        color: #fff;
-      }
-      .nav-tabs li {
-        cursor: pointer;
-        transition: opacity 0.2s ease;
-      }
-      .nav-tabs li:hover {
-        opacity: 0.7;
-      }
-      /* Active tab styling */
-      .nav-tabs li.active {
-        border-bottom: 3px solid #fff;
-      }
-
-      /* MAIN CONTENT */
-      main {
-        flex: 1;
-        max-width: 900px;
-        margin: 75px 85px 50px 109px;
-        padding: 2rem;
-        background-color: rgba(255, 255, 255, 0.8);
-        border-radius: 10px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        position: relative;
-        z-index: 1;
-      }
-      section {
-        margin-bottom: 2rem;
-        padding: 1.5rem;
-        background-color: #fff;
-        border-radius: 10px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      }
-      section h2 {
-        margin-bottom: 1rem;
-        font-size: 1.5rem;
-        color: #333;
-      }
-      /* Hide tab contents by default */
-      .hidden {
-        display: none;
-      }
-
-      /* FOOTER */
-      footer {
-        text-align: center;
-        background-color: #333;
-        color: #fff;
-        font-size: 0.9rem;
-        height: 2rem;
-        width: 100%;
-        margin-top: 10px;
-      }
-
-      /* Additional styling for progress bars, leaderboard, etc. */
-      .progress-bar-container {
-        background-color: #ddd;
-        border-radius: 10px;
-      }
-      .progress-bar {
-        background-color: #4caf50;
-        height: 20px;
-        border-radius: 10px;
-        transition: width 0.5s;
-        position: relative;
-      }
-      .progress-bar::after {
-        content: attr(data-progress) "%";
-        position: absolute;
-        right: 10px;
-        top: 0;
-        font-size: 0.8rem;
-        color: #fff;
-      }
-      .milestone {
-        font-style: italic;
-        color: #555;
-        margin-top: 5px;
-        font-size: 0.9rem;
-      }
-      .milestone:before {
-        content: "💡 ";
-      }
-      .leaderboard-table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 20px;
-        text-align: left;
-        font-family: Arial, sans-serif;
-      }
-      .leaderboard-table th,
-      .leaderboard-table td {
-        padding: 10px;
-        border-bottom: 1px solid #ddd;
-      }
-      .leaderboard-table th {
-        background-color: #4caf50;
-        color: #fff;
-      }
-      .leaderboard-table tr:nth-child(even) {
-        background-color: #f9f9f9;
-      }
-      .leaderboard-table tr:hover {
-        background-color: #f1f1f1;
-      }
-      .leaderboard-table td {
-        color: #333;
-      }
-
-      /* Notification Button */
-      .notification-container {
-        position: relative;
-        display: inline-block;
-      }
-
-      .notification-button {
-        background: none;
-        border: none;
-        font-size: 20px;
-        cursor: pointer;
-        position: relative;
-      }
-
-      .notification-count {
-        background: red;
-        color: white;
-        font-size: 12px;
-        font-weight: bold;
-        border-radius: 50%;
-        width: 18px;
-        height: 18px;
-        text-align: center;
-        position: absolute;
-        top: -5px;
-        right: -5px;
-      }
-
-      /* Dropdown Menu */
-      .notification-dropdown {
-        display: none;
-        position: absolute;
-        right: 0;
-        margin-top: 10px;
-        width: 250px;
-        background: white;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-        overflow: hidden;
-        z-index: 1000;
-      }
-
-      .main-box {
-        display: flex;
-        justify-content: center;
-        gap: 2rem;
-      }
-
-      .notification-dropdown.show {
-        display: block;
-      }
-
-      .notification-item {
-        padding: 10px;
-        border-bottom: 1px solid #eee;
-      }
-
-      .notification-item:last-child {
-        border-bottom: none;
-      }
-
-      .notification-title {
-        font-weight: bold;
-        color: #333;
-      }
-
-      .notification-message {
-        font-size: 14px;
-        color: #666;
-      }
-
-      .no-notifications {
-        text-align: center;
-        padding: 10px;
-        color: #666;
-      }
-      /* Progress Container */
-      .progress-container {
-        width: 400px;
-        background: #f9f9f9;
-        padding: 15px;
-        border-radius: 8px;
-        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-        font-family: Arial, sans-serif;
-      }
-
-      /* Title */
-      .progress-container h2 {
-        text-align: center;
-        margin-bottom: 15px;
-        color: #333;
-      }
-
-      /* Individual Progress Item */
-      .progress-item {
-        margin-bottom: 15px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-      }
-
-      /* Class Name */
-      .class-name {
-        flex: 1;
-        font-weight: bold;
-        color: #444;
-      }
-
-      /* Progress Bar */
-      .progress-bar {
-        flex: 2;
-        height: 10px;
-        background: #ddd;
-        border-radius: 5px;
-        overflow: hidden;
-        margin: 0 10px;
-        position: relative;
-      }
-
-      /* Progress Fill */
-      .progress-fill {
-        height: 100%;
-        background: #4caf50;
-        transition: width 0.5s ease-in-out;
-      }
-
-      /* Progress Percentage */
-      .progress-percent {
-        font-weight: bold;
-        color: #333;
-      }
-
-      @media (max-width: 768px) {
-        .header__topPart,
-        .ribbon-bar {
-          height: 60px;
-        }
-        .nav-tabs {
-          gap: 15px;
-          font-size: 16px;
-        }
-        .ribbon-bar::after {
-          bottom: -30px;
-          height: 30px;
-        }
-        .ribbon-wrapper {
-          height: 60px;
-        }
-        main {
-          margin-top: 120px;
-        }
-        .notification-tab {
-          color: #fff;
-          background: #fff;
-          font-size: 18px;
-          border-radius: 4px;
-          padding: 6px 8px;
-          cursor: pointer;
-        }
-        .notification-tab i {
-          font-size: 18px;
-        }
-        .notification-tab:hover {
-          background: #eee;
-        }
-
-        .notification-count {
-          background: red;
-          color: white;
-          font-size: 12px;
-          font-weight: bold;
-          border-radius: 50%;
-          width: 18px;
-          height: 18px;
-          text-align: center;
-          position: absolute;
-          top: -5px;
-          right: -5px;
-        }
-
-        /* Dropdown Menu */
-        .notification-dropdown {
-          display: none;
-          position: absolute;
-          right: 0;
-          margin-top: 10px;
-          width: 250px;
-          background: white;
-          border: 1px solid #ccc;
-          border-radius: 5px;
-          box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-          overflow: hidden;
-          z-index: 1000;
-        }
-
-        .notification-dropdown.show {
-          display: block;
-        }
-
-        .notification-item {
-          padding: 10px;
-          border-bottom: 1px solid #eee;
-        }
-
-        .notification-item:last-child {
-          border-bottom: none;
-        }
-
-        .notification-title {
-          font-weight: bold;
-          color: #333;
-        }
-
-        .notification-message {
-          font-size: 14px;
-          color: #666;
-        }
-
-        .no-notifications {
-          text-align: center;
-          padding: 10px;
-          color: #666;
-        }
-      }
-    </style>
-  </head>
-  <body>
-    <!-- LEFT NAV -->
-    <div class="left-nav">
-      <div class="account-button" id="accountBtn">TN</div>
-      <!-- Home Icon -->
-      <div class="nav-item" title="Dashboard">
-        <a href="{% url 'home' %}">
-          <i class="fas fa-home" style="color: white"></i>
-        </a>
-      </div>
-      <div class="nav-item" title="Courses">
-        <i class="fas fa-book"></i>
-      </div>
-      <div class="nav-item" title="Calendar">
-        <a href="{% url 'calendar' %}">
-          <i class="fas fa-calendar" style="color: white"></i>
-        </a>
-      </div>
-      <div class="nav-item" title="Inbox">
-        <i class="fas fa-inbox"></i>
-      </div>
-    </div>
-
-    <!-- ACCOUNT PANEL -->
-    <div class="account-panel" id="accountPanel">
-      <div class="account-header">
-        <div class="user-info">
-          <div class="user-initials">TN</div>
-          <div class="user-details">
-            <span class="name"
-              >{{ request.user.get_full_name|default:request.user.username
-              }}</span
-            >
-            <button
-              class="logout-button"
-              onclick="location.href='{% url 'logout_view' %}'"
-            >
-              Logout
-            </button>
-          </div>
-        </div>
-        <button class="close-btn" id="closeBtn">✕</button>
-      </div>
-      <div class="account-links">
-        <a href="#">Notifications</a>
-        <a href="#">Profile</a>
-        <a href="#">Files</a>
-        <a href="#">Settings</a>
-      </div>
-    </div>
-
-    <!-- TWO-PART HEADER -->
-    <div class="header__wrapper" role="navigation">
-      <!-- TOP PART -->
-      <div class="header__topPart">
-        <div class="logo">
-          <img
-            src="{% static '/KidVenture/images/kidventure_logo.jpg' %}"
-            alt="KidVenture Logo"
-          />
-        </div>
-        <div>
-          <span class="name">
-            Welcome to KidVenture, {{
-            request.user.get_full_name|default:request.user.username }}</span
-          >
-        </div>
-        <div class="cf-zip-container">
-          <div class="finder">
-            <i class="fas fa-search"></i>
-            Finder
-          </div>
-          <div class="notification-tab">
-            <button id="notificationbtn" class="notification-button">
-              🔔 {% if notifications %}
-              <span class="notification-count">{{ notifications|length }}</span>
-              {% endif %}
-            </button>
-            <div id="notificationDropdown" class="notification-dropdown">
-              {% if notifications %}
-              <ul>
-                {% for notification in notifications %}
-                <li class="notification-item">
-                  <p class="notification-title">{{ notification.title }}</p>
-                  <p class="notification-message">{{ notification.message }}</p>
-                </li>
-                {% endfor %}
-              </ul>
-              {% else %}
-              <p class="no-notifications">No new notifications</p>
-              {% endif %}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- BOTTOM PART: Ribbon bar with Tabs -->
-      <div class="header__bottomPart">
-        <div class="ribbon-wrapper">
-          <div class="ribbon-bar">
-            <ul class="nav-tabs">
-              <li class="tab-link active" data-tab="progress-tab">Progress</li>
-              <li class="tab-link" data-tab="activities-tab">Activities</li>
-              <li class="tab-link" data-tab="leaderboard-tab">Leaderboard</li>
-              <li class="tab-link" data-tab="achievements-tab">Achievements</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- MAIN CONTENT -->
-    <main>
-      <div class="main-box">
-        <!-- Class Information Section -->
-        <section class="class-info">
-          <h2>Your Class Information</h2>
-          {% if classroom %}
-          <p><strong>Class:</strong> {{ classroom.name }}</p>
-          <p><strong>Teacher:</strong> {{ teacher }}</p>
-          {% else %}
-          <p>
-            You have not joined any classes yet. Please
-            <a href="{% url 'join_class' %}">join a class</a> to get started!
-          </p>
-          {% endif %}
-        </section>
-
-        <!-- Notification Section -->
-
-        <!-- Notification Dropdown -->
-
-        <!-- PROGRESS SECTION (Visible by default) -->
-        <section id="progress-tab" class="tab-content hidden">
-          <div class="progress-container">
-            <h2>Class Progress</h2>
-            <div id="progressList">
-              <!-- Progress bars will be injected here by JavaScript -->
-            </div>
-          </div>
-        </section>
-
-    <!-- ACTIVITIES SECTION (Hidden by default) -->
-    <!-- ACTIVITIES SECTION -->
-    <section id="activities-tab" class="tab-content hidden">
-      <!-- Assigned Activities -->
-      <h2>Assigned Activities</h2>
-      <p>Complete the assigned activities from your teacher:</p>
-    
-      <div class="activity-container">
-        {% for activity in activities %}
-            <div class="activity-item">
-                <h3 class="activity-header">{{ activity.name }}</h3>
-                <!-- <p>{{ activity.description }}</p> -->
-                <p><strong>Progress:</strong> {{ activity.completed_levels|floatformat:0 }} / {{ activity.max_levels }} levels ({{ activity.percent_complete|floatformat:0 }}%)</p>
-    
-                <button class="activity-button" onclick="window.location.href='{% url activity.url_name %}?activity={{ activity.id }}'">
-                    <i class="fas fa-play-circle"></i> Continue Activity
-                </button>
-            </div>
+  <!-- ─── SUMMARY TABLE ─── -->
+  <div class="progress-summary">
+    <table class="student-progress-table">
+      <thead>
+        <tr>
+          <th>Class</th>
+          <th>Activity</th>
+          <th>Progress</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for a in progress_data %}
+          <tr>
+            <td>{{ classroom.name }}</td>
+            <td>{{ a.activity_name }}</td>
+            <td>{{ a.progress_percent }}%</td>
+          </tr>
         {% empty %}
-            <p>No assigned activities yet.</p>
+          <tr>
+            <td colspan="3">No progress yet—let’s play some levels!</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <!-- ──────────────────────────────────── -->
+
+  <div class="progress-cards">
+    {% for activity in progress_data %}
+      <div class="progress-card">
+        <!-- Activity Title -->
+        <h3 class="card-title">{{ activity.activity_name }}</h3>
+
+        <!-- Big Friendly Progress Bar -->
+        <div class="bar-bg">
+          <div class="bar-fill" style="width: {{ activity.progress_percent }}%;">
+            <span class="bar-label-inside">{{ activity.progress_percent }}%</span>
+          </div>
+        </div>
+
+        <!-- Level list -->
+        {% if activity.levels %}
+          <ul class="level-list">
+            {% for lvl in activity.levels %}
+              <li>
+                <strong>Lvl {{ lvl.level }}:</strong>
+                <span class="icon"><i class="fas fa-stopwatch"></i></span> {{ lvl.time }}s
+                <span class="icon"><i class="fas fa-bug"></i></span> {{ lvl.mistakes }}
+                <span class="icon"><i class="fas fa-exchange-alt"></i></span> {{ lvl.mismatches|length }}
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="no-levels">No levels played yet—let’s start!</p>
+        {% endif %}
+      </div>
+    {% empty %}
+      <p class="no-progress">No progress to show—play some games!</p>
+    {% endfor %}
+  </div>
+</section>
+
+
+  <!-- ACTIVITIES SECTION -->
+  <section id="activities-tab" class="tab-content hidden">
+    <h2>Assigned Activities</h2>
+    <p>Complete the activities your teacher assigned:</p>
+
+    <div class="grid-container">
+      {% for activity in activities %}
+        <div class="card">
+          <h3 class="activity-title">
+            {{ activity.name }}
+            {% if activity.progress == 100 %}
+              <i class="fas fa-star sticker" title="Completed!"></i>
+            {% endif %}
+          </h3>
+          <p class="levels">
+            Levels: <strong>{{ activity.completed_levels|floatformat:0 }}</strong> /
+                    <strong>{{ activity.max_levels }}</strong>
+          </p>
+          <p class="progress">
+            Progress: <strong>{{ activity.progress }}%</strong>
+          </p>
+          <button
+            class="btn btn-continue"
+            onclick="location.href='{% url activity.url_name %}?activity={{ activity.id }}'">
+            ▶️ Continue
+          </button>
+        </div>
+      {% empty %}
+        <p class="no-activities">No activities yet! Ask your teacher to assign one</p>
+      {% endfor %}
+    </div>
+
+    <h2>Free Play</h2>
+    <p>play a fun game:</p>
+    <div class="game-container">
+      <div class="game-card">
+        <h3>Alphabet Matching</h3>
+        <img src="{% static 'KidVenture/images/alphabet-matching.jpg' %}" alt="Matching Game" />
+        <button class="btn btn-freeplay"
+                onclick="location.href='{% url 'alphabet_matching' %}'">
+          🔄 Free Play
+        </button>
+      </div>
+      <div class="game-card">
+        <h3>Alphabet Memory</h3>
+        <img src="{% static 'KidVenture/images/memory_game.jpg' %}" alt="Memory Game" />
+        <button class="btn btn-freeplay"
+                onclick="location.href='{% url 'alphabet_memory' %}'">
+          🔄 Free Play
+        </button>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- LEADERBOARD SECTION -->
+  <section id="leaderboard-tab" class="tab-content hidden">
+    <h2>Leaderboard</h2>
+    <table class="leaderboard-table">
+      <thead>
+        <tr>
+          <th>Rank</th>
+          <th>Avatar</th>
+          <th>Name</th>
+          <th>Max Level</th>
+          <th>Total Mistakes</th>
+          <th>Average Time</th>
+          <th>Total Mismatches</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for user in leaderboard %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>
+              <img src="{{ user.user__avatar.url }}" alt="Avatar" width="50" height="50" />
+            </td>
+            <td>{{ user.user__username }}</td>
+            <td>{{ user.max_level }}</td>
+            <td>{{ user.total_mistakes }}</td>
+            <td>{{ user.avg_time }}</td>
+            <td>{{ user.total_mismatches }}</td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="7">No leaderboard data available yet.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ACHIEVEMENTS SECTION -->
+  <section id="achievements-tab" class="tab-content hidden">
+    <div class="card">
+      <h2>My Achievements</h2>
+      <p class="badge-summary">
+        You’ve earned {{ badges|length }} of {{ badge_definitions|length }} badges
+      </p>
+
+      <div class="badge-container">
+        {% for bd in badge_definitions %}
+          <div class="badge-card {% if bd.name in earned_names %}earned{% else %}locked{% endif %}">
+            <img src="{{ bd.image_url }}" alt="{{ bd.name }}" />
+            <p class="badge-name">{{ bd.name }}</p>
+            {% if bd.name not in earned_names %}
+              <i class="fas fa-lock badge-lock"></i>
+            {% endif %}
+          </div>
         {% endfor %}
       </div>
-
-      <h2>Games</h2>
-      <p>Select a game to play:</p>
-    
-      Free Play Mode
-      <div class="game-container">
-          <div class="game-item">
-              <h2 class="game-header">Alphabet Matching Game</h2>
-              <iframe src="{% static 'KidVenture/images/alphabet-matching.jpg' %}" 
-                      width="250px" height="250px" style="border:none;"></iframe>
-              <button class="game-button" onclick="window.location.href='{% url 'alphabet_matching' %}'">
-                  <i class="fas fa-play-circle"></i> Free Play
-              </button>
-          </div>
-          <div class="game-item">
-              <h2 class="game-header">Alphabet Memory Game</h2>
-              <iframe src="{% static 'KidVenture/images/memory_game.jpg' %}" 
-                      width="250px" height="250px" style="border:none;"></iframe>
-              <button class="game-button" onclick="window.location.href='{% url 'alphabet_memory' %}'">
-                  <i class="fas fa-play-circle"></i> Free Play
-              </button>
-          </div>
-      </div>
-    </section>
-
-        <!-- LEADERBOARD SECTION (Hidden by default) -->
-        <section id="leaderboard-tab" class="tab-content hidden">
-          <h2>Leaderboard</h2>
-          <table class="leaderboard-table">
-            <thead>
-              <tr>
-                <th>Rank</th>
-                <th>Avatar</th>
-                <th>Name</th>
-                <th>Max Level</th>
-                <th>Total Mistakes</th>
-                <th>Average Time</th>
-                <th>Total Mismatches</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for user in leaderboard %}
-              <tr>
-                <td>{{ forloop.counter }}</td>
-                <td>
-                  <img
-                    src="{{ user.user__avatar.url }}"
-                    alt="Avatar"
-                    width="50"
-                    height="50"
-                  />
-                </td>
-                <td>{{ user.user__username }}</td>
-                <td>{{ user.max_level }}</td>
-                <td>{{ user.total_mistakes }}</td>
-                <td>{{ user.avg_time }}</td>
-                <td>{{ user.total_mismatches }}</td>
-              </tr>
-              {% empty %}
-              <tr>
-                <td colspan="7">No leaderboard data available yet.</td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </section>
-
-        <!-- ACHIEVEMENTS SECTION (Hidden by default) -->
-        <section id="achievements-tab" class="tab-content hidden">
-          <h2>Your Achievements</h2>
-          <div class="badge-container">
-            {% for badge in badges %}
-            <div class="badge">
-              <img src="{% static badge.image %}" alt="{{ badge.name }}" />
-              <p>{{ badge.name }}</p>
-            </div>
-            {% empty %}
-            <p>
-              No badges earned yet. Start completing activities to earn rewards!
-            </p>
-            {% endfor %}
-          </div>
-        </section>
-      </div>
-    </main>
-
-    <footer>KidVenture - Making Learning Fun!</footer>
-
-    <!-- SIMPLE JS for Account Panel Toggle and Tab Switching -->
-    <script>
-      // Account Panel Toggle
-      const accountBtn = document.getElementById("accountBtn");
-      const notificationbtn = document.getElementById("notificationbtn");
-      const accountPanel = document.getElementById("accountPanel");
-      const notificationPanel = document.getElementById("notificationDropdown");
-      const closeBtn = document.getElementById("closeBtn");
-
-      accountBtn.addEventListener("click", () => {
-        accountPanel.classList.add("open");
-      });
-      closeBtn.addEventListener("click", () => {
-        accountPanel.classList.remove("open");
-      });
-
-      notificationbtn.addEventListener("click", () => {
-        notificationPanel.classList.toggle("show");
-      });
-
-      <!-- JavaScript to Generate Dummy Progress Data -->
-
-      document.addEventListener("DOMContentLoaded", function () {
-        const progressData = [
-          { className: "Math 101", progress: 75 },
-          { className: "Science 202", progress: 50 },
-          { className: "History 303", progress: 90 },
-          { className: "English 404", progress: 65 },
-          { className: "Art 505", progress: 30 },
-        ];
-
-        const progressList = document.getElementById("progressList");
-
-        progressData.forEach((item) => {
-          let progressHTML = `
-                <div class="progress-item">
-                    <span class="class-name">${item.className}</span>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: ${item.progress}%;"></div>
-                    </div>
-                    <span class="progress-percent">${item.progress}%</span>
-                </div>
-            `;
-          progressList.innerHTML += progressHTML;
-        });
-      });
-
-      // Tab Switching Logic
-      document.addEventListener("DOMContentLoaded", () => {
-        const tabs = document.querySelectorAll(".tab-link");
-        const contents = document.querySelectorAll(".tab-content");
-
-        tabs.forEach((tab) => {
-          tab.addEventListener("click", () => {
-            // Remove 'active' class from all tabs
-            tabs.forEach((t) => t.classList.remove("active"));
-            // Hide all tab contents by adding 'hidden'
-            contents.forEach((content) => content.classList.add("hidden"));
-            // Activate clicked tab and show its content
-            tab.classList.add("active");
-            const tabId = tab.getAttribute("data-tab");
-            document.getElementById(tabId).classList.remove("hidden");
-          });
-        });
-      });
-    </script>
-  </body>
-</html>
+    </div>
+  </section>
+</div>
+{% endblock %}

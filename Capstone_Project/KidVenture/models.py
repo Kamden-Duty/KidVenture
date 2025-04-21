@@ -153,6 +153,18 @@ class Activity(models.Model):
     def __str__(self):
         return f"{self.name} - {self.student.user.username if self.student and self.student.user else 'Unassigned'}"
 
+class ActivityTemplate(models.Model):
+    classroom = models.ForeignKey(Class, on_delete=models.CASCADE, related_name="activity_templates")
+    name = models.CharField(max_length=255)
+    description = models.TextField(blank=True, null=True)
+    url_name = models.CharField(max_length=50, blank=True, null=True)
+    max_levels = models.IntegerField(default=1)
+    game = models.CharField(max_length=20, choices=Activity.games, default='matching')
+
+    def __str__(self):
+        return f"{self.name} for {self.classroom.name}"
+
+
 
 # This models is for leaderboard entries. Has the user who made the points and the points made.
 class LeaderboardEntry(models.Model):

@@ -11,8 +11,8 @@ urlpatterns = [
     path('home', views.home, name='home'),
     path('logout/', views.logout_view, name='logout_view'),
     path('create_class/', views.create_class, name='create_class'),
-    # path('student/', views.student_homepage, name='student_homepage'),
-    # path('student/home/', views.student_homepage, name='student_home'),
+    path('student/', views.student_homepage, name='student_homepage'),
+    path('student/home/', views.student_homepage, name='student_home'),
     path('calendar/', views.calendar_view, name='calendar'),
 
     path('teacher_page/', views.home, name='teacher'),
