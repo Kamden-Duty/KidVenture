@@ -21,6 +21,10 @@ let matches = 0;
 let mismatchCount = 0;
 let mismatchedLetters = [];
 
+// flag to make sure the user doesn't click while we are doing animation or something
+let boardLocked = false;
+
+
 function shuffle(array) {
     for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -193,6 +197,7 @@ function playSound(soundId) {
 function onCardClick(event) {
     const clickedCard = event.target;
 
+    if (boardLocked) return;
     if (!timerStarted) {
         startTimer();
     }
@@ -209,6 +214,7 @@ function onCardClick(event) {
         cardClickSound.play();
     } else {
         secondCard = clickedCard;
+        boardLocked = true;
 
         if (firstCard.dataset.card.toLowerCase() === secondCard.dataset.card.toLowerCase()) {
             firstCard.classList.add("matched");
@@ -218,6 +224,8 @@ function onCardClick(event) {
             matches++;
             updateScore();
             playSound("match-sound");
+
+            boardLocked = false;
 
             if (matches === totalMatches) {
                 stopTimer();
@@ -249,10 +257,12 @@ function onCardClick(event) {
                 firstCard = null;
                 secondCard = null;
                 reshuffleCards();
+                boardLocked = false;
             }, 2000);
         }
     }
 }
+
 
 function reshuffleCards() {
     const gameBoard = document.getElementById("game-board");

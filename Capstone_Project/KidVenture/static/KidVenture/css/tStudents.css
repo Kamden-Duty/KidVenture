@@ -1,0 +1,131 @@
+/* === Container === */
+.content-box {
+    background-color: #4c6f66; /* Dark Teal */
+    padding: 20px;
+    border-radius: 10px;
+    color: #cadec8; /* Soft Mint */
+    margin: 20px;
+}
+
+/* === Header === */
+.content-box h2 {
+    color: #84aca3; /* Light Teal */
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+/* === Labels === */
+label {
+    color: #cadec8;
+    font-weight: bold;
+    display: block;
+    margin-top: 10px;
+    margin-bottom: 5px;
+}
+
+/* === Dropdowns === */
+select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #718f89;
+    border-radius: 5px;
+    background-color: #cadec8;
+    color: #25433d;
+    font-size: 16px;
+    box-sizing: border-box;
+    appearance: none;
+    cursor: pointer;
+}
+
+select:hover,
+select:focus {
+    background-color: #e0f2f1;
+    border-color: #25433d;
+    outline: none;
+}
+
+/* === Search Bar === */
+#search-bar {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #718f89;
+    border-radius: 5px;
+    background-color: #cadec8;
+    color: #25433d;
+    margin-top: 10px;
+    margin-bottom: 20px;
+}
+
+/* === Export Button === */
+button {
+    background-color: #84aca3;
+    color: #25433d;
+    padding: 10px 20px;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+button:hover {
+    background-color: #6e9189;
+}
+
+/* === Table Container === */
+.table-container {
+    max-height: 500px;
+    overflow-y: auto;
+    border-radius: 6px;
+}
+
+/* === Table === */
+.student-overview-table {
+    width: 100%;
+    border-collapse: collapse;
+    /* margin-top: 20px; */
+}
+
+.student-overview-table th,
+.student-overview-table td {
+    padding: 12px;
+    text-align: left;
+    color: #25433d;
+    border-bottom: 1px solid rgba(113, 143, 137, 0.3);
+}
+
+.student-overview-table th {
+    background-color: #84aca3; /* Light Teal */
+    color: #25433d;
+    font-weight: bold;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.student-overview-table tr:nth-child(even) {
+    background-color: #cadec8; /* Soft Mint */
+}
+
+.student-overview-table tr:nth-child(odd) {
+    background-color: #b0c9c4; /* Cool Gray */
+}
+
+/* === Remove Button === */
+.delete-btn {
+    background-color: transparent;
+    border: none;
+    color: #25433d;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 5px 10px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.delete-btn:hover {
+    background-color: #f7fffd;
+    color: darkred;
+}

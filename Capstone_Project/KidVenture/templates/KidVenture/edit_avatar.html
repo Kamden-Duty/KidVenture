@@ -2,8 +2,12 @@
 {% load static %}
 {% block title %}Edit Avatar{% endblock %}
 {% block pageName %}
-<link rel="stylesheet" href="{% static 'KidVenture/css/avatar.css' %}">
-{%endblock%}
+    <span style="font-size: 30px; cursor: pointer; color: white;" class="nav">&#9776; Edit Avatar</span>
+    <span style="font-size: 30px; cursor: pointer; color: white;" class="nav2">&#9776; Edit Avatar</span>
+    <link rel="stylesheet" href="{% static 'KidVenture/css/avatar.css' %}">
+{% endblock %}
+
+
 {% block content %}
 <div class="edit-avatar-container">
     <h2>Edit Your Avatar</h2>
