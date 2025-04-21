@@ -77,15 +77,22 @@ function applyAlternatingRowColors() {
 }
 
 
-// Export Table to CSV
 function exportTableToCSV() {
     let csv = [];
     let rows = document.querySelectorAll("table tr");
 
     rows.forEach(row => {
+        // Only include rows that are visible
+        if (row.style.display === "none") return;
+
         let cols = row.querySelectorAll("th, td");
         let rowData = [];
-        cols.forEach(col => rowData.push(col.innerText));
+
+        cols.forEach(col => {
+            let text = col.innerText.replace(/,/g, ""); // Remove commas to avoid breaking CSV
+            rowData.push(text);
+        });
+
         csv.push(rowData.join(","));
     });
 
@@ -96,6 +103,7 @@ function exportTableToCSV() {
     link.download = "progress_report.csv";
     link.click();
 }
+
 
 document.addEventListener("DOMContentLoaded", function () {
     const classFilter = document.getElementById("class-filter");

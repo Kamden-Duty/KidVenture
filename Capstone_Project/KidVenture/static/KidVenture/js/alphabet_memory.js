@@ -30,6 +30,10 @@ let matches = 0;
 let mismatchCount = 0;
 let mismatchedLetters = [];
 
+// flag to make sure the user doesn't click while we are doing animation or something
+let boardLocked = false;
+
+
 function shuffle(array) {
   for (let i = array.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -253,15 +257,21 @@ function startNextRound() {
 }
 
 function onCardClick(cardElement) {
+  if (boardLocked) return;
+
   const cardInner = cardElement.querySelector(".card-inner");
   if (cardInner.classList.contains("matched") || cardElement.classList.contains("flip")) return;
+
   if (!timerStarted) startTimer();
   cardElement.classList.add("flip");
+
   if (!firstCard) {
     firstCard = cardInner;
     cardClickSound.play();
   } else {
     secondCard = cardInner;
+    boardLocked = true;
+
     if (firstCard.dataset.card.toLowerCase() === secondCard.dataset.card.toLowerCase()) {
       firstCard.classList.add("matched");
       secondCard.classList.add("matched");
@@ -269,6 +279,8 @@ function onCardClick(cardElement) {
       firstCard = null;
       secondCard = null;
       updateScore();
+      boardLocked = false;
+
       if (matches === totalMatches) {
         stopTimer();
         triggerConfetti();
@@ -292,13 +304,15 @@ function onCardClick(cardElement) {
 
         firstCard.classList.remove("mismatch");
         secondCard.classList.remove("mismatch");
-        
+
         firstCard = null;
         secondCard = null;
+        boardLocked = false;
       }, 1000);
     }
   }
 }
+
 
 document.addEventListener("DOMContentLoaded", () => {
   if (activityId) {

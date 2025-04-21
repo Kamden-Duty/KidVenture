@@ -53,13 +53,14 @@
 }
 
 .selector-container span {
-    min-width: 120px; /* Prevents shifting when text changes */
+    min-width: 120px;
     text-align: center;
     font-size: 16px;
     padding: 5px;
     border-radius: 5px;
-    border: 1px solid #ccc;
-    background-color: white;
+    border: 1px solid #718f89; /* Gray-Green */
+    background-color: #cadec8; /* Soft Yellow-Green */
+    color: #25433d; /* Deep Green */
 }
 
 .arrow-btn {
@@ -67,31 +68,31 @@
     padding: 5px 10px;
     cursor: pointer;
     border: none;
-    background-color: #007bff;
-    color: white;
+    background-color: #84aca3; /* Light Teal */
+    color: #25433d; /* Deep Green */
     border-radius: 5px;
     transition: background 0.2s ease;
 }
 
 .arrow-btn:hover {
-    background-color: #0056b3;
+    background-color: #6e9189; /* Slightly darker teal */
 }
 
-/* Save Avatar Button */
+/* Save Avatar Button - Match View All button */
 #save-avatar {
     margin-top: 20px;
     padding: 10px 20px;
     font-size: 16px;
     cursor: pointer;
     border: none;
-    background-color: #28a745;
-    color: white;
-    border-radius: 5px;
+    background-color: #84aca3; /* Light Teal */
+    color: #25433d; /* Deep Green */
+    border-radius: 10px;
     transition: background 0.2s ease;
 }
 
 #save-avatar:hover {
-    background-color: #218838;
+    background-color: #6e9189; /* Slightly darker teal */
 }
 
 /* Back Link */
@@ -99,10 +100,14 @@
     margin-top: 15px;
     font-size: 16px;
     text-decoration: none;
-    color: #007bff;
+    color: #25433d; /* Deep Green */
+    background-color: transparent;
+    padding: 6px 12px;
+    border-radius: 10px;
+    transition: background 0.2s ease;
 }
 
 .back-link:hover {
+    background-color: #cadec8; /* Soft Mint for hover effect */
     text-decoration: underline;
 }
-

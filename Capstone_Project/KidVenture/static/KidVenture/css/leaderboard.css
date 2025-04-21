@@ -1,0 +1,94 @@
+/* === Table Styling === */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background-color: #4c6f66; /* Dark Teal background under table */
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+/* === Header Row === */
+table thead,
+table tr:first-child {
+    background-color: #84aca3; /* Light Teal */
+    color: #25433d; /* Deep Green Text */
+    font-weight: bold;
+}
+
+th {
+    padding: 12px 16px;
+    text-align: left;
+    font-size: 16px;
+    color: #25433d;
+}
+
+/* === Table Rows === */
+td {
+    padding: 12px 16px;
+    color: #25433d;
+    font-size: 15px;
+    border-bottom: 1px solid rgba(113, 143, 137, 0.3);
+}
+
+tbody tr:nth-child(even) {
+    background-color: #cadec8; /* Soft Mint */
+}
+
+tbody tr:nth-child(odd) {
+    background-color: #b0c9c4; /* Cool Gray */
+}
+
+/* === Avatar Styling === */
+td img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 2px solid #718f89; /* Gray-Green Border */
+}
+
+/* === Points Column === */
+td:last-child {
+    font-weight: bold;
+    color: #25433d;
+}
+
+/* === No Data Row === */
+#leaderboard-body tr td[colspan] {
+    text-align: center;
+    font-style: italic;
+    color: #25433d;
+    padding: 20px;
+}
+
+/* === Responsive Behavior (optional) === */
+@media (max-width: 768px) {
+    table,
+    thead,
+    tbody,
+    th,
+    td,
+    tr {
+        display: block;
+    }
+
+    thead {
+        display: none;
+    }
+
+    td {
+        position: relative;
+        padding-left: 50%;
+        text-align: left;
+    }
+
+    td::before {
+        position: absolute;
+        left: 16px;
+        top: 12px;
+        font-weight: bold;
+        color: #25433d;
+        content: attr(data-label); /* Make sure to set data-labels in JS if using this */
+    }
+}

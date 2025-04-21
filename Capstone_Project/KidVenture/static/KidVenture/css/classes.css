@@ -357,3 +357,18 @@ select:hover, select:focus {
     background-color: #f7fffd; /* Slightly darker shade */
     color: darkred; /* White text for contrast */
 }
+
+
+
+input[type="number"] {
+    width:20%;
+    padding: 5px;
+    /* margin-bottom: 10px; */
+    border: 1px solid #718f89; /* Gray-Green */
+    border-radius: 5px;
+    background-color: #cadec8; /* Soft Mint */
+    color: #25433d; /* Deep Green */
+    font-size: 16px;
+    box-sizing: border-box;
+    outline: none;
+}
