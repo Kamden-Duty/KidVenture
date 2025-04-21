@@ -41,6 +41,7 @@ function shuffle(array) {
   }
 }
 
+
 function initializeGame() {
   shuffle(allLetters);
   selectedPairs = allLetters.slice(0, totalMatches);
@@ -314,13 +315,25 @@ function onCardClick(cardElement) {
 }
 
 
+function showActivityModal() {
+  const modal = document.getElementById("activity-modal");
+  if (modal) {
+    modal.classList.remove("hidden");
+    modal.style.display = "block";
+  }
+}
+
+
+
 document.addEventListener("DOMContentLoaded", () => {
   if (activityId) {
     menuModal.style.visibility = "hidden";
     modalContent.style.visibility = "hidden";
     menuModal.style.display = "none";
     modalContent.style.display = "none";
+
     if (gameTypeText) gameTypeText.textContent = "Mode: Activity";
+
     fetch(`/get_activity_progress/${activityId}/`)
       .then(res => res.json())
       .then(data => {
@@ -331,10 +344,19 @@ document.addEventListener("DOMContentLoaded", () => {
       .catch(() => initializeGame());
   } else {
     if (gameTypeText) gameTypeText.textContent = "Mode: Free Play";
+
     setTimeout(() => {
-      generateLevels(maxLevel);
+      generateLevels(maxLevel); // generate level buttons
+      
+      const levelOneBtn = levelContainer.querySelector('.level-button');
+      if (levelOneBtn) {
+        levelOneBtn.click(); // auto-load Level 1 behind the modal
+      }
+
+      openModalBtn?.click(); // then show the modal
     }, 0);
-    initializeGame();
   }
+
   updateScore();
 });
+
