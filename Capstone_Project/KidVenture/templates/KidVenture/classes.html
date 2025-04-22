@@ -69,8 +69,6 @@
 <!-- Activity Management Section -->
 <div class="classes-container">
     <!-- Assign Activity to Class -->
-    <!-- Assign Activity to Class -->
-   <!-- Assign Activity to Class -->
    <div class="box-8">
     <div class="content-box">
         <h2>Assign Activity to Class</h2>
@@ -142,7 +140,7 @@
                 {% for activity in activities %}
                 <tr>
                     <td>{{ activity.name }}</td>
-                    <td>{{ activity.student__classroom__name }}</td>
+                    <td>{{ activity.student__classrooms__name }}</td>
                     <td>{{ activity.url_name }}</td>
                     <td>{{ activity.class_progress|floatformat:0 }}%</td>
                     <td>{{ activity.max_levels }}</td>

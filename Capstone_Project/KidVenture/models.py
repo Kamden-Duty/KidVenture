@@ -91,14 +91,21 @@ class Class(models.Model):
 
 
 # Student model.Has a user isntance and a foreign key to the classroom they belong to
+# class Student(models.Model):
+#     # User instance (the student)
+#     user = models.ManyToManyField(User, on_delete=models.CASCADE)
+#     # Inherits from the classroom and is setup to cascade delete if the classroom is deleted
+#     classroom = models.ForeignKey(Class,  on_delete=models.CASCADE, related_name='students')
+
+#     def __str__(self):
+#          return self.user.username if self.user else "Unassigned Student"
+
 class Student(models.Model):
-    # User instance (the student)
-    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
-    # Inherits from the classroom and is setup to cascade delete if the classroom is deleted
-    classroom = models.ForeignKey(Class,  on_delete=models.CASCADE, related_name='students')
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    classrooms = models.ManyToManyField('Class', related_name='students')
 
     def __str__(self):
-         return self.user.username if self.user else "Unassigned Student"
+        return self.user.username
 
 
 # This model is for createing "activities" for our games. This difference from freeplay as in the teacher can assign the number of levels they want complete
@@ -126,6 +133,9 @@ class Activity(models.Model):
     max_levels = models.IntegerField(default=1)  # Track max levels for this activity
     # THe game for the activity. deafult is the matching game
     game = models.CharField(max_length=20, choices=games, default='matching')
+
+    classroom = models.ForeignKey(Class, on_delete=models.CASCADE)
+
 
 
     # Used to update a users progress on the game

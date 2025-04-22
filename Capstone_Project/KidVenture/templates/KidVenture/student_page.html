@@ -5,24 +5,35 @@
 
 {% block content %}
 <div class="main-box">
+  <div class="primary-section">
   <!-- Class information section -->
   <section class="class-info">
     <h2>Class Information</h2>
-    {% if classroom %}
-      <p><strong>Class:</strong> {{ classroom.name }}</p>
-      <p><strong>Teacher:</strong> {{ teacher }}</p>
+    <div class="class-container">
+    {% if classrooms %}
+      
+        {% for class in classrooms %}
+          <div class="class-item">
+            <p><strong>Class<i class="fa fa-landmark class-icon"></i>:</strong> {{ class.name }}</p>
+            <p><strong>Teacher<i class="fa fa-chalkboard teacher-icon"></i>:</strong> {{ class.teacher.username }}</p>
+          </div>
+        {% endfor %}
+      
     {% else %}
       <p>
         You have not joined any classes yet. Please
         <a href="{% url 'join_class' %}">join a class</a> to get started!
       </p>
     {% endif %}
+  </div>
   </section>
+  
   
 
   <!-- PROGRESS SECTION -->
 <section id="progress-tab" class="tab-content hidden">
   <h2>Class Progress</h2>
+  <div class="progress-container">
 
   <!-- ─── SUMMARY TABLE ─── -->
   <div class="progress-summary">
@@ -37,7 +48,7 @@
       <tbody>
         {% for a in progress_data %}
           <tr>
-            <td>{{ classroom.name }}</td>
+            <td>{{ a.class_name }}</td>
             <td>{{ a.activity_name }}</td>
             <td>{{ a.progress_percent }}%</td>
           </tr>
@@ -50,40 +61,7 @@
     </table>
   </div>
   <!-- ──────────────────────────────────── -->
-
-  <div class="progress-cards">
-    {% for activity in progress_data %}
-      <div class="progress-card">
-        <!-- Activity Title -->
-        <h3 class="card-title">{{ activity.activity_name }}</h3>
-
-        <!-- Big Friendly Progress Bar -->
-        <div class="bar-bg">
-          <div class="bar-fill" style="width: {{ activity.progress_percent }}%;">
-            <span class="bar-label-inside">{{ activity.progress_percent }}%</span>
-          </div>
-        </div>
-
-        <!-- Level list -->
-        {% if activity.levels %}
-          <ul class="level-list">
-            {% for lvl in activity.levels %}
-              <li>
-                <strong>Lvl {{ lvl.level }}:</strong>
-                <span class="icon"><i class="fas fa-stopwatch"></i></span> {{ lvl.time }}s
-                <span class="icon"><i class="fas fa-bug"></i></span> {{ lvl.mistakes }}
-                <span class="icon"><i class="fas fa-exchange-alt"></i></span> {{ lvl.mismatches|length }}
-              </li>
-            {% endfor %}
-          </ul>
-        {% else %}
-          <p class="no-levels">No levels played yet—let’s start!</p>
-        {% endif %}
-      </div>
-    {% empty %}
-      <p class="no-progress">No progress to show—play some games!</p>
-    {% endfor %}
-  </div>
+</div>
 </section>
 
 
@@ -200,5 +178,42 @@
       </div>
     </div>
   </section>
+</div>
+
+<div class="secondary-section">
+  <div class="progress-cards">
+    {% for activity in progress_data %}
+      <div class="progress-card">
+        <!-- Activity Title -->
+        <h3 class="card-title">{{ activity.activity_name }}</h3>
+
+        <!-- Big Friendly Progress Bar -->
+        <div class="bar-bg">
+          <div class="bar-fill" style="width: {{ activity.progress_percent }}%;">
+            <span class="bar-label-inside">{{ activity.progress_percent }}%</span>
+          </div>
+        </div>
+
+        <!-- Level list -->
+        {% if activity.levels %}
+          <ul class="level-list">
+            {% for lvl in activity.levels %}
+              <li>
+                <strong>Lvl {{ lvl.level }}:</strong>
+                <span class="icon"><i class="fas fa-stopwatch"></i></span> {{ lvl.time }}s
+                <span class="icon"><i class="fas fa-bug"></i></span> {{ lvl.mistakes }}
+                <span class="icon"><i class="fas fa-exchange-alt"></i></span> {{ lvl.mismatches|length }}
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="no-levels">No levels played yet—let’s start!</p>
+        {% endif %}
+      </div>
+    {% empty %}
+      <p class="no-progress">No progress to show—play some games!</p>
+    {% endfor %}
+  </div>
+</div>
 </div>
 {% endblock %}
