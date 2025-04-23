@@ -57,9 +57,17 @@ function createBoard(cards) {
     });
 }
 
-function startTimer() {
-    if (timerStarted) return;
+function startTimer(reset = false) {
+    if (reset) {
+        clearInterval(timerInterval); // Stop the existing timer
+        elapsedSeconds = 0; // Reset the elapsed time
+        document.getElementById("timer").textContent = `Time: ${elapsedSeconds} seconds`; // Update display
+        timerStarted = false; // Allow the timer to start again
+    }
+
+    if (timerStarted) return; // Prevent multiple timers from running
     timerStarted = true;
+
     timerInterval = setInterval(() => {
         elapsedSeconds++;
         document.getElementById("timer").textContent = `Time: ${elapsedSeconds} seconds`;
@@ -69,6 +77,13 @@ function startTimer() {
 function stopTimer() {
     clearInterval(timerInterval);
     document.getElementById("timer").textContent = `Time: ${elapsedSeconds} seconds - Level Complete!`;
+}
+
+function resetTimer() {
+    clearInterval(timerInterval);
+    timerStarted = false;
+    elapsedSeconds = 0;
+    document.getElementById("timer").textContent = `Time: ${elapsedSeconds} seconds`;
 }
 
 function updateScore() {
@@ -120,6 +135,7 @@ function getCookie(name) {
 }
 
 function advanceToNextLevel() {
+    // resetTimer();
     if (matches === totalMatches) {
         if (activityId) {
             currentLevel++;
@@ -155,6 +171,7 @@ function advanceToNextLevel() {
                     }
                 })
                 .catch(error => console.error("Error checking activity progress:", error));
+            resetTimer();
         } else {
             currentLevel++;
             saveGameProgress(currentLevel, elapsedSeconds, mismatchCount, mismatchedLetters)
@@ -177,7 +194,8 @@ function advanceToNextLevel() {
                     initializeGame();
                 })
                 .catch(error => console.error("Error saving game progress:", error));
-        }
+            resetTimer();
+            }
     }
 }
 
@@ -199,7 +217,8 @@ function onCardClick(event) {
 
     if (boardLocked) return;
     if (!timerStarted) {
-        startTimer();
+        console.log("Timer started");
+        startTimer(true);
     }
 
     if (
@@ -352,6 +371,7 @@ document.addEventListener("DOMContentLoaded", () => {
             button.textContent = `Level ${i}`;
             button.className = 'level-button';
             button.onclick = () => {
+                console.log(`Level ${i} selected`);
                 currentLevel = i;
                 totalMatches = currentLevel + 1;
                 hideActivityModal();
