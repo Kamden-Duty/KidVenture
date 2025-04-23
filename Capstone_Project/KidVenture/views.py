@@ -204,7 +204,6 @@ def home(request):
                     'is_active_user': is_current_user, 
                 }
                 leaderboard.append(leaderboard_entry)
-                print(leaderboard_entry)  # Print the constructed leaderboard entry
 
             # Gets the students badges
             badges = Badge.objects.filter(user=request.user) if hasattr(request.user, 'badge_set') else []

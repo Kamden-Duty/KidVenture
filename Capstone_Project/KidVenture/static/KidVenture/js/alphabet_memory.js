@@ -116,17 +116,25 @@ if (openModalBtn && closeModalBtn) {
 }
 
 function startTimer() {
-  if (timerStarted) return;
+  if (timerStarted) {
+    console.log('Timer already started, elapsedSeconds:', elapsedSeconds);
+    return;
+  }
+  console.log('Starting timer');
   timerStarted = true;
   timerInterval = setInterval(() => {
     elapsedSeconds++;
+    console.log('Timer tick:', elapsedSeconds);
     document.getElementById("timer").textContent = `Time: ${elapsedSeconds} seconds`;
   }, 1000);
 }
 
 function stopTimer() {
+  console.log('Stopping timer, final time:', elapsedSeconds);
   clearInterval(timerInterval);
   document.getElementById("timer").textContent = `Time: ${elapsedSeconds} seconds - Level Complete!`;
+  timerStarted = false;
+  elapsedSeconds = 0;
 }
 
 function updateScore() {
@@ -200,6 +208,12 @@ function saveGameProgress(level, timeTaken, mistakes, mismatchedLetters, activit
 function advanceToNextLevel() {
   currentLevel++;
   totalMatches = currentLevel + 1;
+  // Reset timer state
+  clearInterval(timerInterval);
+  timerStarted = false;
+  elapsedSeconds = 0;
+  document.getElementById("timer").textContent = "Time: 0 seconds";
+
   if (activityId) {
     saveGameProgress(currentLevel, elapsedSeconds, mismatchCount, mismatchedLetters, activityId)
       .then(() => fetch(`/check_activity_progress/${activityId}/`))
@@ -247,13 +261,17 @@ function advanceToNextLevel() {
 }
 
 function startNextRound() {
+  console.log('Starting next round, resetting timer state');
   matches = 0;
   mismatchCount = 0;
+  mismatchedLetters = []; //maybe keep this?
   elapsedSeconds = 0;
   timerStarted = false;
   firstCard = null;
   secondCard = null;
+  clearInterval(timerInterval);
   document.getElementById("timer").textContent = "Time: 0 seconds";
+  console.log('Timer state after reset:', { timerStarted, elapsedSeconds, timerInterval });
   initializeGame();
 }
 
