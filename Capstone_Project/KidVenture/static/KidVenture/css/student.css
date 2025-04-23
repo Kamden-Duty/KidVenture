@@ -777,8 +777,37 @@ footer {
   flex: 0 0 65%
 }
 
-.secondary-section {
+/* .secondary-section {
   flex: 0 0 25%
+} */
+
+.secondary-section {
+  display: flex;
+  align-items: flex-start;   /* top align both panels */
+  gap: 2rem;                 /* space between them */
+  margin: 1.5rem 0;
+}
+
+/* let your Assigned Activities fill the leftover space */
+.secondary-section #progress-cards {
+  flex: 1;                   /* take up all remaining width */
+  /* if you’d previously forced it to 100%, override here: */
+  width: auto !important;
+  max-width: none;
+  display: grid !important;  /* once JS removes .hidden, snap into a grid */
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+/* give Free Play a fixed-width sidebar */
+.secondary-section #freeplay-cards {
+  flex: 0 0 300px;           /* exactly 300px wide */
+  display: block !important; /* override the .hidden utility */
+}
+
+/* utility */
+.hidden {
+  display: none !important;
 }
 
 .progress-card {
