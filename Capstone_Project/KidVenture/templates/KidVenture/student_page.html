@@ -97,26 +97,6 @@
       {% endfor %}
     </div>
 
-    <h2>Free Play</h2>
-    <p>play a fun game:</p>
-    <div class="game-container">
-      <div class="game-card">
-        <h3>Alphabet Matching</h3>
-        <img src="{% static 'KidVenture/images/alphabet-matching.jpg' %}" alt="Matching Game" />
-        <button class="btn btn-freeplay"
-                onclick="location.href='{% url 'alphabet_matching' %}'">
-          🔄 Free Play
-        </button>
-      </div>
-      <div class="game-card">
-        <h3>Alphabet Memory</h3>
-        <img src="{% static 'KidVenture/images/memory_game.jpg' %}" alt="Memory Game" />
-        <button class="btn btn-freeplay"
-                onclick="location.href='{% url 'alphabet_memory' %}'">
-          🔄 Free Play
-        </button>
-      </div>
-    </div>
   </section>
 
 
@@ -181,7 +161,7 @@
 </div>
 
 <div class="secondary-section">
-  <div class="progress-cards">
+  <div class="progress-cards hidden"  id="progress-cards">
     {% for activity in progress_data %}
       <div class="progress-card">
         <!-- Activity Title -->
@@ -200,9 +180,9 @@
             {% for lvl in activity.levels %}
               <li>
                 <strong>Lvl {{ lvl.level }}:</strong>
-                <span class="icon"><i class="fas fa-stopwatch"></i></span> {{ lvl.time }}s
-                <span class="icon"><i class="fas fa-bug"></i></span> {{ lvl.mistakes }}
-                <span class="icon"><i class="fas fa-exchange-alt"></i></span> {{ lvl.mismatches|length }}
+                <span class="icon"><i class="fas fa-stopwatch" style="color: blue"></i></span> {{ lvl.time }}s
+                <span class="icon"><i class="fas fa-bug" style="color: darkorange"></i></span> {{ lvl.mistakes }}
+                <span class="icon"><i class="fas fa-exchange-alt" style="color: crimson"></i></span> {{ lvl.mismatches|length }}
               </li>
             {% endfor %}
           </ul>
@@ -214,6 +194,32 @@
       <p class="no-progress">No progress to show—play some games!</p>
     {% endfor %}
   </div>
+  <div id="freeplay-cards" class="hidden">
+    <h2>Free Play</h2>
+    <p>play a fun game:</p>
+    <div class="game-container">
+      <div class="game-card">
+        <h3>Alphabet Matching</h3>
+        <img src="{% static 'KidVenture/images/alphabet-matching.jpg' %}" alt="Matching Game" />
+        <button class="btn btn-freeplay"
+                onclick="location.href='{% url 'alphabet_matching' %}'">
+          🔄 Free Play
+        </button>
+      </div>
+      <div class="game-card">
+        <h3>Alphabet Memory</h3>
+        <img src="{% static 'KidVenture/images/memory_game.jpg' %}" alt="Memory Game" />
+        <button class="btn btn-freeplay"
+                onclick="location.href='{% url 'alphabet_memory' %}'">
+          🔄 Free Play
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+
+
 </div>
 </div>
 {% endblock %}
