@@ -172,16 +172,19 @@ def home(request):
 
             RANDOM_AVATARS = [f"fake_avatars/fake_avatar_{i}.png" for i in range(1, 11)]
 
+            # Leaderboard with points calculation
+            base_points = 10  # Base points per level
             raw_leaderboard = (
                 GameProgress.objects.filter(user__student__classroom=classroom)
                 .values('user__id', 'user__username', 'user__avatar')
                 .annotate(
                     max_level=Max('level'),
+                    total_points=Sum(F('level') * base_points),  # Calculate total points
                     total_mistakes=Sum('mistakes'),
                     avg_time=Avg('time_taken'),
                     total_mismatches=Sum('mismatched_letters')
                 )
-                .order_by('-max_level', 'total_mistakes', 'avg_time', 'total_mismatches')
+                .order_by('-total_points', '-max_level', 'total_mistakes', 'avg_time', 'total_mismatches')
             )
 
             leaderboard = []
@@ -194,6 +197,7 @@ def home(request):
                     'avatar_url': avatar_url,
                     'display_name': display_name,
                     'max_level': entry['max_level'],
+                    'total_points': entry['total_points'],  # Use total points for sorting
                     'total_mistakes': entry['total_mistakes'],
                     'avg_time': entry['avg_time'],
                     'total_mismatches': entry['total_mismatches'],

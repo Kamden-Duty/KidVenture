@@ -789,6 +789,7 @@
       <tr>
         <th>Rank</th>
         <th>Avatar</th>
+        <th>Total Points</th>
         <th>Name</th>
         <th>Max Level</th>
         <th>Total Mistakes</th>
@@ -802,6 +803,7 @@
         <td>
           <img src="/media/{{ user.avatar_url }}" alt="Avatar" width="50" height="50" />
         </td>
+        <td>{{ user.total_points }}</td>
         <td>{{ user.display_name }}</td>
         <td>{{ user.max_level }}</td>
         <td>{{ user.total_mistakes }}</td>
