@@ -1,0 +1,8 @@
+{% extends "KidVenture/student_base.html" %}
+{% block content %}
+  <div class="profile-card">
+    <img src="{{ request.user.avatar.url }}" class="profile-avatar" alt="Avatar">
+    <h2>{{ request.user.first_name|default:request.user.username }}</h2>
+    <p><strong style="margin-right:1rem">Joined On:</strong>{{ date_joined }} </p>
+  </div>
+{% endblock %}
