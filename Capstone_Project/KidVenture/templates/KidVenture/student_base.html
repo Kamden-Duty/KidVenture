@@ -98,7 +98,7 @@
             <button id="notificationbtn" class="notification-button">
               🔔 {% if notifications %}<span class="notification-count">{{ notifications|length }}</span>{% endif %}
             </button>
-            <div id="notificationDropdown" class="notification-dropdown hidden">
+            <div id="notificationDropdown" appendTo="body" class="notification-dropdown hidden">
               {% if notifications %}
                 <ul>
                   {% for notification in notifications %}

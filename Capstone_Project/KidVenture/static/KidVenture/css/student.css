@@ -162,7 +162,7 @@ body {
 }
 /* TOP PART */
 .header__topPart {
-  background-color: #00A8E8;
+  background-color: yellowgreen;
   height: 70px;
   display: flex;
   align-items: center;
@@ -201,7 +201,7 @@ body {
   overflow: hidden;
 }
 .ribbon-bar {
-  background-color: #00BEE5;
+  background-color: chocolate;
   height: 70px;
   position: relative;
   z-index: 2;
@@ -448,7 +448,7 @@ footer {
 }
 .notification-dropdown {
   display: none;
-  position: absolute;
+  position: fixed;
   right: 0;
   margin-top: 10px;
   width: 250px;
@@ -460,7 +460,7 @@ footer {
   z-index: 1000;
 }
 .notification-dropdown.show {
-  display: block;
+  display: block !important;
 }
 .notification-item {
   padding: 10px;
@@ -769,45 +769,13 @@ footer {
   margin: 1rem 0;
   flex-direction: column;
 }
-.hidden {
-  display: none !important;
-}
 
 .primary-section {
   flex: 0 0 65%
 }
 
-/* .secondary-section {
-  flex: 0 0 25%
-} */
-
 .secondary-section {
-  display: flex;
-  align-items: flex-start;   /* top align both panels */
-  gap: 2rem;                 /* space between them */
-  margin: 1.5rem 0;
-}
-
-/* let your Assigned Activities fill the leftover space */
-.secondary-section #progress-cards {
-  flex: 1;                   /* take up all remaining width */
-  /* if you’d previously forced it to 100%, override here: */
-  width: auto !important;
-  max-width: none;
-  display: grid !important;  /* once JS removes .hidden, snap into a grid */
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 1rem;
-}
-
-/* give Free Play a fixed-width sidebar */
-.secondary-section #freeplay-cards {
-  flex: 0 0 300px;           /* exactly 300px wide */
-  display: block !important; /* override the .hidden utility */
-}
-
-/* utility */
-.hidden {
-  display: none !important;
+  flex: 0 0 25%
 }
 
 .progress-card {
@@ -918,134 +886,6 @@ footer {
 .badge img.newly-earned {
   animation: bounceIn 0.8s ease-out;
 }
-
-
-/* Responsive Styles */
-@media (max-width: 768px) {
-  .header__topPart,
-  .ribbon-bar {
-    height: 60px;
-  }
-  .nav-tabs {
-    gap: 15px;
-    font-size: 16px;
-  }
-  .ribbon-bar::after {
-    bottom: -30px;
-    height: 30px;
-  }
-  .ribbon-wrapper {
-    height: 60px;
-  }
-  main {
-    margin-top: 120px;
-  }
-  .notification-tab {
-    color: #fff;
-    background: #fff;
-    font-size: 18px;
-    border-radius: 4px;
-    padding: 6px 8px;
-    cursor: pointer;
-  }
-  .notification-tab i {
-    font-size: 18px;
-  }
-  .notification-tab:hover {
-    background: #eee;
-  }
-  .notification-count {
-    background: red;
-    color: white;
-    font-size: 12px;
-    font-weight: bold;
-    border-radius: 50%;
-    width: 18px;
-    height: 18px;
-    text-align: center;
-    position: absolute;
-    top: -5px;
-    right: -5px;
-  }
-  .notification-dropdown {
-    display: none;
-    position: absolute;
-    right: 0;
-    margin-top: 10px;
-    width: 250px;
-    background: white;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-    z-index: 1000;
-  }
-  .notification-dropdown.show {
-    display: block;
-  }
-  .notification-item {
-    padding: 10px;
-    border-bottom: 1px solid #eee;
-  }
-  .notification-item:last-child {
-    border-bottom: none;
-  }
-  .notification-title {
-    font-weight: bold;
-    color: #333;
-  }
-  .notification-message {
-    font-size: 14px;
-    color: #666;
-  }
-  .no-notifications {
-    text-align: center;
-    padding: 10px;
-    color: #666;
-  }
-  .badge {
-    width: 100px;
-    padding: 0.8rem;
-  }
-  .badge img {
-    width: 48px;
-    height: 48px;
-  }
-  .grid-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 1.5rem;
-  }
-  .card {
-    background: #fff;
-    border-radius: 10px;
-    padding: 1rem;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-  }
-
-  .activity-card, .game-card {
-    width: 140px;
-    padding: 0.8rem;
-  }
-  .activity-title, .game-card h3 {
-    font-size: 1.3rem;
-  }
-  .btn {
-    font-size: 1rem;
-    padding: 0.5rem 0.8rem;
-  }
-}
-
-/* Responsive: tuck cards in on small screens */
-@media (max-width: 480px) {
-  .progress-card {
-    width: 160px;
-    padding: 0.8rem;
-  }
-  .card-title {
-    font-size: 1.2rem;
-  }
-  .bar-bg { height: 20px; }
-  .bar-label { font-size: 0.9rem; }
-  .level-list li { font-size: 0.85rem; }
+.hidden {
+  display: none !important;
 }
