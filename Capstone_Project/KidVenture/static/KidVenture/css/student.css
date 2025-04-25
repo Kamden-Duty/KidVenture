@@ -92,6 +92,20 @@ body {
   align-items: center;
   justify-content: space-between;
 }
+.account-links {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+}
+.account-links a {
+  padding: 0.5rem 0;
+  color: #333;
+  text-decoration: none;
+}
+.account-links a:hover {
+  text-decoration: underline;
+}
+
 .user-info {
   display: flex;
   align-items: center;
@@ -291,18 +305,21 @@ footer {
   margin-top: 10px;
 }
 
-/* Additional styling */
-/* .progress-bar-container {
-  background-color: #ddd; 
-  border-radius: 10px;
-} */
-/* .progress-bar {
-  background-color: #4CAF50;
-  height: 20px;
-  border-radius: 10px;
-  transition: width 0.5s;
-  position: relative;
-} */
+.profile-card {
+  background-color: #ffffff;            /* white background */
+  border-radius: 0.75rem;               /* rounded corners */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* soft shadow */
+  padding: 1.5rem;                      /* inner spacing */
+  margin: 2rem auto;                    /* vertical gap + center horizontally */
+  max-width: 500px;                     /* limit width on large screens */
+  border: 1px solid #e5e7eb;            /* light gray border for definition */
+  transition: transform 0.2s ease;      /* subtle hover effect */
+}
+
+.profile-card:hover {
+  transform: translateY(-4px);          /* lift up slightly on hover */
+}
+
 
 /* ——— Bubblified Progress Bar ——— */
 .progress-bar-container {
@@ -484,8 +501,15 @@ footer {
   opacity: 0.5;
 }
 .notification-item.unread {
-  /* you can add a subtle background or bold text here */
-  font-weight: 600;
+  font-weight: bold; /* Make text bold */
+  color: #000; /* Darker text color */
+  background-color: #e6e6e6; /* Slightly darker background */
+}
+.notification-item {
+  color: #666; /* Default text color */
+  background-color: #f9f9f9; /* Default background */
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
 }
 
 /* lighter */
@@ -687,7 +711,7 @@ footer {
   display: flex;
   flex-wrap: wrap;
   gap: 1rem;
-  justify-content: center;
+  justify-content: flex-start;
   margin-top: 1rem;
 }
 

@@ -24,6 +24,10 @@ from django.templatetags.static import static
 from .utils import award_badges
 from django.db.models import Avg, Min
 
+from django.http import HttpResponseRedirect
+from django.urls import reverse
+
+
 
 # Avatar imports
 from py_avataaars import (
@@ -249,6 +253,8 @@ def home(request):
             progress_data = []
 
         notifications = Notification.objects.filter(user=request.user).order_by('-date')
+        unread_count = notifications.filter(read=False).count()  # Count unread notifications
+
 
         return render(request, 'KidVenture/student_page.html', {
             'activities': activities,
@@ -261,18 +267,29 @@ def home(request):
             'badge_definitions': badge_definitions,
             'earned_names': earned_names,
             'show_freeplay': free_play,
+            'unread_count': unread_count,
         })
 
 
 @login_required
 def mark_all_read(request):
-    # only allow POST
     if request.method == "POST":
-        request.user.notifications.filter(read=False).update(read=True)
-        return JsonResponse({'success': True})
+        # Update all unread notifications for the logged-in user
+        Notification.objects.filter(user=request.user, read=False).update(read=True)
+        # Redirect back to the same page (or another page if needed)
+        return HttpResponseRedirect(reverse('home'))
     return JsonResponse({'success': False}, status=400)
 
-
+    
+@login_required
+def view_profile(request):
+    # get the Student row for this user
+    student = get_object_or_404(Student, user=request.user)
+    date_joined = request.user.date_joined
+    return render(request, 'KidVenture/profile.html', {
+        'student': student,
+        'date_joined': date_joined
+    })
 
 # Used to logout the users
 @login_required

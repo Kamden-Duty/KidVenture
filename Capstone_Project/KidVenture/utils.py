@@ -14,7 +14,7 @@ def award_badges(student):
     )
 
     new_badges = []
-    MIN_PLAYS = 5
+    MIN_PLAYS = 3
 
     if stats['plays'] and stats['plays'] >= MIN_PLAYS:
         # Speedster

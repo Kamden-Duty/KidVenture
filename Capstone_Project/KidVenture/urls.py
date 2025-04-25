@@ -14,6 +14,8 @@ urlpatterns = [
     path('student/', views.student_homepage, name='student_homepage'),
     path('student/home/', views.student_homepage, name='student_home'),
     path('notifications/mark-all-read/', views.mark_all_read, name='mark_all_read'),
+    path('profile/', views.view_profile, name='view_profile'),
+    
     path('teacher_page/', views.home, name='teacher'),
     path('alphabet_matching/', views.alphabet_matching, name='alphabet_matching'),
     path('alphabet_memory/', views.alphabet_memory, name='alphabet_memory'),

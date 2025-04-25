@@ -11,6 +11,7 @@ from django.core.files.base import ContentFile
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
+
 import os
 from django.conf import settings
 
@@ -106,7 +107,6 @@ class Student(models.Model):
 
     def __str__(self):
         return self.user.username
-
 
 # This model is for createing "activities" for our games. This difference from freeplay as in the teacher can assign the number of levels they want complete
 class Activity(models.Model):
