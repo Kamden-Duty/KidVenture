@@ -264,7 +264,13 @@ def home(request):
         })
 
 
-
+@login_required
+def mark_all_read(request):
+    # only allow POST
+    if request.method == "POST":
+        request.user.notifications.filter(read=False).update(read=True)
+        return JsonResponse({'success': True})
+    return JsonResponse({'success': False}, status=400)
 
 
 

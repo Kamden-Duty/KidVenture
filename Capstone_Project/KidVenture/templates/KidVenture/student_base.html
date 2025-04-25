@@ -91,9 +91,11 @@
           </div>
           <div class="notification-tab">
             <button id="notificationbtn" class="notification-button">
-              🔔 {% if notifications %}<span class="notification-count">{{ notifications|length }}</span>{% endif %}
+              🔔 {% if notifications %}
+                  <span id="notif-count" class="notification-count">{{ notifications|length }}</span>
+                 {% endif %}
             </button>
-            <div id="notificationDropdown" appendTo="body" class="notification-dropdown hidden">
+            <div id="notificationDropdown" class="notification-dropdown hidden">
               {% if notifications %}
                 <ul>
                   {% for notification in notifications %}
@@ -104,6 +106,10 @@
                     </li>
                   {% endfor %}
                 </ul>
+                <div class="notification-footer">
+                  <!-- <span>Notification</span> -->
+                  <button id="mark-all-read" class="btn-sm btn-link">Mark all as read</button>
+                </div>
               {% else %}
                 <p class="no-notifications">No new notifications</p>
               {% endif %}

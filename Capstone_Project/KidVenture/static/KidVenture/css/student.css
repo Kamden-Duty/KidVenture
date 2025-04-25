@@ -191,6 +191,12 @@ body {
 .notification-tab {
   cursor: pointer;
 }
+.notification-footer {
+  text-align: center;
+  margin-top: 0.5rem;
+  border-top: 1px solid #e0e0e0;
+  padding-top: 0.5rem;
+}
 /* BOTTOM PART */
 .header__bottomPart {
   position: relative;
@@ -473,6 +479,13 @@ footer {
   right: 1rem;
   font-size: 0.8rem;
   color: #666;
+}
+.notification-item.read {
+  opacity: 0.5;
+}
+.notification-item.unread {
+  /* you can add a subtle background or bold text here */
+  font-weight: 600;
 }
 
 /* lighter */
