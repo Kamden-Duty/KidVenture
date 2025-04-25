@@ -1,25 +1,144 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
     <title>{% block title %}KidVenture{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'KidVenture/css/student.css' %}" />
+    <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+  />
+    {% block extra_head %}{% endblock %}
+  </head>
+  <body>
+    <!-- LEFT NAV -->
+    <div class="left-nav">
+      <div class="account-button" id="accountBtn">
+        <img src="{{ user.avatar.url }}" style="width: 3.8rem;" alt="Profile" class="profile-image">
+      </div>
+      <div class="nav-item" title="Dashboard">
+        <a href="{% url 'home' %}">
+          <i class="fas fa-home" style="color: white"></i>
+        </a>
+      </div>
+      <div class="nav-item" title="Inbox" id="inboxIcon">
+        <i class="fas fa-inbox" style="color: white;"></i>
+      </div>
+      <div class="nav-item" onclick="location.href='{% url 'logout_view' %}'" title="Logout" id="logoutIcon">
+        <i class="fa fa-arrow-right-from-bracket"></i>
+      </div>
+    </div>
 
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'KidVenture/css/student.css' %}">
-</head>
+    <!-- INBOX PANEL -->
+    <div id="inboxPanel" class="inbox-panel">
+      <div class="inbox-header">
+        <h3>Inbox</h3>
+        <button onclick="closeInbox()">✕</button>
+      </div>
+      {% if message %}
+        <div class="teacher-message-box">
+          <strong>From: {{ message.teacher.username }}</strong><br>
+          <p>{{ message.message }}</p>
+          <small>Posted on {{ message.created_at|date:"M d, Y H:i" }}</small>
+        </div>
+      {% else %}
+        <p>No messages yet.</p>
+      {% endif %}
+    </div>
 
-<body>
+    <!-- ACCOUNT PANEL -->
+    <div class="account-panel" id="accountPanel">
+      <div class="account-header">
+        <div class="user-info">
+          <div class="user-initials">
+            <a href="{% url 'edit_avatar' %}" class="profile-link">
+              <img src="{{ user.avatar.url }}" style="width: 3.8rem;" alt="Profile" class="profile-image">
+            </a>
+          </div>
+          <div class="user-details">
+            <span class="name">{{ request.user.get_full_name|default:request.user.username }}</span>
+          </div>
+        </div>
+        <button class="close-btn" id="closeBtn">✕</button>
+      </div>
+      <div class="account-links">
+        <a href="{% url 'view_profile' %}">My Profile</a>
+        <a href="{% url 'logout_view' %}">Logout</a>
+      </div>
+    </div>
 
-    {% block content %}
+    <!-- TWO-PART HEADER -->
+    <div class="header__wrapper" role="navigation">
+      <!-- TOP PART -->
+      <div class="header__topPart">
+        <div class="logo">
+          <img src="{% static '/KidVenture/images/kidventure_logo.jpg' %}" alt="KidVenture Logo" />
+        </div>
+        <div>
+          <span class="name">Welcome to KidVenture, {{ request.user.get_full_name|default:request.user.username }}</span>
+        </div>
+        <div class="cf-zip-container">
+          <div class="finder">
+            <a href="{% url 'join_class' %}" style="color: white;">
+              <i class="fa fa-plus" style="--fa-primary-color: #199a51; --fa-secondary-color: #199a51;">Join Class</i>
+            </a>
+          </div>
+          <div class="notification-tab">
+            <button id="notificationbtn" class="notification-button">
+              🔔 {% if unread_count > 0 %}
+                  <span id="notif-count" class="notification-count">{{ unread_count }}</span>
+                 {% endif %}
+            </button>
+            <div id="notificationDropdown" class="notification-dropdown hidden">
+              {% if notifications %}
+                <ul>
+                  {% for notification in notifications %}
+                  <li class="notification-item {% if not notification.read %}unread{% endif %}">
+                    <p class="notification-title">{{ notification.title }}</p>
+                    <p class="notification-message">{{ notification.message }}</p>
+                    <small class="timestamp">{{ notification.date|date:"M j, H:i" }}</small>
+                  </li>
+                  {% endfor %}
+                </ul>
+                <div class="notification-footer">
+                  <form method="POST" action="{% url 'mark_all_read' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-sm btn-link">Mark all as read</button>
+                  </form>
+                </div>
+              {% else %}
+                <p class="no-notifications">No new notifications</p>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- BOTTOM PART -->
+      <div class="header__bottomPart">
+        <div class="ribbon-wrapper">
+          <div class="ribbon-bar">
+            <ul class="nav-tabs">
+              <li class="tab-link active" data-tab="progress-tab">Progress</li>
+              <li class="tab-link" data-tab="activities-tab">Activities</li>
+              <li class="tab-link" data-tab="leaderboard-tab">Leaderboard</li>
+              <li class="tab-link" data-tab="achievements-tab">Achievements</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
 
+    <!-- MAIN CONTENT -->
+    <main>
+      {% block content %}{% endblock %}
+    </main>
 
+    <footer>KidVenture - Making Learning Fun!</footer>
 
-
-    {% endblock %}
-    
-</body>
+    <script src="{% static 'KidVenture/js/student_tab.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+  </body>
 </html>

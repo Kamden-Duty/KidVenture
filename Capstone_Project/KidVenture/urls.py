@@ -11,9 +11,10 @@ urlpatterns = [
     path('home', views.home, name='home'),
     path('logout/', views.logout_view, name='logout_view'),
     path('create_class/', views.create_class, name='create_class'),
-    # path('student/', views.student_homepage, name='student_homepage'),
-    # path('student/home/', views.student_homepage, name='student_home'),
-    path('calendar/', views.calendar_view, name='calendar'),
+    path('student/', views.student_homepage, name='student_homepage'),
+    path('student/home/', views.student_homepage, name='student_home'),
+    path('notifications/mark-all-read/', views.mark_all_read, name='mark_all_read'),
+    path('profile/', views.view_profile, name='view_profile'),
 
     path('teacher_page/', views.home, name='teacher'),
     path('alphabet_matching/', views.alphabet_matching, name='alphabet_matching'),
