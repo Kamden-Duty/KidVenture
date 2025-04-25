@@ -35,6 +35,14 @@ document.addEventListener("DOMContentLoaded", () => {
   const viewProgressButtons = document.querySelectorAll(".view-progress-btn");
   const progressCards = document.getElementById("progress-cards");
   const freeplayCards = document.getElementById("freeplay-cards");
+
+  const homeTab = document.querySelector("[data-tab='home-tab']");
+  const homeContent = document.getElementById("home-tab");
+  if (homeTab && homeContent) {
+    homeTab.classList.add("active");
+    homeContent.classList.remove("hidden");
+  }
+
   tabs.forEach((tab) => {
     tab.addEventListener("click", () => {
       tabs.forEach((t) => t.classList.remove("active"));

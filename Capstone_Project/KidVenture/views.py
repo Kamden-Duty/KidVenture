@@ -323,37 +323,34 @@ def is_student(user):
 
 @login_required
 def student_homepage(request):
-    # 1) get all classes this student is in
-    all_classes = Student.objects.filter(user=request.user) \
-                                 .select_related('classroom') \
-                                 .values_list('classroom', flat=True)
-    all_classes = Class.objects.filter(pk__in=all_classes)
+    # 1) Get all classes this student is in (many-to-many relationship)
+    student = get_object_or_404(Student, user=request.user)
+    all_classes = student.classrooms.all()
 
-    # 2) pick the class via GET 
+    # 2) Pick the class via GET
     selected_id = request.GET.get('class_id')
     if selected_id:
-        classroom = get_object_or_404(Class, pk=selected_id, students__user=request.user)
+        classroom = get_object_or_404(Class, pk=selected_id, students=student)
     else:
         classroom = all_classes.first()
 
-    # 3) fetch activities for that classroom
-    student = get_object_or_404(Student, user=request.user, classroom=classroom)
-    activities_qs = Activity.objects.filter(student=student, completed=False)
+    # 3) Fetch activities for that classroom
+    activities_qs = Activity.objects.filter(student=student, classroom=classroom, completed=False)
 
-    # 4) build progress_data
+    # 4) Build progress_data
     progress_data = []
     total_completed_levels = 0
-    total_freeplay_games   = 0
+    total_freeplay_games = 0
 
     for a in activities_qs:
-        # your existing completed_levels logic…
+        # Calculate completed levels and progress percentage
         if a.max_levels:
-            completed = round((a.progress/100)*a.max_levels, 0)
-            pct       = round((completed/a.max_levels)*100, 0)
+            completed = round((a.progress / 100) * a.max_levels, 0)
+            pct = round((completed / a.max_levels) * 100, 0)
         else:
             completed = pct = 0
 
-        # count free‑play sessions for this activity’s game
+        # Count free-play sessions for this activity’s game
         fp_count = GameProgress.objects.filter(
             user=request.user, game=a.game, is_free_play=True
         ).count()
@@ -361,61 +358,54 @@ def student_homepage(request):
 
         total_completed_levels += completed
 
-        # level_details as you already build…
+        # Build level details
         level_details = [
-          {
-            'level': lvl.level,
-            'time': round(lvl.time_taken, 2),
-            'mistakes': lvl.mistakes,
-            'mismatches': lvl.mismatched_letters,
-          }
-          for lvl in GameProgress.objects.filter(
-            user=request.user,
-            activity=a,
-            is_free_play=False,
-            game=a.game
-          ).order_by('level')
+            {
+                'level': lvl.level,
+                'time': round(lvl.time_taken, 2),
+                'mistakes': lvl.mistakes,
+                'mismatches': lvl.mismatched_letters,
+            }
+            for lvl in GameProgress.objects.filter(
+                user=request.user,
+                activity=a,
+                is_free_play=False,
+                game=a.game
+            ).order_by('level')
         ]
 
         progress_data.append({
-          'activity_name':     a.name,
-          'progress_percent':  pct,
-          'completed_levels':  completed,
-          'max_levels':        a.max_levels,
-          'levels':            level_details,
+            'activity_name': a.name,
+            'progress_percent': pct,
+            'completed_levels': completed,
+            'max_levels': a.max_levels,
+            'levels': level_details,
         })
 
-    # 5) summary cards
+    # 5) Summary cards
     total_activities = activities_qs.count()
-    total_levels     = total_completed_levels
-    total_games      = total_freeplay_games
+    total_levels = total_completed_levels
+    total_games = total_freeplay_games
 
-    # 6) overall for the donut
+    # 6) Overall progress for the donut chart
     overall = round(
-      sum(item['progress_percent'] for item in progress_data) / total_activities
-      if total_activities else 0,
-      1
+        sum(item['progress_percent'] for item in progress_data) / total_activities
+        if total_activities else 0,
+        1
     )
 
     return render(request, 'KidVenture/student_page.html', {
-      'all_classes':      all_classes,
-      'selected_class':   classroom,
-      'total_activities': total_activities,
-      'total_levels':     total_levels,
-      'total_games':      total_games,
-      'progress_data':    progress_data,
-      'overall':          overall,
+        'all_classes': all_classes,
+        'selected_class': classroom,
+        'total_activities': total_activities,
+        'total_levels': total_levels,
+        'total_games': total_games,
+        'progress_data': progress_data,
+        'overall': overall,
     })
 
 
-@login_required
-def calendar_view(request):
-    if not request.user.is_student:
-        return HttpResponseForbidden("You are not authorized to access this page.")
-    
-    
-    return render(request, 'KidVenture/calendar_page.html', {})
-    
+
 
 
 @login_required

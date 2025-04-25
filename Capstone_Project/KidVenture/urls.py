@@ -13,7 +13,6 @@ urlpatterns = [
     path('create_class/', views.create_class, name='create_class'),
     path('student/', views.student_homepage, name='student_homepage'),
     path('student/home/', views.student_homepage, name='student_home'),
-    path('calendar/', views.calendar_view, name='calendar'),
 
     path('teacher_page/', views.home, name='teacher'),
     path('alphabet_matching/', views.alphabet_matching, name='alphabet_matching'),
