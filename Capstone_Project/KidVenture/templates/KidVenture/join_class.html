@@ -1,20 +1,30 @@
-{% extends 'KidVenture/student_base.html' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Join a Class</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'KidVenture/css/join.css' %}">
+</head>
+<body>
 
-{% block title %}Join a Class{% endblock%}
+    <main>
+        <div class="form-container">
+            <div class="content-box">
+                <h2>Join a Class</h2>
+                <form method="post" action="{% url 'join_class' %}">
+                    {% csrf_token %}
+                    <label for="access_token">Class Access Token:</label>
+                    <input type="text" id="access_token" name="access_token" required>
+                    <button type="submit" class="submit-btn">Join Class</button>
+                </form>
 
-{% block pageName %}
-    <span style="font-size: 30px; cursor: pointer; color: white;" class="nav">&#9776; Join Class</span>
-    <span style="font-size: 30px; cursor: pointer; color: white;" class="nav2">&#9776; Join Class</span>
-{% endblock %}
+                <!-- Back to Home Button -->
+                <button onclick="window.location.href='{% url 'home' %}'" class="back-btn">Home</button>
+            </div>
+        </div>
+    </main>
 
-{% block content %}
-<div class="content-box">
-    <h2>Join a Class</h2>
-    <form method="post" action="{% url 'join_class' %}">
-        {% csrf_token %}
-        <label for="access_token">Class Access Token:</label>
-        <input type="text" id="access_token" name="access_token" required style="width: 100%; margin-bottom: 10px;">
-        <button type="submit" class="submit-btn" style="width: 100%;">Join Class</button>
-    </form>
-</div>
-{% endblock %}
+</body>
+</html>
