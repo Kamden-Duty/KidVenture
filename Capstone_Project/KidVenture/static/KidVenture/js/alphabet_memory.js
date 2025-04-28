@@ -234,8 +234,8 @@ function advanceToNextLevel() {
       .then(data => {
         if (data?.status === 'success') {
           Swal.fire({
-            title: 'Activity Complete!',
-            text: 'Great job!',
+            title: "Congratulations!",
+            text: "You have successfully completed the activity!",
             icon: 'success',
             confirmButtonText: 'OK',
             allowOutsideClick: false
