@@ -142,7 +142,8 @@
                 {% for activity in activities %}
                 <tr>
                     <td>{{ activity.name }}</td>
-                    <td>{{ activity.student__classroom__name }}</td>
+                    <td>{{ activity.classroom__name }}</td>
+
                     <td>{{ activity.url_name }}</td>
                     <td>{{ activity.class_progress|floatformat:0 }}%</td>
                     <td>{{ activity.max_levels }}</td>
