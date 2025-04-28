@@ -143,27 +143,27 @@
   </section>
 
   <!-- ACHIEVEMENTS SECTION -->
-  <section id="achievements-tab" class="tab-content hidden">
-    <div class="card">
-      <h2>My Achievements</h2>
-      <p class="badge-summary">
-        You’ve earned {{ badges|length }} of {{ badge_definitions|length }} badges
-      </p>
+<section id="achievements-tab" class="tab-content hidden">
+  <div class="card">
+    <h2>My Achievements</h2>
+    <p class="badge-summary">
+      You’ve earned {{ badges|length }} of {{ badge_definitions|length }} badges
+    </p>
 
-      <div class="badge-container">
-        {% for bd in badge_definitions %}
-          <div class="badge-card {% if bd.name in earned_names %}earned{% else %}locked{% endif %}">
-            <img src="{{ bd.image_url }}" alt="{{ bd.name }}" />
-            <p class="badge-name">{{ bd.name }}</p>
-            {% if bd.name not in earned_names %}
-              <i class="fas fa-lock badge-lock"></i>
-            {% endif %}
-          </div>
-        {% endfor %}
-      </div>
+    <div class="badge-container">
+      {% for bd in badge_definitions %}
+        <div class="badge-card {% if bd.name in earned_names %}earned{% else %}locked{% endif %}">
+          <img src="{% static bd.image_url %}" alt="{{ bd.name }}" />
+          <p class="badge-name">{{ bd.name }}</p>
+          {% if bd.name not in earned_names %}
+            <i class="fas fa-lock badge-lock"></i>
+          {% endif %}
+        </div>
+      {% endfor %}
     </div>
-  </section>
-</div>
+  </div>
+</section>
+
 
 <div class="secondary-section">
   <div class="progress-cards hidden"  id="progress-cards">

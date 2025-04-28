@@ -152,9 +152,9 @@ def home(request):
         teacher = None
 
         badge_definitions = [
-            {"name": "Speedster", "image_url": static("Kidventure/images/badges/speedster.png")},
-            {"name": "Accuracy Master", "image_url": static("Kidventure/images/badges/accuracy_master.png")},
-            {"name": "Mismatch Minor", "image_url": static("Kidventure/images/badges/mismatch_minor.png")},
+            {"name": "Speedster", "image_url": "KidVenture/images/badges/speedster.png"},
+            {"name": "Accuracy Master", "image_url": "KidVenture/images/badges/accuracy_master.png"},
+            {"name": "Mismatch Minor", "image_url": "KidVenture/images/badges/mismatch_minor.png"},
         ]
         try:
             # Get student
