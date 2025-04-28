@@ -823,7 +823,8 @@ def assign_activity(request):
                 student=student,
                 url_name=url_name,
                 max_levels=max_levels,
-                game=game
+                game=game,
+                classroom=classroom,
             )
         
         # Redirect back to the classes page
