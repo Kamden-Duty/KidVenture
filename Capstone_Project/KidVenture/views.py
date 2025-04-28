@@ -310,10 +310,9 @@ def mark_all_read(request):
 @login_required
 def view_profile(request):
     # get the Student row for this user
-    student = get_object_or_404(Student, user=request.user)
+    # user = get_object_or_404(User, user=request.user)
     date_joined = request.user.date_joined
     return render(request, 'KidVenture/profile.html', {
-        'student': student,
         'date_joined': date_joined
     })
 
