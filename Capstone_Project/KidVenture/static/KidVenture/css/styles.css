@@ -99,10 +99,11 @@ input:focus {
 
 .options {
     display: flex;
+    justify-content: center;
     align-items: center;
     margin-top: 15px;
     font-size: 12px;
-    color:white;
+    color: white;
 }
 
 .options input {
@@ -113,8 +114,8 @@ input:focus {
 .options a {
     text-decoration: none;
     color: white;
-    margin-left: auto;
 }
+
 
 
 
@@ -162,4 +163,19 @@ select {
 select:focus {
     border-color: #007bff;
     outline: none;
+}
+
+
+
+
+/* Reset stuff */
+.glass-container3 {
+    width: 300px;
+    height: 300px;
+    position: relative;
+    z-index: 1;
+    background: rgba(1, 9, 2, 0.3);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    border: 1px solid #fff;
 }

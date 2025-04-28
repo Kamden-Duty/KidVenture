@@ -22,6 +22,9 @@ from django.db.models.functions import Length
 from django.views.decorators.http import require_POST
 from .utils import generate_random_username, award_badges
 from django.templatetags.static import static
+from django.contrib.auth.views import PasswordResetView
+from django.contrib.auth.forms import PasswordResetForm
+from .forms import TempPasswordResetForm
 
 from django.http import HttpResponseRedirect
 from django.urls import reverse
@@ -1123,3 +1126,22 @@ def get_class_activities(request, class_id):
     ).values_list('name', flat=True).distinct()
 
     return JsonResponse({"activities": list(activities)})
+
+
+
+
+
+
+
+
+
+def password_reset_view(request):
+    if request.method == "POST":
+        form = TempPasswordResetForm(request.POST)
+        if form.is_valid():
+            form.save(request=request)  
+            return redirect('password_reset_done')  
+    else:
+        form = TempPasswordResetForm()  
+
+    return render(request, 'KidVenture/password_reset_form.html', {'form': form})

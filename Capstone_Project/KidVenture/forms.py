@@ -1,7 +1,7 @@
 from django import forms #django model for managing forms
 from django.contrib.auth.forms import UserCreationForm # Helps simply making sign up forms
 from .models import User, Class, Student # The User model creatd in models.py
-
+from django.contrib.auth.forms import PasswordResetForm
 
 
 # Form for logging in
@@ -160,3 +160,26 @@ class JoinClassForm(forms.Form):
         if not Class.objects.filter(access_token=token).exists():
             raise forms.ValidationError("Invalid access token.")
         return token
+
+
+
+
+
+
+class TempPasswordResetForm(PasswordResetForm):
+    email = forms.EmailField(
+        widget=forms.EmailInput(
+            attrs={
+                "class": "form-control",
+                "placeholder": "Enter your email",
+                "id": "email",
+            }
+        ),
+        label="Email Address",
+    )
+
+
+
+
+
+

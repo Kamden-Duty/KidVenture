@@ -3,6 +3,9 @@ from . import views
 from django.conf import settings
 from django.conf.urls.static import static
 from .views import get_last_session
+from django.contrib.auth import views as auth_views 
+from .views import password_reset_view  
+
 
 urlpatterns = [
     path('', views.home, name='home'),
@@ -41,7 +44,11 @@ urlpatterns = [
     path('complete_class_activitsy/<int:activity_id>/', views.complete_class_activity, name='complete_class_activity'),
     path('progress-overview/', views.progress_overview, name='progress_overview'),
     path('get_class_total_progress/<int:class_id>/', views.get_class_total_progress, name='get_class_total_progress'),
-     path("get_class_activities/<int:class_id>/", views.get_class_activities, name="get_class_activities"),
+    path("get_class_activities/<int:class_id>/", views.get_class_activities, name="get_class_activities"),
+    path('reset_password/', views.password_reset_view, name='password_reset'),
+    path('reset_password_done/', auth_views.PasswordResetDoneView.as_view(), name='password_reset_done'),
+    path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
+    path('reset_password_complete/', auth_views.PasswordResetCompleteView.as_view(), name='password_reset_complete'),
 ]
 
 if settings.DEBUG:

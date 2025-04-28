@@ -5,26 +5,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Join a Class</title>
     {% load static %}
-    <link rel="stylesheet" href="{% static 'KidVenture/css/join.css' %}">
+    <link rel="stylesheet" href="{% static 'KidVenture/css/styles.css' %}">
 </head>
 <body>
 
-    <main>
-        <div class="form-container">
-            <div class="content-box">
-                <h2>Join a Class</h2>
-                <form method="post" action="{% url 'join_class' %}">
-                    {% csrf_token %}
-                    <label for="access_token">Class Access Token:</label>
-                    <input type="text" id="access_token" name="access_token" required>
-                    <button type="submit" class="submit-btn">Join Class</button>
-                </form>
+    <div class="glass-container3">
+        <div class="login-box">
+            <h2>Join a Class</h2>
+            <form method="post">
+                {% csrf_token %}
+      
+                <!-- <label for="access_token">Class Access Token:</label> -->
+                <input type="text" id="access_token" name="access_token" required class="form-control" placeholder="Enter Access Token">
+                
+           
+                {% if form.token.errors %}
+                    <div class="error-message">
+                        {% for error in form.token.errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                
+                <button type="submit">Join Class</button>
+            </form>
 
-                <!-- Back to Home Button -->
-                <button onclick="window.location.href='{% url 'home' %}'" class="back-btn">Home</button>
-            </div>
+        
+            <p><a href="{% url 'home' %}" id="register">Back to Home</a></p>
         </div>
-    </main>
+    </div>
 
 </body>
 </html>
