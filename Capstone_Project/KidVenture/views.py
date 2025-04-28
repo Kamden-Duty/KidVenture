@@ -822,6 +822,7 @@ def assign_activity(request):
                 description=description,
                 progress=0,
                 student=student,
+                classroom=classroom,
                 url_name=url_name,
                 max_levels=max_levels,
                 game=game
@@ -1124,6 +1125,7 @@ def progress_overview(request):
                 progress_data.append({
                     "student_name": student.user.username,
                     "class_name": classroom.name,
+                    "class_id": classroom.id,
                     "activity_name": activity.name,
                     "percent_complete": percent_complete
                 })
@@ -1156,9 +1158,12 @@ def get_class_total_progress(request, class_id):
 # Used to get the assigned activity of a class ( this has a issue if two activites are created with the same name but different levels only one will show though both will be created need to fix )
 @login_required
 def get_class_activities(request, class_id):
-    # Gets the classroom 
+    # Get the classroom
     classroom = get_object_or_404(Class, id=class_id, teacher=request.user)
-    # Gest teh activities of the classroom 
-    activities = Activity.objects.filter(student__classroom=classroom).values_list('name', flat=True).distinct()
-    # Returns the activites of the classroom
+    
+    # Get all activity
+    activities = Activity.objects.filter(
+        classroom=classroom
+    ).values_list('name', flat=True).distinct()
+
     return JsonResponse({"activities": list(activities)})

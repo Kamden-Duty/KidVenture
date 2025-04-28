@@ -1,21 +1,19 @@
 function filterByClass() {
     let selectedClass = document.getElementById("class-filter").value;
     let rows = document.querySelectorAll(".student-row");
-    let visibleRows = [];
 
     rows.forEach(row => {
-        let studentClass = row.getAttribute("data-class");
-        if (selectedClass === "all" || studentClass === selectedClass) {
-            row.style.display = "";
-            visibleRows.push(row);
-        } else {
-            row.style.display = "none";
-        }
+        let rowClassId = row.getAttribute("data-class-id");
+
+        let matches = selectedClass === "all" || rowClassId === selectedClass;
+
+        row.style.display = matches ? "" : "none";
     });
 
-    filterByActivity(); // Ensure activity filtering is applied immediately
+    filterByActivity();
     applyAlternatingRowColors();
 }
+
 
 function filterByActivity() {
     let selectedActivity = document.getElementById("activity-filter").value.toLowerCase();

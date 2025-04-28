@@ -46,7 +46,7 @@
             </thead>
             <tbody>
                 {% for progress in progress_data %}
-                <tr class="student-row" data-class="{{ progress.class_name }}" data-activity="{{ progress.activity_name }}">
+                <tr class="student-row" data-class="{{ progress.class_id }}" data-activity="{{ progress.activity_name }}">
                     <td>{{ progress.student_name }}</td>
                     <td>{{ progress.class_name }}</td>
                     <td>{{ progress.activity_name }}</td>

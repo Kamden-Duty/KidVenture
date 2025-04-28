@@ -123,23 +123,22 @@
       </thead>
       <tbody>
         {% for user in leaderboard %}
-          <tr>
-            <td>{{ forloop.counter }}</td>
-            <td>
-              <img src="{{ user.user__avatar.url }}" alt="Avatar" width="50" height="50" />
-            </td>
-            <td>{{ user.user__username }}</td>
-            <td>{{ user.max_level }}</td>
-            <td>{{ user.total_mistakes }}</td>
-            <td>{{ user.avg_time }}</td>
-            <td>{{ user.total_mismatches }}</td>
-          </tr>
+        <tr class="{% if user.is_active_user %}highlight{% endif %}">
+          <td>{{ forloop.counter }}</td>
+          <td>
+            <img src="/media/{{ user.avatar_url }}" alt="Avatar" width="50" height="50" />
+          </td>
+          <td>{{ user.display_name }}</td>
+          <td>{{ user.max_level }}</td>
+          <td>{{ user.total_mistakes }}</td>
+          <td>{{ user.avg_time|floatformat:2 }}</td>
+        </tr>
         {% empty %}
-          <tr>
-            <td colspan="7">No leaderboard data available yet.</td>
-          </tr>
+        <tr>
+          <td colspan="8">No leaderboard data available yet.</td>
+        </tr>
         {% endfor %}
-      </tbody>
+      </tbody> 
     </table>
   </section>
 
