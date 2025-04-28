@@ -1,55 +1,56 @@
-function filterByClass() {
-    let selectedClass = document.getElementById("class-filter").value;
-    let rows = document.querySelectorAll(".student-row");
-    let visibleRows = [];
+// function filterByClass() {
+//     let selectedClass = document.getElementById("class-filter").value;
+//     let rows = document.querySelectorAll(".student-row");
 
-    rows.forEach(row => {
-        let studentClass = row.getAttribute("data-class");
-        if (selectedClass === "all" || studentClass === selectedClass) {
-            row.style.display = "";
-            visibleRows.push(row);
-        } else {
-            row.style.display = "none";
-        }
-    });
+//     rows.forEach(row => {
+//         let rowClassId = row.getAttribute("data-class"); 
 
-    filterByActivity(); // Ensure activity filtering is applied immediately
-    applyAlternatingRowColors();
-}
+//         let matches = selectedClass === "all" || rowClassId === selectedClass;
 
-function filterByActivity() {
-    let selectedActivity = document.getElementById("activity-filter").value.toLowerCase();
-    let rows = document.querySelectorAll(".student-row");
-    let visibleRows = [];
+//         row.style.display = matches ? "" : "none";
+//     });
 
-    rows.forEach(row => {
-        let rowActivity = row.getAttribute("data-activity")?.toLowerCase() || "";
-        if (selectedActivity === "all" || rowActivity === selectedActivity) {
-            row.style.display = "";
-            visibleRows.push(row);
-        } else {
-            row.style.display = "none";
-        }
-    });
+//     filterByActivity();
+//     applyAlternatingRowColors();
+// }
 
-    applyAlternatingRowColors();
-}
+
+
+// function filterByActivity() {
+//     let selectedActivity = document.getElementById("activity-filter").value.toLowerCase();
+//     let rows = document.querySelectorAll(".student-row");
+//     let visibleRows = [];
+
+//     rows.forEach(row => {
+//         let rowActivity = row.getAttribute("data-activity")?.toLowerCase() || "";
+//         if (selectedActivity === "all" || rowActivity === selectedActivity) {
+//             row.style.display = "";
+//             visibleRows.push(row);
+//         } else {
+//             row.style.display = "none";
+//         }
+//     });
+
+//     applyAlternatingRowColors();
+// }
 
 function filterTable() {
-    let selectedClass = document.getElementById("class-filter").value;
-    let selectedActivity = document.getElementById("activity-filter").value.toLowerCase();
-    let searchText = document.getElementById("search-bar").value.toLowerCase();
-    let rows = document.querySelectorAll(".student-row");
-    let visibleRows = [];
+    const selectedClass = document.getElementById("class-filter").value;
+    const activityFilterElement = document.getElementById("activity-filter");
+    const selectedActivity = activityFilterElement.disabled ? "all" : activityFilterElement.value.toLowerCase();
+    const searchText = document.getElementById("search-bar").value.toLowerCase();
+    const rows = document.querySelectorAll(".student-row");
+
+    const visibleRows = [];
 
     rows.forEach(row => {
-        let rowClass = row.getAttribute("data-class");
-        let rowActivity = row.getAttribute("data-activity")?.toLowerCase() || "";
-        let studentName = row.querySelector("td").textContent.toLowerCase();
+        const rowClass = row.getAttribute("data-class");
+        const rowActivity = row.getAttribute("data-activity")?.toLowerCase() || "";
+        const studentName = row.querySelector("td").textContent.toLowerCase();
 
-        let classMatch = selectedClass === "all" || rowClass === selectedClass;
-        let activityMatch = selectedActivity === "all" || rowActivity === selectedActivity;
-        let nameMatch = studentName.includes(searchText);
+        const classMatch = selectedClass === "all" || rowClass === selectedClass;
+        const activityMatch = selectedActivity === "all" || rowActivity === selectedActivity;
+        const nameMatch = studentName.includes(searchText);
 
         if (classMatch && activityMatch && nameMatch) {
             row.style.display = "";
@@ -61,6 +62,7 @@ function filterTable() {
 
     applyAlternatingRowColors();
 }
+
 
 // Function to apply the correct alternating row colors
 function applyAlternatingRowColors() {
@@ -114,13 +116,13 @@ document.addEventListener("DOMContentLoaded", function () {
         const classId = this.value;
         activityFilter.innerHTML = '<option value="all">All Activities</option>';
         activityFilter.disabled = true;
-
+    
         if (classId !== "all") {
             fetch(`/get_class_activities/${classId}/`)
                 .then(response => response.json())
                 .then(data => {
                     data.activities.forEach(activity => {
-                        let option = document.createElement("option");
+                        const option = document.createElement("option");
                         option.value = activity;
                         option.textContent = activity;
                         activityFilter.appendChild(option);
@@ -129,10 +131,11 @@ document.addEventListener("DOMContentLoaded", function () {
                 })
                 .catch(error => console.error("Error fetching activities:", error));
         }
-
-        filterByClass(); // Ensure students are shown immediately when selecting a class
+    
+        filterTable(); // Always run this regardless of fetch
     });
-
-    activityFilter.addEventListener("change", filterByActivity);
+    
+    activityFilter.addEventListener("change", filterTable);
     searchBar.addEventListener("keyup", filterTable);
+    
 });

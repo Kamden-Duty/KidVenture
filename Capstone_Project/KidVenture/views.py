@@ -39,17 +39,7 @@ import os
 
 
 from django.conf import settings
-# from py_avataaars import PyAvataaar, AvatarStyle, SkinColor, HairColor, FacialHairType, \
-#     TopType, Color, MouthType, EyesType, EyebrowType, NoseType, AccessoriesType, \
-#     ClotheType, ClotheGraphicType
 
-
-# import json
-# from django.http import HttpResponse
-# from django.views.decorators.csrf import csrf_exempt
-# from py_avataaars import PyAvataaar, AvatarStyle, SkinColor, HairColor, FacialHairType, \
-#     TopType, Color, MouthType, EyesType, EyebrowType, NoseType, AccessoriesType, \
-#     ClotheType, ClotheGraphicType
 # =============================================================================================
 
 
@@ -428,13 +418,13 @@ def classes(request):
 
     # gets and group all of hte non completed activities by classes
     activities = (
-        Activity.objects.filter(student__classrooms__teacher=request.user, completed=False)
-        .values("name", "student__classrooms__name", "url_name", "max_levels")  
+        Activity.objects.filter(classroom__teacher=request.user, completed=False)
+        .values("name", "classroom__name", "url_name", "max_levels", "classroom__id")  
         .annotate(
             class_progress=Avg("progress"),  
             activity_id=Min("id")  
         )
-        .order_by("student__classrooms__name")
+        .order_by("classroom__name")
     )
 
 
@@ -442,12 +432,12 @@ def classes(request):
     activities_with_progress = []
     # Loops through the activities getting progress to get the average progress for the class for a activity
     for activity in activities:
-        class_name = activity["student__classrooms__name"]
+        class_id = activity["classroom__id"]
 
        # Calcluate the average progress for the class for an activity
         avg_progress = (
             Activity.objects.filter(
-                student__classrooms__name=class_name, name=activity["name"]
+                classroom__id = class_id, name=activity["name"]
             )
             .aggregate(avg_progress=Avg("progress"))["avg_progress"]
         )
@@ -484,55 +474,6 @@ def delete_class(request, class_id):
     return redirect('classes')
 
 
-# This view allows students to join class using the class token the teacher has to give them
-# @login_required
-# def join_class(request):
-#     # If user not student don't let them join a class
-#     if not request.user.is_student:
-#         return HttpResponseForbidden("Only students can join classes.")
-
-#     # If request method is post: 
-#     if request.method == 'POST':
-
-#         # Get toke from form
-#         access_token = request.POST.get('access_token')
-        
-#         try:
-#             # Find class that has the given token
-#             classroom = Class.objects.get(access_token=access_token)
-            
-#         # If not class has a token, say invalid token  
-#         except Class.DoesNotExist:
-#             messages.error(request, "Invalid access token. Please try again.")
-#             return redirect('join_class')
-    
-        
-#         try:
-#             # Get student(user)
-#             student = Student.objects.get(user=request.user)
-
-#             # If the student is already in the class tell them
-#             if student.classroom == classroom:
-#                 messages.error(request, f"You are already enrolled in {classroom.name}.")
-
-#             # If the student is in another clas tell them
-#             else:
-#                 messages.error(request, "You are already enrolled in another class. Leave your current class before joining a new one.")
-#             # Redirect back to home or /
-#             return redirect('/')
-
-#         # If the student is not in the class allow them to join
-#         except Student.DoesNotExist:
-#             # Student is not enrolled in any class, so add them to this one
-#             Student.objects.create(user=request.user, classroom=classroom)
-#             # Notify them
-#             Notification.objects.create(user=request.user, title="Enrolled", message=f"You have successfully joined {classroom.name}")
-#             # Give the a message
-#             messages.success(request, f"You have successfully joined {classroom.name}.")
-#             # Redirect them back to classes
-#             return redirect('classes')
-#     # Renders the join_class html
-#     return render(request, 'KidVenture/join_class.html') 
 
 @login_required
 def join_class(request):
@@ -616,15 +557,22 @@ def delete_student(request, student_id, class_id):
 
     # Make sure class belongs to current user
     classroom = get_object_or_404(Class, id=class_id, teacher=request.user)
-
+    student = get_object_or_404(Student, id=student_id)
 
     # Find and makre sure student are part of class
-    student = get_object_or_404(Student, id=student_id, classroom=classroom)
+    student = get_object_or_404(Student, id=student_id)
+
+
+    # Mke sure the student is in the classroom.      this should always pass, but is just in case something did break
+    if classroom not in student.classrooms.all():
+        return HttpResponseForbidden("This student is not in the specified class")
+
 
 
     # If request post, delete student
     if request.method == "POST":
-        student.delete()
+        student.classrooms.remove(classroom)
+        Activity.objects.filter(student=student, classroom=classroom).delete()
         return redirect("teacher_students")
 
 
@@ -769,15 +717,15 @@ def get_teacher_leaderboard(request):
     game = request.GET.get('game', 'matching')
 
     # Get all students (with user info) in this teacher's classes
-    students = Student.objects.filter(classroom__teacher=teacher).select_related('user')
+    student_users = User.objects.filter(student__classrooms__teacher=request.user).distinct()
 
     leaderboard = []
 
-    for student in students:
+    for user in student_users:
         # Get their game progress for the selected game
         progress = (
             GameProgress.objects
-            .filter(user=student.user, game=game)
+            .filter(user=user, game=game)
             .aggregate(
                 max_level=Max('level'),
                 total_mistakes=Sum('mistakes'),
@@ -786,8 +734,8 @@ def get_teacher_leaderboard(request):
         )
 
         leaderboard.append({
-            'user__username': student.user.username,
-            'user__avatar': student.user.avatar.name if student.user.avatar else 'default.png',
+            'user__username': user.username,
+            'user__avatar': user.avatar.name if user.avatar else 'default.png',
             'max_level': progress['max_level'] or 0,
             'total_mistakes': progress['total_mistakes'] or 0,
             'avg_time': round(progress['avg_time'], 2) if progress['avg_time'] else 0.0
@@ -822,6 +770,7 @@ def assign_activity(request):
                 description=description,
                 progress=0,
                 student=student,
+                classroom=classroom,
                 url_name=url_name,
                 max_levels=max_levels,
                 game=game
@@ -1070,19 +1019,23 @@ def delete_activity(request, activity_id):
 # THis is used to completed activities for the teacher so if they want to end the activity without deleting it
 @login_required
 def complete_class_activity(request, activity_id):
-    """Marks all activities for a class as complete."""
-
+ 
     # Get the activity to find the associated class
     activity = get_object_or_404(Activity, id=activity_id)
+    classroom = activity.classroom
 
     # Ensure only the teacher who assigned the activity can complete it
-    if request.user != activity.student.classroom.teacher:
+    if request.user != classroom.teacher:
         return HttpResponseForbidden("You are not authorized to complete this activity.")
 
     # Complete all activities for this class and name
-    Activity.objects.filter(student__classroom=activity.student.classroom, name=activity.name).update(completed=True)
+    Activity.objects.filter(
+        classroom=classroom,
+        name=activity.name
+    ).update(completed=True, progress=100)
 
-    messages.success(request, f"All '{activity.name}' activities for {activity.student.classroom.name} have been marked as completed.")
+    messages.success(request, f"All '{activity.name}' activities for {classroom.name} have been marked as completed.")
+    
     
     return redirect('classes')  # Redirect back to the classes page
 
@@ -1109,8 +1062,12 @@ def progress_overview(request):
     for classroom in classes:
         # for the student in the classroom
         for student in classroom.students.all():
+
+            class_activities = student.activities.filter(classroom=classroom)
+
+
             # For activity in all of the students activities
-            for activity in student.activities.all():
+            for activity in class_activities:
                 # Calculate percent complete
                 # Calcualt the number of copmleted levels
                 completed_levels = round((activity.progress / 100) * activity.max_levels, 2)
@@ -1124,6 +1081,7 @@ def progress_overview(request):
                 progress_data.append({
                     "student_name": student.user.username,
                     "class_name": classroom.name,
+                    "class_id": classroom.id,
                     "activity_name": activity.name,
                     "percent_complete": percent_complete
                 })
@@ -1141,7 +1099,7 @@ def progress_overview(request):
 @login_required
 def get_class_total_progress(request, class_id):
     # Gets the activity
-    activities = Activity.objects.filter(student__classroom_id=class_id)
+    activities = Activity.objects.filter(student__classrooms__id=class_id)
 
     if not activities.exists():
         return JsonResponse({'total_progress': 0})  # No activities, progress is 0%
@@ -1156,9 +1114,12 @@ def get_class_total_progress(request, class_id):
 # Used to get the assigned activity of a class ( this has a issue if two activites are created with the same name but different levels only one will show though both will be created need to fix )
 @login_required
 def get_class_activities(request, class_id):
-    # Gets the classroom 
+    # Get the classroom
     classroom = get_object_or_404(Class, id=class_id, teacher=request.user)
-    # Gest teh activities of the classroom 
-    activities = Activity.objects.filter(student__classroom=classroom).values_list('name', flat=True).distinct()
-    # Returns the activites of the classroom
+    
+    # Get all activity
+    activities = Activity.objects.filter(
+        classroom=classroom
+    ).values_list('name', flat=True).distinct()
+
     return JsonResponse({"activities": list(activities)})

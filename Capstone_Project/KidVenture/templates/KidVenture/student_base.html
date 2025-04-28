@@ -65,7 +65,7 @@
         <button class="close-btn" id="closeBtn">✕</button>
       </div>
       <div class="account-links">
-        <a href="{% url 'view_profile' %}">My Profile</a>
+        <!-- <a href="{% url 'view_profile' %}">My Profile</a> -->
         <a href="{% url 'logout_view' %}">Logout</a>
       </div>
     </div>
@@ -75,7 +75,7 @@
       <!-- TOP PART -->
       <div class="header__topPart">
         <div class="logo">
-          <img src="{% static '/KidVenture/images/kidventure_logo.jpg' %}" alt="KidVenture Logo" />
+          <img src="{% static '/KidVenture/images/kidventure_logo-removebg-preview.png' %}" alt="KidVenture Logo" />
         </div>
         <div>
           <span class="name">Welcome to KidVenture, {{ request.user.get_full_name|default:request.user.username }}</span>

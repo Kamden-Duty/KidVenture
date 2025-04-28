@@ -18,7 +18,8 @@
     <select id="class-filter" onchange="filterByClass()" style="margin-bottom: 10px; padding: 5px;">
         <option value="all">All Classes</option>
         {% for classroom in classes %}
-            <option value="{{ classroom.name }}">{{ classroom.name }}</option>
+             <option value="{{ classroom.name }}">{{ classroom.name }}</option>
+
         {% endfor %}
     </select>
 
@@ -41,7 +42,8 @@
             <tbody>
                 {% for classroom in classes %}
                     {% for student in classroom.students.all %}
-                    <tr class="student-row" data-class="{{ classroom.name }}">
+                    <tr class="student-row" data-class="{{ progress.class_name }}">
+
                         <td>{{ student.user.username }}</td>
                         <td>{{ classroom.name }}</td>
                         <td>{{ classroom.access_token }}</td>
