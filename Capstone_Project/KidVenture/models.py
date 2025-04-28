@@ -200,7 +200,6 @@ class Notification(models.Model):
 # Stores the progress a user had made on a game. as in their mistakes mistmatched and time taken
 class GameProgress(models.Model):
 
-    # Used to distinguish between games
     games = [
         ('matching', 'Matching Game'),
         ('memory', 'Memory Game'),

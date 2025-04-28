@@ -5,28 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Memory Game</title>
     {% load static %}
-    <!-- Your Memory game CSS (similar to the matching game CSS) -->
+
     <link rel="stylesheet" href="{% static 'KidVenture/css/alphabet_memory.css' %}">
   </head>
 
   <body>
     <script>
-      // Identify this as memory game so your JS knows which game_type to use
+  
       window.GAME_TYPE = 'memory';
     </script>
 
-    <!-- Menu button in the top-left corner -->
     <button id="menuButton" class="menu-btn">Menu</button>
 
-    <!-- The menu modal that appears when "Menu" is clicked -->
+
     <div id="menu-modal" class="modal hidden">
       <div class="modal-content">
         <div class="menu-spacing">
-          <!-- Button that opens the Level Select modal -->
+       
           <button class="open-level-select-btn">Level Select</button>
         </div>
         <div class="menu-spacing">
-          <!-- A link or button back to your homepage/teacher_homepage -->
+       
           {% if request.user.is_teacher %}
             <a href="{% url 'teacher_homepage' %}" class="button-link">Back to Homepage</a>
           {% else %}
@@ -34,7 +33,7 @@
           {% endif %}
         </div>
         <div class="menu-spacing">
-          <!-- Close button to hide this menu modal -->
+        
           <button id="close-button" class="button-link">Close</button>
         </div>
       </div>
@@ -67,15 +66,7 @@
     <!-- The game board where cards appear -->
     <div id="game-board"></div>
 
-    <!-- If you’re showing a session modal for continue vs start-over, keep it:
-    <div id="session-modal" class="modal hidden">
-      <div class="modal-content">
-        <p id="modal-text">Continue or start from level 1?</p>
-        <button id="continue-btn">Continue</button>
-        <button id="start-over-btn">Start Over</button>
-      </div>
-    </div>
-    -->
+
 
     <!-- Modal for Level Selection -->
     <div id="activity-modal" class="modal hidden">
@@ -101,7 +92,7 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <!-- Finally load the memory-game JS, which references all these elements -->
+
     <script type="module" src="{% static 'KidVenture/js/alphabet_memory.js' %}"></script>
 
     {% csrf_token %}

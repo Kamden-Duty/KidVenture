@@ -39,17 +39,7 @@ import os
 
 
 from django.conf import settings
-# from py_avataaars import PyAvataaar, AvatarStyle, SkinColor, HairColor, FacialHairType, \
-#     TopType, Color, MouthType, EyesType, EyebrowType, NoseType, AccessoriesType, \
-#     ClotheType, ClotheGraphicType
 
-
-# import json
-# from django.http import HttpResponse
-# from django.views.decorators.csrf import csrf_exempt
-# from py_avataaars import PyAvataaar, AvatarStyle, SkinColor, HairColor, FacialHairType, \
-#     TopType, Color, MouthType, EyesType, EyebrowType, NoseType, AccessoriesType, \
-#     ClotheType, ClotheGraphicType
 # =============================================================================================
 
 
@@ -484,55 +474,6 @@ def delete_class(request, class_id):
     return redirect('classes')
 
 
-# This view allows students to join class using the class token the teacher has to give them
-# @login_required
-# def join_class(request):
-#     # If user not student don't let them join a class
-#     if not request.user.is_student:
-#         return HttpResponseForbidden("Only students can join classes.")
-
-#     # If request method is post: 
-#     if request.method == 'POST':
-
-#         # Get toke from form
-#         access_token = request.POST.get('access_token')
-        
-#         try:
-#             # Find class that has the given token
-#             classroom = Class.objects.get(access_token=access_token)
-            
-#         # If not class has a token, say invalid token  
-#         except Class.DoesNotExist:
-#             messages.error(request, "Invalid access token. Please try again.")
-#             return redirect('join_class')
-    
-        
-#         try:
-#             # Get student(user)
-#             student = Student.objects.get(user=request.user)
-
-#             # If the student is already in the class tell them
-#             if student.classroom == classroom:
-#                 messages.error(request, f"You are already enrolled in {classroom.name}.")
-
-#             # If the student is in another clas tell them
-#             else:
-#                 messages.error(request, "You are already enrolled in another class. Leave your current class before joining a new one.")
-#             # Redirect back to home or /
-#             return redirect('/')
-
-#         # If the student is not in the class allow them to join
-#         except Student.DoesNotExist:
-#             # Student is not enrolled in any class, so add them to this one
-#             Student.objects.create(user=request.user, classroom=classroom)
-#             # Notify them
-#             Notification.objects.create(user=request.user, title="Enrolled", message=f"You have successfully joined {classroom.name}")
-#             # Give the a message
-#             messages.success(request, f"You have successfully joined {classroom.name}.")
-#             # Redirect them back to classes
-#             return redirect('classes')
-#     # Renders the join_class html
-#     return render(request, 'KidVenture/join_class.html') 
 
 @login_required
 def join_class(request):
