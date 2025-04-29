@@ -20,7 +20,10 @@ body {
   display: flex;
   flex-direction: column;
 }
-
+#bottom-nav-filler{
+  height: 70px;
+  background-color: chocolate;
+}
 
 /* LEFT NAV */
 .left-nav {
@@ -488,10 +491,11 @@ footer {
 .notification-item {
   padding: 10px;
   border-bottom: 1px solid #eee;
+  background-color: cornsilk;
 }
 
 .notification-item .timestamp {
-  position: absolute;
+
   top: 1rem;
   right: 1rem;
   font-size: 0.8rem;
@@ -507,7 +511,7 @@ footer {
 }
 .notification-item {
   color: #666; /* Default text color */
-  background-color: #f9f9f9; /* Default background */
+  background-color: cornsilk; /* Default background */
   padding: 10px;
   border-bottom: 1px solid #ddd;
 }
@@ -552,6 +556,7 @@ footer {
   z-index: 1000;
   transform: translateX(-100%);
   transition: transform 0.3s ease;
+  background-color: beige;
 }
 .inbox-panel.open {
   transform: translateX(0);
@@ -567,6 +572,7 @@ footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  background-color: khaki;
 }
 .inbox-close-btn {
   background: none;

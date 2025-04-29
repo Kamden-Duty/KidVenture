@@ -287,7 +287,9 @@ def home(request):
             'earned_names': earned_names,
             'show_freeplay': free_play,
             'unread_count': unread_count,
+            'show_nav': True,
         })
+        
 
 
 @login_required
@@ -306,7 +308,8 @@ def view_profile(request):
     # user = get_object_or_404(User, user=request.user)
     date_joined = request.user.date_joined
     return render(request, 'KidVenture/profile.html', {
-        'date_joined': date_joined
+        'date_joined': date_joined,
+        'show_nav': False,
     })
 
 
@@ -514,7 +517,9 @@ def join_class(request):
             messages.success(request, f"You have successfully joined {classroom.name}.")
             return redirect('classes')
 
-    return render(request, 'KidVenture/join_class.html')
+    return render(request, 'KidVenture/join_class.html', {
+        'show_nav' : False,
+    })
 
 
 def create_student_activities(student, classroom):
@@ -635,6 +640,11 @@ def save_game_progress(request):
                 activity=activity,
                 is_free_play=is_free_play,
                 game=game
+            )
+            Notification.objects.create(
+                user=request.user,
+                title="Game Progress",
+                message=f"You have successfully completed {level-1} levels in {game} game."
             )
 
             # if it is a activity, set the progres to elvel - 1 because that is what they have completed and not what they are on

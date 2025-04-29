@@ -1,5 +1,6 @@
 {% extends 'KidVenture/student_base.html' %}
 {% load static %}
+{% load custom_filter %}
 
 {% block title %}Student Dashboard{% endblock %}
 
@@ -184,7 +185,7 @@
           <ul class="level-list">
             {% for lvl in activity.levels %}
               <li>
-                <strong>Lvl {{ lvl.level }}:</strong>
+                <strong>Lvl{{ lvl.level|subtract:1 }}:</strong>
                 <span class="icon"><i class="fas fa-stopwatch" style="color: blue"></i></span> {{ lvl.time }}s
                 <span class="icon"><i class="fas fa-bug" style="color: darkorange"></i></span> {{ lvl.mistakes }}
                 <span class="icon"><i class="fas fa-exchange-alt" style="color: crimson"></i></span> {{ lvl.mismatches|length }}
