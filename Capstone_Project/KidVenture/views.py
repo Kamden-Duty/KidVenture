@@ -764,6 +764,15 @@ def assign_activity(request):
         game = request.POST.get("game", "matching")
         # GEts the classroom 
         classroom = get_object_or_404(Class, id=class_id)
+        teacher = classroom.teacher
+
+
+        activity_exist = Activity.objects.filter(name=activity_name, classroom=classroom).first()
+        
+        if activity_exist:
+         
+            messages.error(request, f"An activity with the name '{activity_name}'")
+            return redirect('assign_activity')  
 
         # For studetn in calssroom create activity for them
         for student in classroom.students.all():

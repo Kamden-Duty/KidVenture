@@ -150,6 +150,7 @@ class Activity(models.Model):
 
         # Save updates
         self.save()
+        
 
     def __str__(self):
         return f"{self.name} - {self.student.user.username if self.student and self.student.user else 'Unassigned'}"
