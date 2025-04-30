@@ -25,6 +25,10 @@ from django.templatetags.static import static
 from django.contrib.auth.views import PasswordResetView
 from django.contrib.auth.forms import PasswordResetForm
 from .forms import TempPasswordResetForm
+from django.urls import reverse_lazy
+from django.contrib.messages.views import SuccessMessageMixin
+from django.contrib.auth.views import PasswordResetView, PasswordResetConfirmView
+from .forms import TempPasswordResetForm, TempSetPasswordForm
 
 from django.http import HttpResponseRedirect
 from django.urls import reverse
@@ -86,17 +90,23 @@ def register(request):
 # Handles the user login
 def login_view(request):
 
-    # Creats a instance of the login form. If POST then fill with the entered data else leave it empty(None)
-    form = LoginForm(request.POST or None)
+    
 
     # Used for feedback 
     msg = None
+    form = LoginForm()
 
     # If method is POST
     if request.method == "POST":
+
+        # Creats a instance of the login form. If POST then fill with the entered data else leave it empty(None)
+        form = LoginForm(request.POST or None)
+
         
+        print(f"post reqruest found")
         # Checks to makes sure the data enterd is valid
         if form.is_valid():
+            print(f"form is valid")
             # Gets the username entered
             username = form.cleaned_data.get("username")
             # Gets the password entered
@@ -107,7 +117,7 @@ def login_view(request):
             # If user is not None, login and go to home page
             if user is not None:
                 login(request, user)
-                return redirect("home")
+                return HttpResponseRedirect(reverse('home'))
 
             # Else tell the user the their credentials are invalid
             else: 
@@ -115,7 +125,7 @@ def login_view(request):
             
         # Tells the user that their input in not valid for this form
         else: msg = "error validating form"
-
+    print(f'cound not find post')
     # Render the html page and passes in the form and msg vars to it
     return render(request, "KidVenture/login.html", {"form": form, "msg": msg})
 
@@ -317,7 +327,7 @@ def view_profile(request):
 @login_required
 def logout_view(request):
     logout(request)
-    return login_view(request)
+    return redirect('login_view')
 
 
 
@@ -1154,13 +1164,46 @@ def get_class_activities(request, class_id):
 
 
 
-def password_reset_view(request):
-    if request.method == "POST":
-        form = TempPasswordResetForm(request.POST)
-        if form.is_valid():
-            form.save(request=request)  
-            return redirect('password_reset_done')  
-    else:
-        form = TempPasswordResetForm()  
+# def password_reset_view(request):
+#     if request.method == "POST":
+#         form = TempPasswordResetForm(request.POST)
+#         if form.is_valid():
+#             form.save(request=request)  
+#             return redirect('password_reset_done')  
+#     else:
+#         form = TempPasswordResetForm()  
 
-    return render(request, 'KidVenture/password_reset_form.html', {'form': form})
+#     return render(request, 'KidVenture/password_reset_form.html', {'form': form})
+
+
+# from django.urls import reverse_lazy
+# from django.contrib.auth.views import PasswordResetView
+# from django.contrib.messages.views import SuccessMessageMixin
+# class ResetPasswordView(SuccessMessageMixin, PasswordResetView):
+#     template_name = 'users/password_reset.html'
+#     email_template_name = 'users/password_reset_email.html'
+#     subject_template_name = 'users/password_reset_subject'
+#     success_message = "We've emailed you instructions for setting your password, " \
+#                       "if an account exists with the email you entered. You should receive them shortly." \
+#                       " If you don't receive an email, " \
+#                       "please make sure you've entered the address you registered with, and check your spam folder."
+#     success_url = reverse_lazy('users-home')
+
+
+
+
+
+
+class ResetPasswordView(SuccessMessageMixin, PasswordResetView):
+    template_name       = 'KidVenture/password_reset.html'
+    email_template_name = 'KidVenture/password_reset_email.html'
+    subject_template_name = 'KidVenture/password_reset_subject.txt'
+    form_class          = TempPasswordResetForm
+    success_url         = reverse_lazy('home')
+    success_message     = "We've emailed you instructions for setting your password."
+
+class CustomPasswordResetConfirmView(SuccessMessageMixin, PasswordResetConfirmView):
+    template_name   = 'KidVenture/password_reset_confirm.html'
+    form_class      = TempSetPasswordForm
+    success_url     = reverse_lazy('password_reset_complete')
+    success_message = "Your password has been set. You can now log in."
