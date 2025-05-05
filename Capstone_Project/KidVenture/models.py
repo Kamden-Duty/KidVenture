@@ -228,4 +228,4 @@ class GameProgress(models.Model):
     game = models.CharField(max_length=20, choices=games, default='matching')
 
     def __str__(self):
-        return f"{self.user.username} - Level {self.level} ({'Free Play' if self.is_free_play else 'Activity'}) - {self.game_type}"
+        return f"{self.user.username} - Level {self.level} ({'Free Play' if self.is_free_play else 'Activity'}) - {self.game}"

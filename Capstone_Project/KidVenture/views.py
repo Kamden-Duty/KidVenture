@@ -727,6 +727,7 @@ def get_leaderboard(request):
         }
         for entry in leaderboard
     ]
+    
 
     # Return the JSON response with leaderboard info
     return JsonResponse({'leaderboard': leaderboard_with_active_flag})
@@ -762,6 +763,11 @@ def get_teacher_leaderboard(request):
             'total_mistakes': progress['total_mistakes'] or 0,
             'avg_time': round(progress['avg_time'], 2) if progress['avg_time'] else 0.0
         })
+        
+    leaderboard.sort(
+    key=lambda x: (-x['max_level'], x['total_mistakes'], x['avg_time'])
+)
+
 
     return JsonResponse({'leaderboard': leaderboard})
 
@@ -1066,7 +1072,7 @@ def complete_class_activity(request, activity_id):
     Activity.objects.filter(
         classroom=classroom,
         name=activity.name
-    ).update(completed=True, progress=100)
+    ).update(completed=True)
 
     messages.success(request, f"All '{activity.name}' activities for {classroom.name} have been marked as completed.")
     
