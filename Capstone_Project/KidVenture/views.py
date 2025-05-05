@@ -162,9 +162,9 @@ def home(request):
         teacher = None
 
         badge_definitions = [
-            {"name": "Speedster", "image_url": static("Kidventure/images/badges/speedster.png")},
-            {"name": "Accuracy Master", "image_url": static("Kidventure/images/badges/accuracy_master.png")},
-            {"name": "Mismatch Minor", "image_url": static("Kidventure/images/badges/mismatch_minor.png")},
+            {"name": "Speedster", "image": static("KidVenture/images/badges/speedster.png")},
+            {"name": "Accuracy Master", "image": static("KidVenture/images/badges/accuracy_master.png")},
+            {"name": "Mismatch Minor", "image": static("KidVenture/images/badges/mismatch_minor.png")},
         ]
         try:
             # Get student
@@ -219,14 +219,14 @@ def home(request):
             free_play = True
 
             new_badges = award_badges(student)
-            earned_badges = Badge.objects.filter(student=request.user)
+            earned_badges = Badge.objects.filter(student=student.user)
             earned_names = {b.name for b in earned_badges}
 
             for badge in new_badges:
                 messages.success(request, f"Congratulations! You've just earned the '{badge.name}' badge!")
 
-            badges = Badge.objects.filter(user=request.user) if hasattr(request.user, 'badge_set') else []
-
+            badges = earned_badges
+            
             RANDOM_AVATARS = [f"fake_avatars/fake_avatar_{i}.png" for i in range(1, 11)]
             
 

@@ -31,9 +31,9 @@ def award_badges(student):
         # Speedster
         if stats['avg_time'] and stats['avg_time'] < 10:
             badge, created = Badge.objects.get_or_create(
-                student=student,
+                student=student.user,
                 name="Speedster",
-                defaults={"image_url": static("KidVenture/images/badges/speedster.png")}
+                defaults={"image": static("KidVenture/images/badges/speedster.png")}
             )
             if created:
                 new_badges.append(badge)
@@ -41,9 +41,9 @@ def award_badges(student):
         # Accuracy Master
         if stats['total_mistakes'] is not None and stats['total_mistakes'] < 5:
             badge, created = Badge.objects.get_or_create(
-                student=student,
+                student=student.user,
                 name="Accuracy Master",
-                defaults={"image_url": static("KidVenture/images/badges/accuracy_master.png")}
+                defaults={"image": static("KidVenture/images/badges/accuracy_master.png")}
             )
             if created:
                 new_badges.append(badge)
@@ -51,9 +51,9 @@ def award_badges(student):
         # Mismatch Minor
         if stats['total_mismatches'] is not None and stats['total_mismatches'] < 3:
             badge, created = Badge.objects.get_or_create(
-                student=student,
+                student=student.user,
                 name="Mismatch Minor",
-                defaults={"image_url": static("KidVenture/images/badges/mismatch_minor.png")}
+                defaults={"image": static("KidVenture/images/badges/mismatch_minor.png")}
             )
             if created:
                 new_badges.append(badge)
