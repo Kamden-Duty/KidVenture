@@ -129,3 +129,21 @@ button:hover {
     background-color: #f7fffd;
     color: darkred;
 }
+
+
+
+/* make this wrapper fill the “content” area and scroll if needed */
+.scrollable-page {
+    /* use entire viewport minus header */
+    max-height: calc(100vh - 60px);
+    overflow-y: auto;
+  }
+  
+  /* reset html/body to allow full‐page scrolling if they had been locked down */
+  html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: auto;
+  }
+  

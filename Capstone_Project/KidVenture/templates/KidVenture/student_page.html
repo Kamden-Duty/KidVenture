@@ -1,5 +1,6 @@
 {% extends 'KidVenture/student_base.html' %}
 {% load static %}
+{% load custom_filter %}
 
 {% block title %}Student Dashboard{% endblock %}
 
@@ -123,47 +124,46 @@
       </thead>
       <tbody>
         {% for user in leaderboard %}
-          <tr>
-            <td>{{ forloop.counter }}</td>
-            <td>
-              <img src="{{ user.user__avatar.url }}" alt="Avatar" width="50" height="50" />
-            </td>
-            <td>{{ user.user__username }}</td>
-            <td>{{ user.max_level }}</td>
-            <td>{{ user.total_mistakes }}</td>
-            <td>{{ user.avg_time }}</td>
-            <td>{{ user.total_mismatches }}</td>
-          </tr>
+        <tr class="{% if user.is_active_user %}highlight{% endif %}">
+          <td>{{ forloop.counter }}</td>
+          <td>
+            <img src="/media/{{ user.avatar_url }}" alt="Avatar" width="50" height="50" />
+          </td>
+          <td>{{ user.display_name }}</td>
+          <td>{{ user.max_level }}</td>
+          <td>{{ user.total_mistakes }}</td>
+          <td>{{ user.avg_time|floatformat:2 }}</td>
+        </tr>
         {% empty %}
-          <tr>
-            <td colspan="7">No leaderboard data available yet.</td>
-          </tr>
+        <tr>
+          <td colspan="8">No leaderboard data available yet.</td>
+        </tr>
         {% endfor %}
-      </tbody>
+      </tbody> 
     </table>
   </section>
 
   <!-- ACHIEVEMENTS SECTION -->
-  <section id="achievements-tab" class="tab-content hidden">
-    <div class="card">
-      <h2>My Achievements</h2>
-      <p class="badge-summary">
-        You’ve earned {{ badges|length }} of {{ badge_definitions|length }} badges
-      </p>
+<section id="achievements-tab" class="tab-content hidden">
+  <div class="card">
+    <h2>My Achievements</h2>
+    <p class="badge-summary">
+      You’ve earned {{ badges|length }} of {{ badge_definitions|length }} badges
+    </p>
 
-      <div class="badge-container">
-        {% for bd in badge_definitions %}
-          <div class="badge-card {% if bd.name in earned_names %}earned{% else %}locked{% endif %}">
-            <img src="{{ bd.image_url }}" alt="{{ bd.name }}" />
-            <p class="badge-name">{{ bd.name }}</p>
-            {% if bd.name not in earned_names %}
-              <i class="fas fa-lock badge-lock"></i>
-            {% endif %}
-          </div>
-        {% endfor %}
-      </div>
+    <div class="badge-container">
+      {% for bd in badge_definitions %}
+        <div class="badge-card {% if bd.name in earned_names %}earned{% else %}locked{% endif %}">
+          <img src="{% static bd.image_url %}" alt="{{ bd.name }}" />
+          <p class="badge-name">{{ bd.name }}</p>
+          {% if bd.name not in earned_names %}
+            <i class="fas fa-lock badge-lock"></i>
+          {% endif %}
+        </div>
+      {% endfor %}
     </div>
-  </section>
+  </div>
+</section>
 </div>
 
 <div class="secondary-section">
@@ -185,7 +185,7 @@
           <ul class="level-list">
             {% for lvl in activity.levels %}
               <li>
-                <strong>Lvl {{ lvl.level }}:</strong>
+                <strong>Lvl{{ lvl.level|subtract:1 }}:</strong>
                 <span class="icon"><i class="fas fa-stopwatch" style="color: blue"></i></span> {{ lvl.time }}s
                 <span class="icon"><i class="fas fa-bug" style="color: darkorange"></i></span> {{ lvl.mistakes }}
                 <span class="icon"><i class="fas fa-exchange-alt" style="color: crimson"></i></span> {{ lvl.mismatches|length }}

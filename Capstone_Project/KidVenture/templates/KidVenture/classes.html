@@ -10,6 +10,7 @@
 {% endblock %}
 
 {% block content %}
+<div class="scrollable-page">
 <div class="classes-container">
     <!-- Classes Section -->
     <div class="box-8">
@@ -22,7 +23,7 @@
                         <th>Class Name</th>
                         <th>Access Token</th>
                         <th>Students</th>
-                        <th>Actions</th> <!-- New column for delete buttons -->
+                        <th>Actions</th> 
                     </tr>
                 </thead>
                 <tbody>
@@ -68,9 +69,7 @@
 
 <!-- Activity Management Section -->
 <div class="classes-container">
-    <!-- Assign Activity to Class -->
-    <!-- Assign Activity to Class -->
-   <!-- Assign Activity to Class -->
+
    <div class="box-8">
     <div class="content-box">
         <h2>Assign Activity to Class</h2>
@@ -101,8 +100,7 @@
             <label for="activity_name">Activity Name:</label>
             <input type="text" id="activity_name" name="activity_name" required>
 
-            <!-- <label for="description">Description:</label>
-            <textarea id="description" name="description" rows="3"></textarea> -->
+  
 
             <!-- Level Selection -->
             <div class="form-group">
@@ -142,7 +140,8 @@
                 {% for activity in activities %}
                 <tr>
                     <td>{{ activity.name }}</td>
-                    <td>{{ activity.student__classroom__name }}</td>
+                    <td>{{ activity.classroom__name }}</td>
+
                     <td>{{ activity.url_name }}</td>
                     <td>{{ activity.class_progress|floatformat:0 }}%</td>
                     <td>{{ activity.max_levels }}</td>
@@ -175,7 +174,7 @@
         </table>
     </div>
 </div>
-
+</div>
 
 <script>
     function confirmDelete() {

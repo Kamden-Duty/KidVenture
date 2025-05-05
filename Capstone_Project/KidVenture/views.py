@@ -22,6 +22,13 @@ from django.db.models.functions import Length
 from django.views.decorators.http import require_POST
 from .utils import generate_random_username, award_badges
 from django.templatetags.static import static
+from django.contrib.auth.views import PasswordResetView
+from django.contrib.auth.forms import PasswordResetForm
+from .forms import TempPasswordResetForm
+from django.urls import reverse_lazy
+from django.contrib.messages.views import SuccessMessageMixin
+from django.contrib.auth.views import PasswordResetView, PasswordResetConfirmView
+from .forms import TempPasswordResetForm, TempSetPasswordForm
 
 from django.http import HttpResponseRedirect
 from django.urls import reverse
@@ -39,17 +46,7 @@ import os
 
 
 from django.conf import settings
-# from py_avataaars import PyAvataaar, AvatarStyle, SkinColor, HairColor, FacialHairType, \
-#     TopType, Color, MouthType, EyesType, EyebrowType, NoseType, AccessoriesType, \
-#     ClotheType, ClotheGraphicType
 
-
-# import json
-# from django.http import HttpResponse
-# from django.views.decorators.csrf import csrf_exempt
-# from py_avataaars import PyAvataaar, AvatarStyle, SkinColor, HairColor, FacialHairType, \
-#     TopType, Color, MouthType, EyesType, EyebrowType, NoseType, AccessoriesType, \
-#     ClotheType, ClotheGraphicType
 # =============================================================================================
 
 
@@ -93,17 +90,23 @@ def register(request):
 # Handles the user login
 def login_view(request):
 
-    # Creats a instance of the login form. If POST then fill with the entered data else leave it empty(None)
-    form = LoginForm(request.POST or None)
+    
 
     # Used for feedback 
     msg = None
+    form = LoginForm()
 
     # If method is POST
     if request.method == "POST":
+
+        # Creats a instance of the login form. If POST then fill with the entered data else leave it empty(None)
+        form = LoginForm(request.POST or None)
+
         
+        print(f"post reqruest found")
         # Checks to makes sure the data enterd is valid
         if form.is_valid():
+            print(f"form is valid")
             # Gets the username entered
             username = form.cleaned_data.get("username")
             # Gets the password entered
@@ -114,7 +117,7 @@ def login_view(request):
             # If user is not None, login and go to home page
             if user is not None:
                 login(request, user)
-                return redirect("home")
+                return HttpResponseRedirect(reverse('home'))
 
             # Else tell the user the their credentials are invalid
             else: 
@@ -122,7 +125,7 @@ def login_view(request):
             
         # Tells the user that their input in not valid for this form
         else: msg = "error validating form"
-
+    print(f'cound not find post')
     # Render the html page and passes in the form and msg vars to it
     return render(request, "KidVenture/login.html", {"form": form, "msg": msg})
 
@@ -294,7 +297,9 @@ def home(request):
             'earned_names': earned_names,
             'show_freeplay': free_play,
             'unread_count': unread_count,
+            'show_nav': True,
         })
+        
 
 
 @login_required
@@ -313,7 +318,8 @@ def view_profile(request):
     # user = get_object_or_404(User, user=request.user)
     date_joined = request.user.date_joined
     return render(request, 'KidVenture/profile.html', {
-        'date_joined': date_joined
+        'date_joined': date_joined,
+        'show_nav': False,
     })
 
 
@@ -321,7 +327,7 @@ def view_profile(request):
 @login_required
 def logout_view(request):
     logout(request)
-    return login_view(request)
+    return redirect('login_view')
 
 
 
@@ -427,13 +433,13 @@ def classes(request):
 
     # gets and group all of hte non completed activities by classes
     activities = (
-        Activity.objects.filter(student__classrooms__teacher=request.user, completed=False)
-        .values("name", "student__classrooms__name", "url_name", "max_levels")  
+        Activity.objects.filter(classroom__teacher=request.user, completed=False)
+        .values("name", "classroom__name", "url_name", "max_levels", "classroom__id")  
         .annotate(
             class_progress=Avg("progress"),  
             activity_id=Min("id")  
         )
-        .order_by("student__classrooms__name")
+        .order_by("classroom__name")
     )
 
 
@@ -441,12 +447,12 @@ def classes(request):
     activities_with_progress = []
     # Loops through the activities getting progress to get the average progress for the class for a activity
     for activity in activities:
-        class_name = activity["student__classrooms__name"]
+        class_id = activity["classroom__id"]
 
        # Calcluate the average progress for the class for an activity
         avg_progress = (
             Activity.objects.filter(
-                student__classrooms__name=class_name, name=activity["name"]
+                classroom__id = class_id, name=activity["name"]
             )
             .aggregate(avg_progress=Avg("progress"))["avg_progress"]
         )
@@ -483,55 +489,6 @@ def delete_class(request, class_id):
     return redirect('classes')
 
 
-# This view allows students to join class using the class token the teacher has to give them
-# @login_required
-# def join_class(request):
-#     # If user not student don't let them join a class
-#     if not request.user.is_student:
-#         return HttpResponseForbidden("Only students can join classes.")
-
-#     # If request method is post: 
-#     if request.method == 'POST':
-
-#         # Get toke from form
-#         access_token = request.POST.get('access_token')
-        
-#         try:
-#             # Find class that has the given token
-#             classroom = Class.objects.get(access_token=access_token)
-            
-#         # If not class has a token, say invalid token  
-#         except Class.DoesNotExist:
-#             messages.error(request, "Invalid access token. Please try again.")
-#             return redirect('join_class')
-    
-        
-#         try:
-#             # Get student(user)
-#             student = Student.objects.get(user=request.user)
-
-#             # If the student is already in the class tell them
-#             if student.classroom == classroom:
-#                 messages.error(request, f"You are already enrolled in {classroom.name}.")
-
-#             # If the student is in another clas tell them
-#             else:
-#                 messages.error(request, "You are already enrolled in another class. Leave your current class before joining a new one.")
-#             # Redirect back to home or /
-#             return redirect('/')
-
-#         # If the student is not in the class allow them to join
-#         except Student.DoesNotExist:
-#             # Student is not enrolled in any class, so add them to this one
-#             Student.objects.create(user=request.user, classroom=classroom)
-#             # Notify them
-#             Notification.objects.create(user=request.user, title="Enrolled", message=f"You have successfully joined {classroom.name}")
-#             # Give the a message
-#             messages.success(request, f"You have successfully joined {classroom.name}.")
-#             # Redirect them back to classes
-#             return redirect('classes')
-#     # Renders the join_class html
-#     return render(request, 'KidVenture/join_class.html') 
 
 @login_required
 def join_class(request):
@@ -570,9 +527,11 @@ def join_class(request):
             messages.success(request, f"You have successfully joined {classroom.name}.")
             return redirect('classes')
 
-    return render(request, 'KidVenture/join_class.html')
+    return render(request, 'KidVenture/join_class.html', {
+        'show_nav' : False,
+    })
 
-
+@login_required
 def create_student_activities(student, classroom):
     # Loop over each activity template for this class
     for template in classroom.activity_templates.all():
@@ -615,15 +574,22 @@ def delete_student(request, student_id, class_id):
 
     # Make sure class belongs to current user
     classroom = get_object_or_404(Class, id=class_id, teacher=request.user)
-
+    student = get_object_or_404(Student, id=student_id)
 
     # Find and makre sure student are part of class
-    student = get_object_or_404(Student, id=student_id, classroom=classroom)
+    student = get_object_or_404(Student, id=student_id)
+
+
+    # Mke sure the student is in the classroom.      this should always pass, but is just in case something did break
+    if classroom not in student.classrooms.all():
+        return HttpResponseForbidden("This student is not in the specified class")
+
 
 
     # If request post, delete student
     if request.method == "POST":
-        student.delete()
+        student.classrooms.remove(classroom)
+        Activity.objects.filter(student=student, classroom=classroom).delete()
         return redirect("teacher_students")
 
 
@@ -635,9 +601,9 @@ def alphabet_matching(request):
 def alphabet_memory(request):
     return render(request, "KidVenture/alphabet_memory.html")
 
-# view for rendering the game selectio html (will most likely remove this at some point)
-def game_selection(request):
-    return render(request, "KidVenture/game_selection.html")
+# # view for rendering the game selectio html (will most likely remove this at some point)
+# def game_selection(request):
+#     return render(request, "KidVenture/game_selection.html")
 
 
 
@@ -684,6 +650,11 @@ def save_game_progress(request):
                 activity=activity,
                 is_free_play=is_free_play,
                 game=game
+            )
+            Notification.objects.create(
+                user=request.user,
+                title="Game Progress",
+                message=f"You have successfully completed {level-1} levels in {game} game."
             )
 
             # if it is a activity, set the progres to elvel - 1 because that is what they have completed and not what they are on
@@ -768,15 +739,15 @@ def get_teacher_leaderboard(request):
     game = request.GET.get('game', 'matching')
 
     # Get all students (with user info) in this teacher's classes
-    students = Student.objects.filter(classroom__teacher=teacher).select_related('user')
+    student_users = User.objects.filter(student__classrooms__teacher=request.user).distinct()
 
     leaderboard = []
 
-    for student in students:
+    for user in student_users:
         # Get their game progress for the selected game
         progress = (
             GameProgress.objects
-            .filter(user=student.user, game=game)
+            .filter(user=user, game=game)
             .aggregate(
                 max_level=Max('level'),
                 total_mistakes=Sum('mistakes'),
@@ -785,8 +756,8 @@ def get_teacher_leaderboard(request):
         )
 
         leaderboard.append({
-            'user__username': student.user.username,
-            'user__avatar': student.user.avatar.name if student.user.avatar else 'default.png',
+            'user__username': user.username,
+            'user__avatar': user.avatar.name if user.avatar else 'default.png',
             'max_level': progress['max_level'] or 0,
             'total_mistakes': progress['total_mistakes'] or 0,
             'avg_time': round(progress['avg_time'], 2) if progress['avg_time'] else 0.0
@@ -796,6 +767,7 @@ def get_teacher_leaderboard(request):
 
 
 # A view used to assign activites 
+@login_required
 def assign_activity(request):
     # If request is post
     if request.method == "POST":
@@ -813,6 +785,15 @@ def assign_activity(request):
         game = request.POST.get("game", "matching")
         # GEts the classroom 
         classroom = get_object_or_404(Class, id=class_id)
+        teacher = classroom.teacher
+
+
+        activity_exist = Activity.objects.filter(name=activity_name, classroom=classroom).first()
+        
+        if activity_exist:
+         
+            messages.error(request, f"An activity with the name '{activity_name}'")
+            return redirect('assign_activity')  
 
         # For studetn in calssroom create activity for them
         for student in classroom.students.all():
@@ -821,10 +802,11 @@ def assign_activity(request):
                 description=description,
                 progress=0,
                 student=student,
+                classroom=classroom,
                 url_name=url_name,
                 max_levels=max_levels,
                 game=game,
-                classroom=classroom,
+             
             )
         
         # Redirect back to the classes page
@@ -928,6 +910,7 @@ def edit_avatar(request):
 
 # Used to update our avatar while we are editing so we can see what we are changing live
 @csrf_exempt
+@login_required
 def update_avatar_preview(request):
     # If the method is post
     if request.method == "POST":
@@ -1070,19 +1053,23 @@ def delete_activity(request, activity_id):
 # THis is used to completed activities for the teacher so if they want to end the activity without deleting it
 @login_required
 def complete_class_activity(request, activity_id):
-    """Marks all activities for a class as complete."""
-
+ 
     # Get the activity to find the associated class
     activity = get_object_or_404(Activity, id=activity_id)
+    classroom = activity.classroom
 
     # Ensure only the teacher who assigned the activity can complete it
-    if request.user != activity.student.classroom.teacher:
+    if request.user != classroom.teacher:
         return HttpResponseForbidden("You are not authorized to complete this activity.")
 
     # Complete all activities for this class and name
-    Activity.objects.filter(student__classroom=activity.student.classroom, name=activity.name).update(completed=True)
+    Activity.objects.filter(
+        classroom=classroom,
+        name=activity.name
+    ).update(completed=True, progress=100)
 
-    messages.success(request, f"All '{activity.name}' activities for {activity.student.classroom.name} have been marked as completed.")
+    messages.success(request, f"All '{activity.name}' activities for {classroom.name} have been marked as completed.")
+    
     
     return redirect('classes')  # Redirect back to the classes page
 
@@ -1109,8 +1096,12 @@ def progress_overview(request):
     for classroom in classes:
         # for the student in the classroom
         for student in classroom.students.all():
+
+            class_activities = student.activities.filter(classroom=classroom)
+
+
             # For activity in all of the students activities
-            for activity in student.activities.all():
+            for activity in class_activities:
                 # Calculate percent complete
                 # Calcualt the number of copmleted levels
                 completed_levels = round((activity.progress / 100) * activity.max_levels, 2)
@@ -1124,6 +1115,7 @@ def progress_overview(request):
                 progress_data.append({
                     "student_name": student.user.username,
                     "class_name": classroom.name,
+                    "class_id": classroom.id,
                     "activity_name": activity.name,
                     "percent_complete": percent_complete
                 })
@@ -1141,7 +1133,7 @@ def progress_overview(request):
 @login_required
 def get_class_total_progress(request, class_id):
     # Gets the activity
-    activities = Activity.objects.filter(student__classroom_id=class_id)
+    activities = Activity.objects.filter(student__classrooms__id=class_id)
 
     if not activities.exists():
         return JsonResponse({'total_progress': 0})  # No activities, progress is 0%
@@ -1156,9 +1148,31 @@ def get_class_total_progress(request, class_id):
 # Used to get the assigned activity of a class ( this has a issue if two activites are created with the same name but different levels only one will show though both will be created need to fix )
 @login_required
 def get_class_activities(request, class_id):
-    # Gets the classroom 
+    # Get the classroom
     classroom = get_object_or_404(Class, id=class_id, teacher=request.user)
-    # Gest teh activities of the classroom 
-    activities = Activity.objects.filter(student__classroom=classroom).values_list('name', flat=True).distinct()
-    # Returns the activites of the classroom
+    
+    # Get all activity
+    activities = Activity.objects.filter(
+        classroom=classroom
+    ).values_list('name', flat=True).distinct()
+
     return JsonResponse({"activities": list(activities)})
+
+
+
+
+
+
+class ResetPasswordView(SuccessMessageMixin, PasswordResetView):
+    template_name       = 'KidVenture/password_reset.html'
+    email_template_name = 'KidVenture/password_reset_email.html'
+    subject_template_name = 'KidVenture/password_reset_subject.txt'
+    form_class          = TempPasswordResetForm
+    success_url         = reverse_lazy('home')
+    success_message     = "We've emailed you instructions for setting your password."
+
+class CustomPasswordResetConfirmView(SuccessMessageMixin, PasswordResetConfirmView):
+    template_name   = 'KidVenture/password_reset_confirm.html'
+    form_class      = TempSetPasswordForm
+    success_url     = reverse_lazy('password_reset_complete')
+    success_message = "Your password has been set. You can now log in."

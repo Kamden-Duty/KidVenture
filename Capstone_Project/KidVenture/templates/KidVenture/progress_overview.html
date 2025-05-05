@@ -10,6 +10,7 @@
 {% endblock %}
 
 {% block content %}
+<div class="scrollable-page">
 <div class="content-box">
     <h2>Progress Overview</h2>
 
@@ -46,7 +47,9 @@
             </thead>
             <tbody>
                 {% for progress in progress_data %}
-                <tr class="student-row" data-class="{{ progress.class_name }}" data-activity="{{ progress.activity_name }}">
+                <tr class="student-row" data-class="{{ progress.class_id }}" data-activity="{{ progress.activity_name }}">
+
+
                     <td>{{ progress.student_name }}</td>
                     <td>{{ progress.class_name }}</td>
                     <td>{{ progress.activity_name }}</td>
@@ -64,7 +67,7 @@
         </table>
     </div>
 </div>
-
+</div>
 {% load static %}
 <script src="{% static 'KidVenture/js/progress_overview.js' %}"></script>
 

@@ -3,6 +3,13 @@ from . import views
 from django.conf import settings
 from django.conf.urls.static import static
 from .views import get_last_session
+from django.contrib.auth import views as auth_views 
+from .forms import LoginForm
+from .views import ResetPasswordView  
+from .views import (
+    ResetPasswordView,
+    CustomPasswordResetConfirmView,   
+)
 
 urlpatterns = [
     path('', views.home, name='home'),
@@ -19,7 +26,7 @@ urlpatterns = [
     path('teacher_page/', views.home, name='teacher'),
     path('alphabet_matching/', views.alphabet_matching, name='alphabet_matching'),
     path('alphabet_memory/', views.alphabet_memory, name='alphabet_memory'),
-    path('game_selection/', views.game_selection, name='game_selection'),
+    # path('game_selection/', views.game_selection, name='game_selection'),
     path('classes', views.classes, name='classes'),
     path('delete-class/<int:class_id>/', views.delete_class, name='delete_class'),
     path('join-class/', views.join_class, name='join_class'),
@@ -41,7 +48,36 @@ urlpatterns = [
     path('complete_class_activitsy/<int:activity_id>/', views.complete_class_activity, name='complete_class_activity'),
     path('progress-overview/', views.progress_overview, name='progress_overview'),
     path('get_class_total_progress/<int:class_id>/', views.get_class_total_progress, name='get_class_total_progress'),
-     path("get_class_activities/<int:class_id>/", views.get_class_activities, name="get_class_activities"),
+    path("get_class_activities/<int:class_id>/", views.get_class_activities, name="get_class_activities"),
+
+
+    path('password-reset/', ResetPasswordView.as_view(), name='password_reset'), 
+
+    
+    path(
+        'password-reset-confirm/<uidb64>/<token>/',
+        CustomPasswordResetConfirmView.as_view(),
+        name='password_reset_confirm'
+    ),
+
+
+    path(
+        'password-reset-complete/',
+        auth_views.PasswordResetCompleteView.as_view(
+            template_name='KidVenture/password_reset_complete.html'
+        ),
+        name='password_reset_complete'
+    ),
+
+    
+    path(
+      'login/',
+      auth_views.LoginView.as_view(
+        template_name='KidVenture/login.html',
+        authentication_form=LoginForm
+      ),
+      name='login'
+    ),    
 ]
 
 if settings.DEBUG:

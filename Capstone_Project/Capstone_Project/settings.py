@@ -154,3 +154,15 @@ LOGGING = {
         },
     },
 }
+
+
+
+# For email setup
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com' # gmail host
+EMAIL_PORT = 587  # TLS PORT
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = ''  #  This is where we place the email we want to send the rest link
+EMAIL_HOST_PASSWORD = ''  # email app password goes here
+DEFAULT_FROM_EMAIL = ''

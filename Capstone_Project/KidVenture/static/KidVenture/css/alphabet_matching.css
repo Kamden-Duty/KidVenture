@@ -1,5 +1,6 @@
 body {
-    font-family: "Comic Sans MS", "Comic Sans", cursive;
+    /* font-family: "Comic Sans MS", "Comic Sans", cursive; */
+    font-family: "Comic Sans MS", "Comic Sans";
     text-align: center;
     background-color: #b0c9c4; /* Cool Gray */
     margin: 0;

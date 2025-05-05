@@ -1,7 +1,10 @@
 from django import forms #django model for managing forms
 from django.contrib.auth.forms import UserCreationForm # Helps simply making sign up forms
 from .models import User, Class, Student # The User model creatd in models.py
+from django.contrib.auth.forms import PasswordResetForm
 
+
+from django import forms
 
 
 # Form for logging in
@@ -160,3 +163,54 @@ class JoinClassForm(forms.Form):
         if not Class.objects.filter(access_token=token).exists():
             raise forms.ValidationError("Invalid access token.")
         return token
+
+
+
+
+
+
+# forms.py
+from django import forms
+from django.contrib.auth.forms import PasswordResetForm
+
+from django import forms
+from django.contrib.auth.forms import PasswordResetForm, SetPasswordForm
+
+
+# Form for entering email for reset password
+class TempPasswordResetForm(PasswordResetForm):
+
+    # Email field for holdijng emails
+    email = forms.EmailField(
+        # Sets input type to password
+        widget=forms.EmailInput(attrs={
+            "class": "form-control",
+            "placeholder": "Enter your email",
+            "id": "email",
+        }),
+        label="Email Address",
+    )
+
+# Form for entering new password
+class TempSetPasswordForm(SetPasswordForm):
+    #Charfiedl for holding password
+    new_password1 = forms.CharField(
+        label="New Password",
+        # Sets input type to password
+        widget=forms.PasswordInput(attrs={
+            "class": "form-control",
+            "placeholder": "New Password",
+            "id": "password1",
+        }),
+    )
+    # Charfield for holding password
+    new_password2 = forms.CharField(
+        label="Confirm Password",
+        # Set input type to password
+        widget=forms.PasswordInput(attrs={
+            "class": "form-control",
+            "placeholder": "Confirm Password",
+            "id": "password2",
+        }),
+    )
+
