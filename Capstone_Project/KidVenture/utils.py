@@ -33,7 +33,7 @@ def award_badges(student):
             badge, created = Badge.objects.get_or_create(
                 student=student.user,
                 name="Speedster",
-                defaults={"image": static("badges/speedster.png")}
+                defaults={"image": static("KidVenture/images/badges/speedster.png")}
             )
             if created:
                 new_badges.append(badge)
@@ -43,7 +43,7 @@ def award_badges(student):
             badge, created = Badge.objects.get_or_create(
                 student=student.user,
                 name="Accuracy Master",
-                defaults={"image": static("badges/accuracy_master.png")}
+                defaults={"image": static("KidVenture/images/badges/accuracy_master.png")}
             )
             if created:
                 new_badges.append(badge)
@@ -53,7 +53,7 @@ def award_badges(student):
             badge, created = Badge.objects.get_or_create(
                 student=student.user,
                 name="Mismatch Minor",
-                defaults={"image": static("badges/mismatch_minor.png")}
+                defaults={"image": static("KidVenture/images/badges/mismatch_minor.png")}
             )
             if created:
                 new_badges.append(badge)
