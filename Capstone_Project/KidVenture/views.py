@@ -531,7 +531,7 @@ def join_class(request):
         'show_nav' : False,
     })
 
-
+@login_required
 def create_student_activities(student, classroom):
     # Loop over each activity template for this class
     for template in classroom.activity_templates.all():
@@ -601,9 +601,9 @@ def alphabet_matching(request):
 def alphabet_memory(request):
     return render(request, "KidVenture/alphabet_memory.html")
 
-# view for rendering the game selectio html (will most likely remove this at some point)
-def game_selection(request):
-    return render(request, "KidVenture/game_selection.html")
+# # view for rendering the game selectio html (will most likely remove this at some point)
+# def game_selection(request):
+#     return render(request, "KidVenture/game_selection.html")
 
 
 
@@ -767,6 +767,7 @@ def get_teacher_leaderboard(request):
 
 
 # A view used to assign activites 
+@login_required
 def assign_activity(request):
     # If request is post
     if request.method == "POST":
@@ -909,6 +910,7 @@ def edit_avatar(request):
 
 # Used to update our avatar while we are editing so we can see what we are changing live
 @csrf_exempt
+@login_required
 def update_avatar_preview(request):
     # If the method is post
     if request.method == "POST":
@@ -1155,39 +1157,6 @@ def get_class_activities(request, class_id):
     ).values_list('name', flat=True).distinct()
 
     return JsonResponse({"activities": list(activities)})
-
-
-
-
-
-
-
-
-
-# def password_reset_view(request):
-#     if request.method == "POST":
-#         form = TempPasswordResetForm(request.POST)
-#         if form.is_valid():
-#             form.save(request=request)  
-#             return redirect('password_reset_done')  
-#     else:
-#         form = TempPasswordResetForm()  
-
-#     return render(request, 'KidVenture/password_reset_form.html', {'form': form})
-
-
-# from django.urls import reverse_lazy
-# from django.contrib.auth.views import PasswordResetView
-# from django.contrib.messages.views import SuccessMessageMixin
-# class ResetPasswordView(SuccessMessageMixin, PasswordResetView):
-#     template_name = 'users/password_reset.html'
-#     email_template_name = 'users/password_reset_email.html'
-#     subject_template_name = 'users/password_reset_subject'
-#     success_message = "We've emailed you instructions for setting your password, " \
-#                       "if an account exists with the email you entered. You should receive them shortly." \
-#                       " If you don't receive an email, " \
-#                       "please make sure you've entered the address you registered with, and check your spam folder."
-#     success_url = reverse_lazy('users-home')
 
 
 
